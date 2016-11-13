@@ -8,4 +8,5 @@ To generate report do:
     > cd report; make
 ## Dependencies
 [ku-forside](http://www.math.ku.dk/~m00cha/ku-forside.zip)
+
 pdflatex
