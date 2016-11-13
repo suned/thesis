@@ -1,9 +1,13 @@
-\documentclass[11pt]{article}
+\documentclass[11pt]{report}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage[babel, titelside, en]{ku-forside} % KU-forside
+\usepackage[a4paper]{geometry}  % Geometri-pakke: Styrer bl.a. maginer    %
+\usepackage[round]{natbib}
+\usepackage{blindtext}
 
-\usepackage[a4paper, vmargin={2.5cm, 2.5cm}]{geometry}  % Geometri-pakke: Styrer bl.a. maginer    %
+\addto\captionsenglish{\renewcommand{\chaptername}{Part}}
+
 %
 % Mini-manual til ku-forside pakken:
 %
@@ -22,7 +26,7 @@
 
 
 \titel{Deep Learning Architectures} %
-\undertitel{for Transfer Learning in Relation Classification} %
+\undertitel{for Multi Task Information Extraction} %
 \opgave{Master Thesis} % Findes kun under 'titelside'
 \forfatter{Sune Andreas Dybro Debel}%
 \dato{\today}%
@@ -30,9 +34,19 @@
 
 \begin{document}
 \maketitle
+\newgeometry{hmargin=4cm, vmargin=3cm}
 
-\setcounter{page}{1}
+\addtocontents{toc}{\protect\thispagestyle{empty}}
+\input{abstract}
+
+\tableofcontents
+\setcounter{page}{0}
 \input{introduction}
+\input{experiment}
+\input{results}
+\input{discussion}
+\input{conclusion}
 \input{bib}
+\input{appendix}
 
 \end{document}

@@ -1,0 +1,10 @@
+\select@language {english}
+\thispagestyle {empty}
+\contentsline {chapter}{\numberline {1}Introduction}{1}
+\contentsline {section}{\numberline {1.1}Information Extraction}{1}
+\contentsline {chapter}{\numberline {2}Experiment}{3}
+\contentsline {chapter}{\numberline {3}Results}{4}
+\contentsline {chapter}{\numberline {4}Discussion}{5}
+\contentsline {chapter}{\numberline {5}Conclusion}{6}
+\contentsline {chapter}{\numberline {A}Appendix}{8}
+\contentsline {section}{\numberline {A.1}First}{8}
