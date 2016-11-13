@@ -2,6 +2,7 @@
 \thispagestyle {empty}
 \contentsline {chapter}{\numberline {1}Introduction}{1}
 \contentsline {section}{\numberline {1.1}Information Extraction}{1}
+\contentsline {section}{\numberline {1.2}Summary}{2}
 \contentsline {chapter}{\numberline {2}Experiment}{3}
 \contentsline {chapter}{\numberline {3}Results}{4}
 \contentsline {chapter}{\numberline {4}Discussion}{5}
