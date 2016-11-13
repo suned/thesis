@@ -138,7 +138,7 @@ backend      : pgf
 # The font.size property is the default font size for text, given in pts.
 # 12pt is the standard value.
 #
-#font.family         : sans-serif
+font.family         : serif
 #font.style          : normal
 #font.variant        : normal
 #font.weight         : medium
@@ -277,6 +277,8 @@ font.serif          : Palatino
 
 #polaraxes.grid      : True    # display grid on polar axes
 #axes3d.grid         : True    # display grid on 3d axes
+axes.spines.right : False
+axes.spines.top : False
 
 ### TICKS
 # see http://matplotlib.org/api/axis_api.html#matplotlib.axis.Tick
@@ -287,7 +289,7 @@ font.serif          : Palatino
 #xtick.major.pad      : 4      # distance to major tick label in points
 #xtick.minor.pad      : 4      # distance to the minor tick label in points
 #xtick.color          : k      # color of the tick labels
-#xtick.labelsize      : medium # fontsize of the tick labels
+xtick.labelsize      : 8 # fontsize of the tick labels
 #xtick.direction      : in     # direction: in, out, or inout
 
 #ytick.major.size     : 4      # major tick size in points
@@ -297,9 +299,8 @@ font.serif          : Palatino
 #ytick.major.pad      : 4      # distance to major tick label in points
 #ytick.minor.pad      : 4      # distance to the minor tick label in points
 #ytick.color          : k      # color of the tick labels
-#ytick.labelsize      : medium # fontsize of the tick labels
+ytick.labelsize      : 8 # fontsize of the tick labels
 #ytick.direction      : in     # direction: in, out, or inout
-
 
 ### GRIDS
 #grid.color       :   black   # grid color
@@ -312,7 +313,7 @@ font.serif          : Palatino
                                # legend, else a rectangle
 #legend.isaxes        : True
 #legend.numpoints     : 2      # the number of points in the legend line
-#legend.fontsize      : large
+legend.fontsize      : 10
 #legend.borderpad     : 0.5    # border whitespace in fontsize units
 #legend.markerscale   : 1.0    # the relative size of legend markers vs. original
 # the following dimensions are in axes coords
@@ -323,7 +324,7 @@ font.serif          : Palatino
 #legend.borderaxespad : 0.5   # the border between the axes and legend edge in fraction of fontsize
 #legend.columnspacing : 2.    # the border between the axes and legend edge in fraction of fontsize
 #legend.shadow        : False
-#legend.frameon       : True   # whether or not to draw a frame around legend
+legend.frameon       : False   # whether or not to draw a frame around legend
 #legend.framealpha    : None    # opacity of of legend frame
 #legend.scatterpoints : 3 # number of scatter points
 
@@ -331,7 +332,7 @@ font.serif          : Palatino
 # See http://matplotlib.org/api/figure_api.html#matplotlib.figure.Figure
 #figure.titlesize : medium     # size of the figure title
 #figure.titleweight : normal   # weight of the figure title
-#figure.figsize   : 8, 6    # figure size in inches
+figure.figsize   : 5, 3    # figure size in inches
 #figure.dpi       : 80      # figure dots per inch
 #figure.facecolor : 0.75    # figure facecolor; 0.75 is scalar gray
 #figure.edgecolor : white   # figure edgecolor
@@ -400,7 +401,7 @@ font.serif          : Palatino
 # the default savefig params can be different from the display params
 # e.g., you may want a higher resolution, or to make the figure
 # background white
-#savefig.dpi         : 100      # figure dots per inch
+savefig.dpi         : 200      # figure dots per inch
 #savefig.facecolor   : white    # figure facecolor when saving
 #savefig.edgecolor   : white    # figure edgecolor when saving
 #savefig.format      : png      # png, ps, pdf, svg
