@@ -1,7 +1,7 @@
 font_size = 10
 
 import matplotlib as mpl
-import matplotlib.pyplot as plt
+
 mpl.use("pgf")
 pgf_with_rc_fonts = {
     "font.size": font_size,
@@ -12,13 +12,12 @@ pgf_with_rc_fonts = {
     ]
 }
 mpl.rcParams.update(pgf_with_rc_fonts)
-
+import matplotlib.pyplot as plt
 
 plt.figure(figsize=(5,3))
 plt.plot(range(5), label="$\\Delta(a)$")
 plt.xlabel(u"µ is not $\\mu$")
 plt.ylabel("this is the y label")
-plt.tight_layout(0)
 plt.gca().spines["top"].set_visible(False)
 plt.gca().spines["right"].set_visible(False)
 plt.gca().xaxis.set_ticks_position("bottom")
@@ -27,4 +26,5 @@ labels = plt.gca().yaxis.get_ticklabels()
 labels[0] = ""
 plt.gca().set_yticklabels(labels)
 plt.legend(loc='lower right', frameon=False, prop={'size': font_size})
+plt.tight_layout()
 plt.savefig("img/test.pgf")
