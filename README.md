@@ -9,4 +9,6 @@ To generate report do:
 ## Dependencies
 [ku-forside](http://www.math.ku.dk/~m00cha/ku-forside.zip)
 
+[texlive](https://www.tug.org/texlive/)
+
 pdflatex
