@@ -2,8 +2,7 @@
 
 Master thesis by Sune Debel, written in the spring of 2017.
 
-# Project Plan
-[Gantt chart](https://app.teamweek.com/#p/dwtqvjq2igcforiqfiex).
+Project plan can be found [here](https://app.teamweek.com/#p/dwtqvjq2igcforiqfiex).
 
 # Report
 To generate report do:
