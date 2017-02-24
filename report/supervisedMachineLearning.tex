@@ -1,0 +1,37 @@
+\section{Supervised Machine Learning}
+\label{supervised_machine_learning}
+
+Most solutions to the information extraction problems in \ref{information_extraction} are based on supervised machine learning techniques. In this setting, a system learns to predict the named entities or relations between them given a unit of natural language by inspecting examples provided by a human annotator.
+
+\subsection{The Supervised Learning Problem}
+\label{the_supervised_learning_problem}
+In general terms, a set $\mathcal{D}_{train}$ of $N$ training examples $(\mathbf{x}_i, \mathbf{y}_i)$ of inputs $\mathbf{x}_i$ and corresponding labels $\mathbf{y}_i$ is given, where each $\mathbf{x}_i$ belongs to a space $\mathcal{X}$ and each $\mathbf{y}_i$ belongs to a space $\mathcal{Y}$. At a later time, a new set of un-labeled inputs $\mathcal{D}_{test} = \{ \mathbf{x}_i \mid \mathbf{x}_i \in \mathcal{X}\}$ will be provided. The task is to learn a function $h: \mathcal{X} \mapsto \mathcal{Y}$ that performs well on $\mathcal{D}_{test}$. In particular, we are not explicitly interested in the performance of $h$ on $\mathcal{D}_{train}$ \citep{yaser12}.
+\\\\
+We can formalise the preference for functions $h$ that perform well on examples outside of the training set with a quantity known as \textbf{generalisation error}.
+
+\begin{definition}[generalisation error]
+	Let $P(\mathbf{x}, \mathbf{y})$ be a joint probability distribution over inputs $\mathbf{x} \in \mathcal{X}$ and labels $\mathbf{y} \in \mathcal{Y}$. Let $e(\mathbf{y}_1, \mathbf{y}_2)$ be an error measure that measures agreement between labels $\mathbf{y}_1$ and $\mathbf{y}_2$. Then the generalisation error $E$ of a function $h: \mathcal{X} \mapsto \mathcal{Y}$ is defined as:
+	$$
+		E(h) = \mathbb{E}_{\mathbf{x},\mathbf{y}\sim P(\mathbf{y}, \mathbf{x})}[e(h(\mathbf{x}), \mathbf{y})]
+	$$
+\end{definition}
+Now, formally, the objective of supervised machine learning is to find a function $h^*$ that minimises $E(h)$ in a space of functions $\mathcal{H}$. Unfortunately, $P(\mathbf{x}, \mathbf{y})$ is unknown (if it was not, no learning would be required!). However, we can use $\mathcal{D}_{train}$ to estimate $E(h)$ with a quantity known as \textbf{training error}:
+
+\begin{definition}[training error]
+	Let $\mathcal{D}$ be a set of $N$ training examples $\{(\mathbf{x}_i, \mathbf{y}_i) \mid \mathbf{x}_i, \mathbf{y}_i \sim P(\mathbf{x}, \mathbf{y})\}$. Then the training error $\hat{E}$ is defined as:
+	$$
+		\hat{E}(h, \mathcal{D}) = \frac{1}{N}\sum\limits_{i=1}^N e(h(\mathbf{x}_i), \mathbf{y}_i)
+	$$
+\end{definition}
+Using $\hat{E}$ to estimate $E$ is dangerous for two reasons. Firstly, $\mathcal{D}$ is a random quantity. It may happen that the samples available to us are not representative of $P(\mathbf{x}, \mathbf{y})$, leading us to choose $h$ that does not perform well in terms of $e$ on examples outside the training set.
+
+Secondly, even if $\mathcal{D}$ is a good sample, it's possible to choose $h$ such that $\hat{E}$ is small, but $E$ is large. In particular, if $\mathcal{H}$ is very large, there likely exists a $h$ such that $\hat{E}(h, \mathcal{D}) = 0$. This is problematic for two reasons. Firstly the relationship between $\mathbf{x}$ and $\mathbf{y}$ may be noisy, that is $P(\mathbf{y} \mid \mathbf{x})$ is non-deterministic. In this case, by selecting $h$ such that $\hat{E}(h, \mathcal{D}) = 0$, we have fitted not only the general relationship between $\mathbf{x}$ and $\mathbf{y}$, but also the noise which is particular to $\mathcal{D}$.
+
+Secondly, even if $P(\mathbf{y} \mid \mathbf{x})$ is deterministic, fitting it exactly will likely lead to poor generalisation since $\mathcal{D}$ is a finite sample. 
+\\\\
+Understanding the relationship between $E$, $\hat{E}$, $\mathcal{H}$ and $\mathcal{D}$ is the objective of a field of research known as \textbf{statistical learning theory}.
+
+\subsection{Statistical Learning Theory}
+In \ref{the_supervised_learning_problem} we argued informally that the relationship between $E$ and $\hat{E}$ depends on $\mathcal{D}$ and $\mathcal{H}$. The objective of statistical learning theory is to bound $E$ in terms of $\hat{E}$, $\mathcal{H}$ and $\mathcal{D}$. A central aspect of this problem is the question of what features of $\mathcal{H}$ determine how well $h^*$ fits $\mathcal{D}$, since the examples therein are finite and may be noisy.
+\\\\
+A \textbf{dichotomy} is an important concept in measuring how well $\mathcal{H}$ can fit an arbitrary $\mathcal{D}$.

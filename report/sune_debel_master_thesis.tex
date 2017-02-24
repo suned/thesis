@@ -8,14 +8,23 @@
 \usepackage{mathpazo}
 \usepackage{sectsty}
 \usepackage{helvet}
-\usepackage{eulervm}
 \usepackage{pgfplots}
 \usepackage{amsmath}
+\usepackage{amsthm}
 \usepackage[font={sf, it}, margin=1.1cm, justification=raggedleft, singlelinecheck=off]{caption}
 
+% Change chapter headings to "Part"
 \addto\captionsenglish{\renewcommand{\chaptername}{Part}}
 
+% Change section headings to sans serif
 \allsectionsfont{\normalfont\sffamily\bfseries}
+
+% Enable definitions
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+
+% Math commands
+\DeclareMathOperator*{\argmin}{arg\,min}
 %
 % Mini-manual til ku-forside pakken:
 %
@@ -33,8 +42,8 @@
 % Ex. \usepackage[babel, lille, jur, sh, en]{ku-forside} giver et lille logo i sorthvid for juridisk fakultet og loader babelpakken med engelsk som sprog.
 
 
-\titel{Title} %
-\undertitel{Subtitle} %
+\titel{Deep Multi-Task Learning} %
+\undertitel{For Relation Extraction} %
 \opgave{Master Thesis} % Findes kun under 'titelside'
 \forfatter{Sune Andreas Dybro Debel}%
 \dato{\today}%
@@ -50,6 +59,7 @@
 \tableofcontents
 \setcounter{page}{0}
 \input{introduction}
+\input{background}
 \input{experiment}
 \input{results}
 \input{discussion}
