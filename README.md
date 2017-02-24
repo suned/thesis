@@ -1,4 +1,4 @@
-# README
+# Deep Multi-Task Learning For Relation Extraction
 
 Master thesis by Sune Debel, written in the spring of 2017.
 
@@ -9,5 +9,8 @@ To generate report do:
     
 The latest built version can be found [here](https://github.com/suned/thesis/raw/master/report/sune_debel_master_thesis.pdf).
 ## Dependencies
-
 [texlive](https://www.tug.org/texlive/)
+
+# Experiment
+
+To be announced...
