@@ -5,7 +5,7 @@ Most solutions to the information extraction problems in \ref{information_extrac
 
 \subsection{The Supervised Learning Problem}
 \label{the_supervised_learning_problem}
-In general terms, a set $\mathcal{D}_{train}$ of $N$ training examples $(\mathbf{x}_i, \mathbf{y}_i)$ of inputs $\mathbf{x}_i$ and corresponding labels $\mathbf{y}_i$ is given, where each $\mathbf{x}_i$ belongs to a space $\mathcal{X}$ and each $\mathbf{y}_i$ belongs to a space $\mathcal{Y}$. At a later time, a new set of un-labeled inputs $\mathcal{D}_{test} = \{ \mathbf{x}_i \mid \mathbf{x}_i \in \mathcal{X}\}$ will be provided. The task is to learn a function $h: \mathcal{X} \mapsto \mathcal{Y}$ that performs well on $\mathcal{D}_{test}$. In particular, we are not explicitly interested in the performance of $h$ on $\mathcal{D}_{train}$ \citep{yaser12}.
+A set $\mathcal{D}_{train}$ of $N$ training examples $(\mathbf{x}_i, \mathbf{y}_i)$ of inputs $\mathbf{x}_i$ and corresponding labels $\mathbf{y}_i$ is created by a human annotator. Each $\mathbf{x}_i$ belongs to a space $\mathcal{X}$ of input dimensions and each $\mathbf{y}_i$ belongs to a space $\mathcal{Y}$ of labels. We want to use this data to automatically assign labels to a new set of un-labeled inputs $\mathcal{D}_{test} = \{ \mathbf{x}_i \mid \mathbf{x}_i \in \mathcal{X}\}$ at some point in the future. The task is to learn a function $h: \mathcal{X} \mapsto \mathcal{Y}$ from $\mathcal{D}_{train}$ that performs well on $\mathcal{D}_{test}$. In particular, we are not explicitly interested in the performance of $h$ on $\mathcal{D}_{train}$ \citep{yaser12}.
 \\\\
 We can formalise the preference for functions $h$ that perform well on examples outside of the training set with a quantity known as \textbf{generalisation error}.
 
@@ -15,7 +15,7 @@ We can formalise the preference for functions $h$ that perform well on examples 
 		E(h) = \mathbb{E}_{\mathbf{x},\mathbf{y}\sim P(\mathbf{y}, \mathbf{x})}[e(h(\mathbf{x}), \mathbf{y})]
 	$$
 \end{definition}
-Now, formally, the objective of supervised machine learning is to find a function $h^*$ that minimises $E(h)$ in a space of functions $\mathcal{H}$. Unfortunately, $P(\mathbf{x}, \mathbf{y})$ is unknown (if it was not, no learning would be required!). However, we can use $\mathcal{D}_{train}$ to estimate $E(h)$ with a quantity known as \textbf{training error}:
+Now, formally, the objective of supervised machine learning is to find a function $h^*$ in a space of functions $\mathcal{H}$ that minimises $E(h)$. Unfortunately, $P(\mathbf{x}, \mathbf{y})$ is unknown (if it was not, no learning would be required!). However, we can use $\mathcal{D}_{train}$ to estimate $E(h)$ with a quantity known as \textbf{training error}:
 
 \begin{definition}[training error]
 	Let $\mathcal{D}$ be a set of $N$ training examples $\{(\mathbf{x}_i, \mathbf{y}_i) \mid \mathbf{x}_i, \mathbf{y}_i \sim P(\mathbf{x}, \mathbf{y})\}$. Then the training error $\hat{E}$ is defined as:
@@ -32,6 +32,6 @@ Secondly, even if $P(\mathbf{y} \mid \mathbf{x})$ is deterministic, fitting it e
 Understanding the relationship between $E$, $\hat{E}$, $\mathcal{H}$ and $\mathcal{D}$ is the objective of a field of research known as \textbf{statistical learning theory}.
 
 \subsection{Statistical Learning Theory}
-In \ref{the_supervised_learning_problem} we argued informally that the relationship between $E$ and $\hat{E}$ depends on $\mathcal{D}$ and $\mathcal{H}$. The objective of statistical learning theory is to bound $E$ in terms of $\hat{E}$, $\mathcal{H}$ and $\mathcal{D}$. A central aspect of this problem is the question of what features of $\mathcal{H}$ determine how well $h^*$ fits $\mathcal{D}$, since the examples therein are finite and may be noisy.
+In \ref{the_supervised_learning_problem} we argued informally that the relationship between $E$ and $\hat{E}$ depends on $\mathcal{D}$ and $\mathcal{H}$. The objective of statistical learning theory is to bound $E$ in terms of $\hat{E}$, $\mathcal{H}$ and $\mathcal{D}$. A central aspect of this problem is the question of what features of $\mathcal{H}$ determine how well a function $h$ in $\mathcal{H}$ is able to fit $\mathcal{D}$, since the examples therein are finite and may be noisy.
 \\\\
 A \textbf{dichotomy} is an important concept in measuring how well $\mathcal{H}$ can fit an arbitrary $\mathcal{D}$.

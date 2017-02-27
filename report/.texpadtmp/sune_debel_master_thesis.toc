@@ -8,18 +8,18 @@
 \contentsline {section}{\numberline {2.2}Supervised Machine Learning}{3}
 \contentsline {subsection}{\numberline {2.2.1}The Supervised Learning Problem}{3}
 \contentsline {subsection}{\numberline {2.2.2}Statistical Learning Theory}{4}
-\contentsline {section}{\numberline {2.3}Transfer Learning}{4}
-\contentsline {subsection}{\numberline {2.3.1}Domain Adaptation}{4}
-\contentsline {subsection}{\numberline {2.3.2}Multi-Task Learning}{4}
-\contentsline {section}{\numberline {2.4}Neural Networks}{4}
-\contentsline {subsection}{\numberline {2.4.1}Feed-Forward Neural Networks}{4}
-\contentsline {subsection}{\numberline {2.4.2}Learning Algorithm}{4}
-\contentsline {subsection}{\numberline {2.4.3}Convolutional Neural Networks}{4}
-\contentsline {subsection}{\numberline {2.4.4}Recurrent Neural Networks}{4}
+\contentsline {section}{\numberline {2.3}Neural Networks}{4}
+\contentsline {subsection}{\numberline {2.3.1}Feed-Forward Neural Networks}{4}
+\contentsline {subsection}{\numberline {2.3.2}Learning Algorithm}{4}
+\contentsline {subsection}{\numberline {2.3.3}Convolutional Neural Networks}{4}
+\contentsline {subsection}{\numberline {2.3.4}Recurrent Neural Networks}{4}
+\contentsline {section}{\numberline {2.4}Multi-Task Learning}{4}
 \contentsline {section}{\numberline {2.5}Representation Learning}{4}
 \contentsline {section}{\numberline {2.6}Deep Multi-Task Learning}{4}
 \contentsline {section}{\numberline {2.7}Summary}{4}
 \contentsline {chapter}{\numberline {3}Experiment}{5}
+\contentsline {section}{\numberline {3.1}Network Architecture}{5}
+\contentsline {section}{\numberline {3.2}Auxiliary Tasks}{5}
 \contentsline {chapter}{\numberline {4}Results}{6}
 \contentsline {chapter}{\numberline {5}Discussion}{7}
 \contentsline {chapter}{\numberline {6}Conclusion}{8}
