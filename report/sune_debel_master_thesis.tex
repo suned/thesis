@@ -1,4 +1,4 @@
-\documentclass[10pt]{report}
+\documentclass[a4paper, 10pt, twoside]{report}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage[babel, titelside, en]{ku-forside} % KU-forside
@@ -11,7 +11,7 @@
 \usepackage{pgfplots}
 \usepackage{amsmath}
 \usepackage{amsthm}
-\usepackage[font={sf, it}, margin=1.1cm, justification=raggedleft, singlelinecheck=off]{caption}
+\usepackage[format=hang, font={sf, it}, margin={4cm, 0cm}, justification=raggedleft, singlelinecheck=off]{caption}
 
 % Change chapter headings to "Part"
 \addto\captionsenglish{\renewcommand{\chaptername}{Part}}
@@ -22,6 +22,7 @@
 % Enable definitions
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}[section]
+\newtheorem{theorem}{Theorem}[section]
 
 % Math commands
 \DeclareMathOperator*{\argmin}{arg\,min}
@@ -51,15 +52,21 @@
 
 \begin{document}
 \maketitle
-\newgeometry{hmargin=4cm, vmargin=3cm}
+\thispagestyle{empty}
+\newpage
+
+\input{abstract}
+\pagebreak
+\newgeometry{twoside, inner=5cm, outer=3cm, vmargin=3cm}
 
 \addtocontents{toc}{\protect\thispagestyle{empty}}
-\input{abstract}
 
 \tableofcontents
 \setcounter{page}{0}
 \input{introduction}
 \input{background}
+\input{neuralNetworks}
+\input{multiTaskLearning}
 \input{experiment}
 \input{results}
 \input{discussion}

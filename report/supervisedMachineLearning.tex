@@ -1,37 +1,106 @@
 \section{Supervised Machine Learning}
 \label{supervised_machine_learning}
 
-Most solutions to the information extraction problems in \ref{information_extraction} are based on supervised machine learning techniques. In this setting, a system learns to predict the named entities or relations between them given a unit of natural language by inspecting examples provided by a human annotator.
+Most modern solutions to the information extraction problems in \ref{information_extraction} are based on supervised machine learning techniques. In this setting, a system learns to recognise the named entities or relations between them from examples provided by a human annotator.
 
 \subsection{The Supervised Learning Problem}
 \label{the_supervised_learning_problem}
-A set $\mathcal{D}_{train}$ of $N$ training examples $(\mathbf{x}_i, \mathbf{y}_i)$ of inputs $\mathbf{x}_i$ and corresponding labels $\mathbf{y}_i$ is created by a human annotator. Each $\mathbf{x}_i$ belongs to a space $\mathcal{X}$ of input dimensions and each $\mathbf{y}_i$ belongs to a space $\mathcal{Y}$ of labels. We want to use this data to automatically assign labels to a new set of un-labeled inputs $\mathcal{D}_{test} = \{ \mathbf{x}_i \mid \mathbf{x}_i \in \mathcal{X}\}$ at some point in the future. The task is to learn a function $h: \mathcal{X} \mapsto \mathcal{Y}$ from $\mathcal{D}_{train}$ that performs well on $\mathcal{D}_{test}$. In particular, we are not explicitly interested in the performance of $h$ on $\mathcal{D}_{train}$ \citep{yaser12}.
+A set $\mathcal{D}_{train}$ of $N$ training examples $(\mathbf{x}_i, \mathbf{y}_i)$ of inputs $\mathbf{x}_i$ and corresponding labels $\mathbf{y}_i$ is created by a human annotator. Each $\mathbf{x}_i$ belongs to an input space $\mathcal{X}$, for example the set of all english sentences. Each $\mathbf{y}_i$ belongs to a space $\mathcal{Y}$ of labels, for example the set of all sequences of BIO tags. As designers of the learning system, we specify a set $\mathcal{H}$ of functions $h: \mathcal{X} \mapsto \mathcal{Y}$. We want to find a $h \in \mathcal{H}$ that can automatically assign labels to a new set of un-labeled inputs $\mathcal{D}_{test} = \{ \mathbf{x}_i \mid \mathbf{x}_i \in \mathcal{X}\}$ at some point in the future. 
+
+In supervised machine learning, we want to use an algorithm to learn a function $h$ from $\mathcal{D}_{train}$ that performs well on $\mathcal{D}_{test}$, as measured by some performance measure $e$. In classification problems such as named entity recognition or relation extraction where $\mathcal{Y}$ is discrete, we typically use binary error $e(\mathbf{y}_1, \mathbf{y_2}) = \mathbb{I}[\mathbf{y}_1 \neq \mathbf{y}_2]$. Importantly, we are not explicitly interested in the performance of $h$ on $\mathcal{D}_{train}$ \citep{yaser12}.
 \\\\
 We can formalise the preference for functions $h$ that perform well on examples outside of the training set with a quantity known as \textbf{generalisation error}.
 
-\begin{definition}[generalisation error]
-	Let $P(\mathbf{x}, \mathbf{y})$ be a joint probability distribution over inputs $\mathbf{x} \in \mathcal{X}$ and labels $\mathbf{y} \in \mathcal{Y}$. Let $e(\mathbf{y}_1, \mathbf{y}_2)$ be an error measure that measures agreement between labels $\mathbf{y}_1$ and $\mathbf{y}_2$. Then the generalisation error $E$ of a function $h: \mathcal{X} \mapsto \mathcal{Y}$ is defined as:
+\begin{definition}[generalisation error] \label{generalisation_error}
+	Let $P(\mathbf{x}, \mathbf{y})$ be a joint probability distribution over inputs $\mathbf{x} \in \mathcal{X}$ and labels $\mathbf{y} \in \mathcal{Y}$. Let $e(\mathbf{y}_1, \mathbf{y_2}) = \mathbb{I}[\mathbf{y}_1 \neq \mathbf{y}_2]$ be the binary error measure that measures agreement between labels $\mathbf{y}_1$ and $\mathbf{y}_2$. Then the generalisation error $E$ of a function $h: \mathcal{X} \mapsto \mathcal{Y}$ is defined as:
 	$$
 		E(h) = \mathbb{E}_{\mathbf{x},\mathbf{y}\sim P(\mathbf{y}, \mathbf{x})}[e(h(\mathbf{x}), \mathbf{y})]
 	$$
 \end{definition}
-Now, formally, the objective of supervised machine learning is to find a function $h^*$ in a space of functions $\mathcal{H}$ that minimises $E(h)$. Unfortunately, $P(\mathbf{x}, \mathbf{y})$ is unknown (if it was not, no learning would be required!). However, we can use $\mathcal{D}_{train}$ to estimate $E(h)$ with a quantity known as \textbf{training error}:
+Now, formally, the objective of supervised machine learning is to find a function $h$ in a space of functions $\mathcal{H}$ that minimises $E(h)$. We see the process generating the data as random, but with a behaviour describable by a distribution $P(\mathbf{x}, \mathbf{y})$. Unfortunately, this distribution is unknown. However, we can use sampled data $\mathcal{D} = \{(\mathbf{x}, \mathbf{y}) \mid \mathbf{x}, \mathbf{y} \sim P(\mathbf{x}, \mathbf{y})\}$ to estimate $E(h)$ with a quantity known as \textbf{empirical error}:
 
-\begin{definition}[training error]
-	Let $\mathcal{D}$ be a set of $N$ training examples $\{(\mathbf{x}_i, \mathbf{y}_i) \mid \mathbf{x}_i, \mathbf{y}_i \sim P(\mathbf{x}, \mathbf{y})\}$. Then the training error $\hat{E}$ is defined as:
+\begin{definition}[empirical error] \label{empirical_error}
+	Let $\mathcal{D}$ be a set of $N$ examples $\{(\mathbf{x}_i, \mathbf{y}_i) \mid \mathbf{x}_i, \mathbf{y}_i \sim P(\mathbf{x}, \mathbf{y})\}$. Then the empirical error $\hat{E}$ is defined as:
 	$$
 		\hat{E}(h, \mathcal{D}) = \frac{1}{N}\sum\limits_{i=1}^N e(h(\mathbf{x}_i), \mathbf{y}_i)
 	$$
 \end{definition}
-Using $\hat{E}$ to estimate $E$ is dangerous for two reasons. Firstly, $\mathcal{D}$ is a random quantity. It may happen that the samples available to us are not representative of $P(\mathbf{x}, \mathbf{y})$, leading us to choose $h$ that does not perform well in terms of $e$ on examples outside the training set.
 
-Secondly, even if $\mathcal{D}$ is a good sample, it's possible to choose $h$ such that $\hat{E}$ is small, but $E$ is large. In particular, if $\mathcal{H}$ is very large, there likely exists a $h$ such that $\hat{E}(h, \mathcal{D}) = 0$. This is problematic for two reasons. Firstly the relationship between $\mathbf{x}$ and $\mathbf{y}$ may be noisy, that is $P(\mathbf{y} \mid \mathbf{x})$ is non-deterministic. In this case, by selecting $h$ such that $\hat{E}(h, \mathcal{D}) = 0$, we have fitted not only the general relationship between $\mathbf{x}$ and $\mathbf{y}$, but also the noise which is particular to $\mathcal{D}$.
+Because $\mathcal{D}$ is a random quantity, it's dangerous to use $\hat{E}$ to estimate $E$. We risk that the samples are not representative of $P(\mathbf{x}, \mathbf{y})$, leading us to believe that $h$ is great, when in fact it's terrible. If we assume that the samples in $\mathcal{D}$ are drawn independently from $P(\mathbf{x}, \mathbf{y})$, that is the choice of any one sample did not change the probabilities of the rest samples, and that $h$ is independent of $\mathcal{D}$, that is $h$ was not specifically chosen based on the sample, we can use \textbf{Hoeffding's inequality} to bound the risk that this happens:
 
-Secondly, even if $P(\mathbf{y} \mid \mathbf{x})$ is deterministic, fitting it exactly will likely lead to poor generalisation since $\mathcal{D}$ is a finite sample. 
+\begin{theorem}[Hoeffding's inequality]
+	let $E(h)$ be defined as in definition \ref{generalisation_error}, and let $E(h, \mathcal{D})$ be defined as in definition \ref{empirical_error}. Then:
+	$$
+	\mathbb{P}\left( |E(h) - \hat{E}(h, \mathcal{D})| \geq \epsilon \right) \leq 2e^{-2N\epsilon^2}
+	$$
+\end{theorem}
+
+The inequality tells us that the probability that $E$ is more than $\epsilon$ away from $\hat{E}$ decreases exponentially in $\epsilon$ and $N$. In other words, the more samples in $D$, the less likely it is that $E$ will be misleading.
 \\\\
-Understanding the relationship between $E$, $\hat{E}$, $\mathcal{H}$ and $\mathcal{D}$ is the objective of a field of research known as \textbf{statistical learning theory}.
+Estimating $E$ with a sample that is independent of $h$ is a technique called validation. Because $\mathcal{D}_{train}$ is used to select $h$, it cannot be used to estimate $E$ by Hoeffding's inequality, and we need more sophisticated techniques to understand the relationship between $\mathcal{D}_{train}$ and $E$.
+
+In validation, the sample provided by a human annotator is instead split into two datasets, $\mathcal{D}_{train}$, which we intend to use to choose a good $h$, and $\mathcal{D}_{validate}$, which is not used for selecting the model. Since $\mathcal{D}_{validate}$ is independent of $h$, Hoeffding's inequality applies and it can be used to estimate $E$.
+
+The central question in supervised machine learning is \textit{how can we best define $\mathcal{H}$ and use $\mathcal{D}_{train}$ to make $E$ small?} Answering this question is the objective of a field of research known as \textbf{statistical learning theory}.
 
 \subsection{Statistical Learning Theory}
-In \ref{the_supervised_learning_problem} we argued informally that the relationship between $E$ and $\hat{E}$ depends on $\mathcal{D}$ and $\mathcal{H}$. The objective of statistical learning theory is to bound $E$ in terms of $\hat{E}$, $\mathcal{H}$ and $\mathcal{D}$. A central aspect of this problem is the question of what features of $\mathcal{H}$ determine how well a function $h$ in $\mathcal{H}$ is able to fit $\mathcal{D}$, since the examples therein are finite and may be noisy.
+\label{statistical_learning_theory}
+We would like to know how to design $\mathcal{H}$ and how best to use $\mathcal{D}_{train}$ in order to make $E$ small. A straight forward idea would be to find a $h$ that minimises the \textbf{training error} $\hat{E}(h, \mathcal{D}_{train})$. As we argued in section \ref{supervised_machine_learning}, using $\hat{E}$ to estimate $E$ can be misleading. Moreover, because $D_{train}$ is used to specifically choose $h$ that makes $\hat{E}$ small, the guarantees provided by Hoeffding's inequality no longer holds, and therefore it may be possible to select $h$ such that $\hat{E}(h, \mathcal{D}_{train})$ is small and $E$ is large, even when we have a large number of training examples.
 \\\\
-A \textbf{dichotomy} is an important concept in measuring how well $\mathcal{H}$ can fit an arbitrary $\mathcal{D}$.
+The phenomena where training error is small but generalisation error is large is known as \textbf{overfitting}. As the name implies, it happens when $h$ is selected based on harmful idiosyncrasies of $\mathcal{D}_{train}$. The harmful idiosyncrasies of $\mathcal{D}_{train}$ can be seen as variation from one sample to another which is not a consequence of the natural variation expected from sampling from $P(\mathbf{x}, \mathbf{y})$, but rather the product of \textbf{noise}.
+\\\\
+In general, noise comes in two forms. The first form is known as \textbf{stochastic noise}. This type of noise is introduced by non-determinism in the relationship between $\mathbf{x}$ and $\mathbf{y}$. If for example the text used as input to named entity recognition comes from scanned documents, stochastic noise may be introduced by scratches or dust. Clearly selecting $h$ that also uses these features of the data will not be beneficial for generalisation.
+
+The second type of noise is called \textbf{deterministic noise}. This type of noise may be introduced when $\mathbf{x}$ $\mathbf{y}$ is deterministic, but even the best $h$ in $\mathcal{H}$ can't represent this deterministic relationship exactly. For a finite sample, the $h$ which fits the sample very well will therefore likely not generalise well.
+\\\\
+The risk of overfitting is linked to the diversity of $\mathcal{H}$: The more diverse $\mathcal{H}$ is, the greater the risk that there exists a $h \in \mathcal{H}$ that will overfit $\mathcal{D}_{train}$.
+
+A \textbf{dichotomy} is a central concept in measuring the diversity of $\mathcal{H}$. A dichotomy is a specific sequence of $N$ labels. For example, if $\mathcal{Y} = \{0, 1\}$, and $N = 3$, then (0 1 0) is a dichotomy, and so is (1 0 0). We have listed all dichotomies for $N = 3$ in figure \ref{dichotomies}.
+
+\begin{figure}[h]
+	\begin{center}
+			\begin{tabular}{c}
+		(0 0 0) \\
+		(1 0 0) \\
+		(0 1 0) \\
+		(0 0 1) \\
+		(1 1 0) \\
+		(0 1 1) \\
+		(1 0 1) \\
+		(1 1 1) \\
+	\end{tabular}
+	\end{center}
+	\label{dichotomies}
+	\caption{All dichotomies for $\mathcal{Y} = \{0, 1\}$ and $N = 3$.}
+\end{figure}
+
+Dichotomies allow us to group similar functions. There may be infinitely many functions in $\mathcal{H}$, but on a specific $\mathcal{D}_{train}$, many of them will produce the same dichotomy.
+This allows us to quantify the diversity of $\mathcal{H}$ in terms of the number of dichotomies it is able to generate on a set of $N$ points. This is achieved by a measure known as the \textbf{growth function}.
+\begin{definition}[growth function]
+	\label{growth_function}
+	Let $\mathcal{H}(N) = \{(h(\mathbf{x}_1), \dots, h(\mathbf{x}_N))\ \mid h \in \mathcal{H}, \mathbf{x}_i \in \mathcal{X}\}$ be the set of all dichotomies generated by $\mathcal{H}$ on $N$ points, and let $|\cdot|$ be the set cardinality function. Then the growth function $m$ is:
+	$$
+		m(N, \mathcal{H}) = \max |\mathcal{H}(N)|
+	$$
+\end{definition}
+In words, the growth function measures the maximum number of dichotomies that are realisable by $\mathcal{H}$ on $N$ points. To compute $m(N, \mathcal{H})$, we consider any choice of $N$ points from the whole input space $\mathcal{X}$, select the set that realises the most dichotomies and count them.
+\\\\
+The growth function allows us to account for redundancy in $\mathcal{H}$. If two functions $h \in \mathcal{H}$ and $g \in \mathcal{H}$ realise the same dichotomy on $\mathcal{D}$, then any statement based only on $\mathcal{D}$ will be either true or false for for both $h$ and $g$. This makes it possible to group the events \textit{$\hat{E}(h, \mathcal{D})$ is far away from $E(h)$} and \textit{$\hat{E}(g, \mathcal{D})$ is far away from $E(g)$}, and thereby avoiding to overestimate the probability of either event occurring.
+
+If $\mathcal{H}$ is infinite, the number of redundant functions in $\mathcal{H}$ will also be infinite, since the number of dichotomies on $N$ points is finite. If $m(N, \mathcal{H})$ is polynomial, the increase in the number redundant functions in $\mathcal{H}$ will be so dramatic, as to make the probability that $\hat{E}$ is far away from $E$ very small.
+\\\\
+ This line of reasoning is the basis of the Vapnik-Chervonenkis bound, which bounds $E(h)$ in terms of $\hat{E}(h, \mathcal{D}_{train})$:
+
+\begin{theorem}[Vapnik-Chervonenkis bound]
+	\label{vc_bound}
+	Let $m(N, \mathcal{H})$ be defined as in definition \ref{growth_function}, $E(h)$ as \ref{generalisation_error}, and $\hat{E}(h, \mathcal{D})$ as in \ref{empirical_error}. Then, with probability $1 - \delta$:
+	$$
+	E(h) \leq \hat{E}(h, \mathcal{D}_{train}) + \sqrt{\frac{8}{N}\ln \frac{4m(2N, \mathcal{H})}{\delta}}
+	$$
+\end{theorem}
+
+The term $\sqrt{\frac{8}{N}\ln \frac{4m(2N, \mathcal{H})}{\delta}}$ is the discrepancy between the training and generalisation error. It tells us that by increasing $N$ the number of training examples, we can afford to use a more diverse $\mathcal{H}$, which will make it more likely that it contains a $h$ that fits $\mathcal{D}_{train}$ well, making $\hat{E}(h, \mathcal{D}_{train})$ small.
+\\\\
+Moreover, it tells us that $E(h)$ will be close to $\hat{E}(h, \mathcal{D}_{train})$ if $m(N, \mathcal{H})$ grows slowly. Intuitively, this tells us that a set $\mathcal{H}$ that contains simple functions, where by simple we mean functions that realise a small number of dichotomies, will make it easier to choose $h$ such that generalisation error will be close to training error.
+
+On the other hand, having a set $\mathcal{H}$ that can realise a large number of dichotomies, will make it easier to find a function that will make $\hat{E}(h, \mathcal{D}_{train})$. Therefore, the optimal $\mathcal{H}$ leads to compromise between these two quantities.

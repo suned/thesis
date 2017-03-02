@@ -14,21 +14,40 @@ $$
 $$
 This is a difficult problem because of two types of ambiguity. Firstly, two distinct entities may share the same name and category, such as \textit{Francis Bacon} the painter and \textit{Francis Bacon} the philosopher. Secondly, two distinct entities can have the same name, but belong to different categories such as \textit{JFK} the former American president and \textit{JFK} the airport near New York.
 \\\\
-Named entity recognition can be framed as a sequence labelling problem. A common approach is to apply so called tokenisation to the text, i.e finding boundaries between words and punctuation, and associate each token with a label indicating which entity it belongs to. BIO (figure \ref{bio}) is a widely used labelling scheme in which token labels indicate whether the token is at the \textbf{B}eginning, \textbf{I}nside, or \textbf{O}utside an entity mention.
+Named entity recognition can be framed as a sequence labeling problem. A common approach is to apply so called tokenisation to the text, i.e finding boundaries between words and punctuation, and associate each token with a label indicating which entity it belongs to. BIO (figure \ref{bio}) is a widely used labelling scheme in which token labels indicate whether the token is at the \textbf{B}eginning, \textbf{I}nside, or \textbf{O}utside an entity mention.
 \begin{figure}
-	\centering
-	\begin{tabular}{c c c c c c c c c c c}
+	\begin{center}
+		\begin{tabular}{c c c c c c c c c c c}
 	Jim & bought & 300 & shares & of & Acme & Corp & . & in & 2006 & . \\
-	B-PER & O & O & O & O & B-ORG & I-ORG & I-ORG & O & O & O
+	\texttt{B-PER} & \texttt{O} & \texttt{O} & \texttt{O} & \texttt{O} & \texttt{B-ORG} & \texttt{I-ORG} & \texttt{I-ORG} & \texttt{O} & \texttt{O} & \texttt{O}
 	\end{tabular}
-	\caption{A sentence labelled with the BIO labels for named entity recognition.}
+	\end{center}
+	\caption{A sentence labeled with the BIO labels for named entity recognition.}
 	\label{bio}
 \end{figure}
 
 \subsection{Relation Extraction}
 \label{relation_extract}
-Relation extraction refers to the problem of identifying relationships between entities. As an example, consider the sentence 
+Relation extraction refers to the problem of identifying relationships such as \textit{Family} or \textit{Employment} between entities. As an example, consider the sentence: 
 $$
 \text{Yesterday, New York based Foo Inc. announced their acquisition of Bar Corp.}
 $$ 
 Imagine we have designed a relation extraction system that recognises the relation \textit{MergerBetween(organisation, organisation)} between two mentions of organisations. Ideally, we would like that system to extract the relation \textit{MergerBetween(Foo Inc., Bar Corp.)} from the above sentence.
+\\\\
+Because relation extraction is concerned with relationships between named entities, many systems that perform relation extraction applies named entity recognition first as a pre-processing step. This approach is sometimes called \textbf{pipelining}. An alternative to pipelining is \textbf{end-to-end} relation extraction, where relations and entities are extracted simultaneously. Pipeline approaches can suffer from the problem of \textbf{error propagation}, where the system erroneously assigns a label in the named entity recognition step, which later causes it to make an error in the relation extraction step.
+
+\subsection{Accuracy Measures}
+Information extraction systems are often evaluated empirically by applying them to collections of text, so called corpora, in which $N$ mentions of named entities or relations are known. Accuracy measures used in such tests are usually defined in terms of:
+\begin{description}
+	\item [True positives ($tp$)] The number of true named entities or relations correctly labeled by the system.
+	\item [True negatives ($tn$)] The number of true non-entities or non-relations correctly labeled by the system.
+	\item [False positives ($fp$)] The number of true non-entities or relations incorrectly labeled by the system.
+	\item [False negatives ($fn$)] The number of true named entities or relations incorrectly labeled by the system.
+\end{description}
+The distribution of labels used in both named entity recognition and relation extraction is often highly imbalanced. Consider for example the BIO labelling scheme in figure \ref{bio}. Most words will be outside a mention of a named entity, and will have the label \texttt{O}. Using simple accuracy $\frac{tp + tn}{N}$ as a performance metric is therefore not very informative, since a useless system which labels all tokens with \texttt{O} would achieve high performance.
+
+\textbf{Precision} and \textbf{recall} are more appropriate performance metrics for this reason. Precision $\frac{tp}{tp + fp}$ is the fraction of true named entities or relations of all named entities or relations that were extracted by the system. This is equal to 0 when none of the information extracted by the system was correct and 1 when all of it was correct. 
+
+Recall $\frac{tp}{tp + fn}$ is the fraction of true named entities or relations that were extracted by the system. This is 0 when none of the extracted information was correct, and 1 when all of the extracted information was correct, and no true named entities or relations were incorrectly labeled.
+
+To get a single number that summarises the performance, precision $p$ and recall $r$ are often combined into a single metric, the $F1$ measure, defined as the harmonic mean of precision and recall $\frac{2pr}{p + r}$.
