@@ -1,7 +1,7 @@
 \section{Supervised Machine Learning}
 \label{supervised_machine_learning}
 
-Most modern solutions to the information extraction problems in \ref{information_extraction} are based on supervised machine learning techniques. In this setting, a system learns to recognise the named entities or relations between them from examples provided by a human annotator.
+Most modern solutions to the information extraction problems in \ref{information_extraction} are based on supervised machine learning techniques. In this setting, a system learns to recognise the named entities or relations between them from examples provided by a human annotator. In this section we formally describe this approach and introduce important theoretical tools for understanding supervised machine learning.
 
 \subsection{The Supervised Learning Problem}
 \label{the_supervised_learning_problem}
@@ -45,13 +45,15 @@ The central question in supervised machine learning is \textit{how can we best d
 
 \subsection{Statistical Learning Theory}
 \label{statistical_learning_theory}
-We would like to know how to design $\mathcal{H}$ and how best to use $\mathcal{D}_{train}$ in order to make $E$ small. A straight forward idea would be to find a $h$ that minimises the \textbf{training error} $\hat{E}(h, \mathcal{D}_{train})$. As we argued in section \ref{supervised_machine_learning}, using $\hat{E}$ to estimate $E$ can be misleading. Moreover, because $D_{train}$ is used to specifically choose $h$ that makes $\hat{E}$ small, the guarantees provided by Hoeffding's inequality no longer holds, and therefore it may be possible to select $h$ such that $\hat{E}(h, \mathcal{D}_{train})$ is small and $E$ is large, even when we have a large number of training examples.
+We would like to know how best to define $\mathcal{H}$ and use $\mathcal{D}_{train}$ in order to make $E$ small. $\mathcal{D}_{train}$ is the only information we have about $P(\mathbf{x}, \mathbf{y})$, and therefore also the only information we have about $E$. A straight forward idea would be to find a $h$ that minimises the \textbf{training error} $\hat{E}(h, \mathcal{D}_{train})$ under the assumption that this $h$ will also minimise $E$. 
+
+As we argued in section \ref{supervised_machine_learning}, using $\hat{E}$ to estimate $E$ can be misleading. Moreover, because $D_{train}$ is used to specifically choose $h$ that makes $\hat{E}$ small, the guarantees provided by Hoeffding's inequality no longer holds, and therefore it may be possible to select $h$ such that $\hat{E}(h, \mathcal{D}_{train})$ is small and $E$ is large, even when we have a large number of training examples.
 \\\\
 The phenomena where training error is small but generalisation error is large is known as \textbf{overfitting}. As the name implies, it happens when $h$ is selected based on harmful idiosyncrasies of $\mathcal{D}_{train}$. The harmful idiosyncrasies of $\mathcal{D}_{train}$ can be seen as variation from one sample to another which is not a consequence of the natural variation expected from sampling from $P(\mathbf{x}, \mathbf{y})$, but rather the product of \textbf{noise}.
 \\\\
 In general, noise comes in two forms. The first form is known as \textbf{stochastic noise}. This type of noise is introduced by non-determinism in the relationship between $\mathbf{x}$ and $\mathbf{y}$. If for example the text used as input to named entity recognition comes from scanned documents, stochastic noise may be introduced by scratches or dust. Clearly selecting $h$ that also uses these features of the data will not be beneficial for generalisation.
 
-The second type of noise is called \textbf{deterministic noise}. This type of noise may be introduced when $\mathbf{x}$ $\mathbf{y}$ is deterministic, but even the best $h$ in $\mathcal{H}$ can't represent this deterministic relationship exactly. For a finite sample, the $h$ which fits the sample very well will therefore likely not generalise well.
+The second type of noise is called \textbf{deterministic noise}. This type of noise may be introduced when the relationship between $\mathbf{x}$ and $\mathbf{y}$ is deterministic, but even the best $h$ in $\mathcal{H}$ can't represent this deterministic relationship exactly. For a finite sample, the $h$ which fits the sample very well will therefore likely not generalise well.
 \\\\
 The risk of overfitting is linked to the diversity of $\mathcal{H}$: The more diverse $\mathcal{H}$ is, the greater the risk that there exists a $h \in \mathcal{H}$ that will overfit $\mathcal{D}_{train}$.
 
@@ -75,7 +77,7 @@ A \textbf{dichotomy} is a central concept in measuring the diversity of $\mathca
 \end{figure}
 
 Dichotomies allow us to group similar functions. There may be infinitely many functions in $\mathcal{H}$, but on a specific $\mathcal{D}_{train}$, many of them will produce the same dichotomy.
-This allows us to quantify the diversity of $\mathcal{H}$ in terms of the number of dichotomies it is able to generate on a set of $N$ points. This is achieved by a measure known as the \textbf{growth function}.
+This allows us to quantify the diversity of $\mathcal{H}$ in terms of the number of dichotomies it's able to realise on a set of $N$ points. This is achieved by a measure known as the \textbf{growth function}.
 \begin{definition}[growth function]
 	\label{growth_function}
 	Let $\mathcal{H}(N) = \{(h(\mathbf{x}_1), \dots, h(\mathbf{x}_N))\ \mid h \in \mathcal{H}, \mathbf{x}_i \in \mathcal{X}\}$ be the set of all dichotomies generated by $\mathcal{H}$ on $N$ points, and let $|\cdot|$ be the set cardinality function. Then the growth function $m$ is:
@@ -87,7 +89,7 @@ In words, the growth function measures the maximum number of dichotomies that ar
 \\\\
 The growth function allows us to account for redundancy in $\mathcal{H}$. If two functions $h \in \mathcal{H}$ and $g \in \mathcal{H}$ realise the same dichotomy on $\mathcal{D}$, then any statement based only on $\mathcal{D}$ will be either true or false for for both $h$ and $g$. This makes it possible to group the events \textit{$\hat{E}(h, \mathcal{D})$ is far away from $E(h)$} and \textit{$\hat{E}(g, \mathcal{D})$ is far away from $E(g)$}, and thereby avoiding to overestimate the probability of either event occurring.
 
-If $\mathcal{H}$ is infinite, the number of redundant functions in $\mathcal{H}$ will also be infinite, since the number of dichotomies on $N$ points is finite. If $m(N, \mathcal{H})$ is polynomial, the increase in the number redundant functions in $\mathcal{H}$ will be so dramatic, as to make the probability that $\hat{E}$ is far away from $E$ very small.
+If $\mathcal{H}$ is infinite, the number of redundant functions in $\mathcal{H}$ will also be infinite, since the number of dichotomies on $N$ points is finite. If $m(N, \mathcal{H})$ is polynomial, the number of redundant functions in $\mathcal{H}$ will be so large as to make the probability that $\hat{E}$ is far away from $E$ very small.
 \\\\
  This line of reasoning is the basis of the Vapnik-Chervonenkis bound, which bounds $E(h)$ in terms of $\hat{E}(h, \mathcal{D}_{train})$:
 
@@ -99,8 +101,8 @@ If $\mathcal{H}$ is infinite, the number of redundant functions in $\mathcal{H}$
 	$$
 \end{theorem}
 
-The term $\sqrt{\frac{8}{N}\ln \frac{4m(2N, \mathcal{H})}{\delta}}$ is the discrepancy between the training and generalisation error. It tells us that by increasing $N$ the number of training examples, we can afford to use a more diverse $\mathcal{H}$, which will make it more likely that it contains a $h$ that fits $\mathcal{D}_{train}$ well, making $\hat{E}(h, \mathcal{D}_{train})$ small.
+The term $\sqrt{\frac{8}{N}\ln \frac{4m(2N, \mathcal{H})}{\delta}}$ is the discrepancy between the training and generalisation error. It tells us that by increasing the number of training examples $N$, we can afford to use a more diverse $\mathcal{H}$, which will make it more likely that it contains a $h$ that fits $\mathcal{D}_{train}$ well, making $\hat{E}(h, \mathcal{D}_{train})$ small.
 \\\\
-Moreover, it tells us that $E(h)$ will be close to $\hat{E}(h, \mathcal{D}_{train})$ if $m(N, \mathcal{H})$ grows slowly. Intuitively, this tells us that a set $\mathcal{H}$ that contains simple functions, where by simple we mean functions that realise a small number of dichotomies, will make it easier to choose $h$ such that generalisation error will be close to training error.
+Moreover, it tells us that $E(h)$ will be close to $\hat{E}(h, \mathcal{D}_{train})$ if $m(N, \mathcal{H})$ is small. Intuitively, this tells us that a set $\mathcal{H}$ that contains simple functions, where by simple we mean functions that realise a small number of dichotomies, will make it easier to choose $h$ such that generalisation error will be close to training error.
 
-On the other hand, having a set $\mathcal{H}$ that can realise a large number of dichotomies, will make it easier to find a function that will make $\hat{E}(h, \mathcal{D}_{train})$. Therefore, the optimal $\mathcal{H}$ leads to compromise between these two quantities.
+On the other hand, having a set $\mathcal{H}$ that can realise a large number of dichotomies, will make it easier to find a function that will make $\hat{E}(h, \mathcal{D}_{train})$ small. Therefore, the optimal $\mathcal{H}$ must balance the tradeoff between $m$ and $\hat{E}$.

@@ -28,7 +28,7 @@
 \contentsline {subsection}{\numberline {4.1.2}Word Embeddings}{9}
 \contentsline {section}{\numberline {4.2}Deep Multi-Task Learning}{9}
 \contentsline {chapter}{\numberline {5}Experiment}{10}
-\contentsline {section}{\numberline {5.1}Auxiliary Data}{10}
+\contentsline {section}{\numberline {5.1}Auxiliary Tasks}{10}
 \contentsline {section}{\numberline {5.2}Network Architecture}{10}
 \contentsline {chapter}{\numberline {6}Results}{11}
 \contentsline {chapter}{\numberline {7}Discussion}{12}

@@ -1,6 +1,6 @@
 \section{Information Extraction}
 \label{information_extraction}
-In natural language processing, information extraction is the problem of extracting structured information from unstructured text. Many practical information extraction problems fall in one of two categories: \textbf{named entity recognition}, or \textbf{relation extraction} \citep{jurafsky09}.
+In natural language processing, information extraction is the problem of extracting structured information from unstructured text. Many practical information extraction problems fall in one of two categories: \textbf{named entity recognition}, or \textbf{relation extraction} \citep{jurafsky09}. Here, we introduce each of them, and explain why they are difficult.
 
 \subsection{Named Entity Recognition}
 \label{named_entity_recognition}
@@ -14,7 +14,7 @@ $$
 $$
 This is a difficult problem because of two types of ambiguity. Firstly, two distinct entities may share the same name and category, such as \textit{Francis Bacon} the painter and \textit{Francis Bacon} the philosopher. Secondly, two distinct entities can have the same name, but belong to different categories such as \textit{JFK} the former American president and \textit{JFK} the airport near New York.
 \\\\
-Named entity recognition can be framed as a sequence labeling problem. A common approach is to apply so called tokenisation to the text, i.e finding boundaries between words and punctuation, and associate each token with a label indicating which entity it belongs to. BIO (figure \ref{bio}) is a widely used labelling scheme in which token labels indicate whether the token is at the \textbf{B}eginning, \textbf{I}nside, or \textbf{O}utside an entity mention.
+Named entity recognition can be framed as a sequence labelling problem. A common approach is to apply so called tokenisation to the text, i.e finding boundaries between words and punctuation, and associate each token with a label indicating which entity it belongs to. BIO (figure \ref{bio}) is a widely used labelling scheme in which token labels indicate whether the token is at the \textbf{B}eginning, \textbf{I}nside, or \textbf{O}utside an entity mention.
 \begin{figure}
 	\begin{center}
 		\begin{tabular}{c c c c c c c c c c c}
