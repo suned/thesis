@@ -13,13 +13,21 @@
 \usepackage{amsthm}
 \usepackage{tikz}
 \usetikzlibrary{arrows,shapes,positioning}
-\usepackage[format=plain, labelfont={small, sf, bf}, textfont={small, sf, it}, singlelinecheck=off, margin={1cm, 0cm}, oneside, labelsep=newline]{caption}
+\usepackage[format=plain, labelfont={small, sf, bf}, textfont={small, it}, singlelinecheck=off, margin={1cm, 0cm}, oneside, labelsep=newline]{caption}
 
 % Change chapter headings to "Part"
 \addto\captionsenglish{\renewcommand{\chaptername}{Part}}
 
 % Change section headings to sans serif
-\allsectionsfont{\normalfont\sffamily\bfseries}
+\sectionfont{\Large}
+\subsectionfont{\normalsize}
+\chapternumberfont{\mdseries\huge}
+
+% Put section numbers in margin
+\makeatletter
+\def\@seccntformat#1{\protect\makebox[0pt][r]{\csname
+the#1\endcsname\quad}}
+\makeatother
 
 % Enable definitions
 \theoremstyle{definition}
@@ -59,7 +67,7 @@
 
 \input{abstract}
 \pagebreak
-\newgeometry{twoside, inner=5cm, outer=3cm, vmargin=3cm}
+\newgeometry{twoside, inner=4.8cm, outer=3.2cm, vmargin=3cm}
 
 \addtocontents{toc}{\protect\thispagestyle{empty}}
 
