@@ -14,26 +14,26 @@
 \contentsline {section}{\numberline {2.3}Summary}{7}
 \contentsline {chapter}{\numberline {3}Neural Networks}{8}
 \contentsline {section}{\numberline {3.1}Feed-Forward Neural Networks}{8}
-\contentsline {subsection}{\numberline {3.1.1}Activation Functions}{10}
-\contentsline {subsection}{\numberline {3.1.2}Objective Function}{10}
-\contentsline {section}{\numberline {3.2}Learning Algorithm}{10}
-\contentsline {subsection}{\numberline {3.2.1}Gradient Descent}{10}
-\contentsline {subsection}{\numberline {3.2.2}Backpropagation}{10}
-\contentsline {subsection}{\numberline {3.2.3}Regularisation}{10}
-\contentsline {subsection}{\numberline {3.2.4}Adam}{10}
-\contentsline {section}{\numberline {3.3}Convolutional Neural Networks}{10}
-\contentsline {section}{\numberline {3.4}Recurrent and Recursive Neural Networks}{10}
-\contentsline {subsection}{\numberline {3.4.1}LSTM}{10}
-\contentsline {chapter}{\numberline {4}Multi-Task Learning}{11}
-\contentsline {section}{\numberline {4.1}Representation Learning}{11}
-\contentsline {subsection}{\numberline {4.1.1}Auto Encoders}{11}
-\contentsline {subsection}{\numberline {4.1.2}Word Embeddings}{11}
-\contentsline {section}{\numberline {4.2}Deep Multi-Task Learning}{11}
-\contentsline {chapter}{\numberline {5}Experiment}{12}
-\contentsline {section}{\numberline {5.1}Auxiliary Tasks}{12}
-\contentsline {section}{\numberline {5.2}Network Architecture}{12}
-\contentsline {chapter}{\numberline {6}Results}{13}
-\contentsline {chapter}{\numberline {7}Discussion}{14}
-\contentsline {chapter}{\numberline {8}Conclusion}{15}
-\contentsline {chapter}{\numberline {A}Appendix}{17}
-\contentsline {section}{\numberline {A.1}First}{17}
+\contentsline {subsection}{\numberline {3.1.1}Activation Functions}{9}
+\contentsline {subsection}{\numberline {3.1.2}Objective Function}{11}
+\contentsline {section}{\numberline {3.2}Learning Algorithm}{12}
+\contentsline {subsection}{\numberline {3.2.1}Gradient Descent}{12}
+\contentsline {subsection}{\numberline {3.2.2}Backpropagation}{12}
+\contentsline {subsection}{\numberline {3.2.3}Regularisation}{12}
+\contentsline {subsection}{\numberline {3.2.4}Adam}{12}
+\contentsline {section}{\numberline {3.3}Convolutional Neural Networks}{12}
+\contentsline {section}{\numberline {3.4}Recurrent and Recursive Neural Networks}{12}
+\contentsline {subsection}{\numberline {3.4.1}LSTM}{12}
+\contentsline {chapter}{\numberline {4}Multi-Task Learning}{13}
+\contentsline {section}{\numberline {4.1}Representation Learning}{13}
+\contentsline {subsection}{\numberline {4.1.1}Auto Encoders}{13}
+\contentsline {subsection}{\numberline {4.1.2}Word Embeddings}{13}
+\contentsline {section}{\numberline {4.2}Deep Multi-Task Learning}{13}
+\contentsline {chapter}{\numberline {5}Experiment}{14}
+\contentsline {section}{\numberline {5.1}Auxiliary Tasks}{14}
+\contentsline {section}{\numberline {5.2}Network Architecture}{14}
+\contentsline {chapter}{\numberline {6}Results}{15}
+\contentsline {chapter}{\numberline {7}Discussion}{16}
+\contentsline {chapter}{\numberline {8}Conclusion}{17}
+\contentsline {chapter}{\numberline {A}Appendix}{19}
+\contentsline {section}{\numberline {A.1}First}{19}

@@ -14,7 +14,7 @@ We can formalise the preference for functions $h$ that perform well on examples 
 \begin{definition}[generalisation error] \label{generalisation_error}
 	Let $P(\mathbf{x}, \mathbf{y})$ be a joint probability distribution over inputs $\mathbf{x} \in \mathcal{X}$ and labels $\mathbf{y} \in \mathcal{Y}$. Let $e(\mathbf{y}_1, \mathbf{y_2}) = \mathbb{I}[\mathbf{y}_1 \neq \mathbf{y}_2]$ be the binary error function that measures agreement between labels $\mathbf{y}_1$ and $\mathbf{y}_2$. Then the generalisation error $E$ of a function $h: \mathcal{X} \mapsto \mathcal{Y}$ is defined as:
 	$$
-		E(h) = \mathbb{E}_{\mathbf{x},\mathbf{y}\sim P(\mathbf{y}, \mathbf{x})}[e(h(\mathbf{x}), \mathbf{y})]
+		E(h) = \mathbb{E}_{\mathbf{x},\mathbf{y}\sim P(\mathbf{x}, \mathbf{y})}[e(h(\mathbf{x}), \mathbf{y})]
 	$$
 \end{definition}
 Now, formally, the objective of supervised machine learning is to find a function $h^*$ in a space of functions $\mathcal{H}$ that minimises $E(h)$. We see the process generating the data as random, but with a behaviour describable by a distribution $P(\mathbf{x}, \mathbf{y})$. Unfortunately, this distribution is unknown, which makes $E$ unknown. However, we can use sampled data $\mathcal{D} = \{(\mathbf{x}, \mathbf{y}) \mid \mathbf{x}, \mathbf{y} \sim P(\mathbf{x}, \mathbf{y})\}$ to estimate $E(h)$ with a quantity known as \textbf{empirical error}:

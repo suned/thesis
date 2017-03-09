@@ -5,9 +5,9 @@
 \usepackage[a4paper]{geometry}  % Geometri-pakke: Styrer bl.a. maginer    %
 \usepackage[round]{natbib}
 \usepackage{blindtext}
+\usepackage{palatino}
 \usepackage{mathpazo}
 \usepackage{sectsty}
-\usepackage{helvet}
 \usepackage{pgfplots}
 \usepackage{amsmath}
 \usepackage{amsthm}
@@ -18,7 +18,7 @@
 % Change chapter headings to "Part"
 \addto\captionsenglish{\renewcommand{\chaptername}{Part}}
 
-% Change section headings to sans serif
+% Change section headings
 \sectionfont{\Large}
 \subsectionfont{\normalsize}
 \chapternumberfont{\mdseries\huge}
@@ -29,6 +29,9 @@
 the#1\endcsname\quad}}
 \makeatother
 
+% allow text to not take up all space
+\raggedbottom
+
 % Enable definitions
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}[section]
@@ -36,6 +39,7 @@ the#1\endcsname\quad}}
 
 % Math commands
 \DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\expect}{\mathbb{E}}
 %
 % Mini-manual til ku-forside pakken:
 %
@@ -61,6 +65,7 @@ the#1\endcsname\quad}}
 \vejleder{Dirk Hovy} %  Findes kun under 'titelside'
 
 \begin{document}
+\the\textwidth
 \maketitle
 \thispagestyle{empty}
 \newpage
