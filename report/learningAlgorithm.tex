@@ -15,6 +15,11 @@ The gradient of $\nabla J$ is a vector where each component is the partial deriv
 \end{definition}
 The gradient can be used for computing the rate of change of $J$ in the direction of a unit vector $\mathbf{u}$ by taking the dot product $\nabla J^T\mathbf{u}$. We would like to know in which direction $\mathbf{u}$ we should change $\mathcal{W}_i$ in order to make $J$ as small as possible. The dot product of $\nabla J^T\mathbf{u}$ is equal to $|\nabla J||\mathbf{u}|\cos \theta$ where $\theta$ is the angle between $\nabla J$ and $\mathbf{u}$. The direction $\mathbf{u}$ with the greatest positive rate of change of $J$ is the direction in which $\theta = 0\degree$, in other words, the same direction as $\nabla J$. The direction with the greatest negative rate of change of $J$ is the direction in which $\theta = 180\degree$, in other words, the direction $-\nabla J$. This means that we can make $J$ smaller by taking a small step $\epsilon$ in the direction $-\nabla J$.
 
+\begin{figure}
+	\input{img/cost_function.pgf}
+	\input{img/d_train.pgf}
+\end{figure}
+
 \subsection{Backpropagation}
 \subsection{Regularisation}
 \label{early_stopping}

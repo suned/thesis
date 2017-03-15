@@ -3,6 +3,8 @@ import math
 import numpy as np
 import random
 from matplotlib import pyplot as plt
+from util import figure_size, format_ticks
+import os
 
 
 def cost(x, y, h):
@@ -10,21 +12,24 @@ def cost(x, y, h):
     return np.mean(squared_error)
 
 
-def plot_gradient_steps():
+def plot_gradient_steps(path):
     def target_function(x):
-        return x + 10
+        return 5 * x + np.random.normal(scale=3, size=len(x))
 
-    target_function = np.vectorize(target_function)
-    x = np.linspace(-15, 15, 100)
+    x_min = 0
+    x_max = 10
+    x = np.linspace(x_min, x_max, 100)
     y = target_function(x)
     x = x.reshape((-1, 1))
     data = list(zip(x, y))
-    n = 100
-    d_train = [random.choice(data) for _ in range(n)]
+    n = 30
+    d_train = random.sample(data, n)
     x_train, y_train = zip(*d_train)
+    x_train = np.array(x_train).reshape((-1, 1))
+    y_train = np.array(y_train)
     h = SGDRegressor(n_iter=1, warm_start=True, penalty="none")
-    w1s = np.linspace(0, 20, 100)
-    w2s = np.linspace(0, 2, 100)
+    w1s = np.linspace(-30, 30, 100)
+    w2s = np.linspace(0, 10, 100)
     W1, W2 = np.meshgrid(w1s, w2s)
     costs = np.zeros(W1.shape)
     for index, _ in np.ndenumerate(W1):
@@ -34,6 +39,65 @@ def plot_gradient_steps():
         h.coef_ = np.array([w2]).reshape((1, 1))
         c = cost(x, y, h)
         costs[index] = c
-    plt.figure()
-    values = np.arange(0.1, 10, .5)
-    contour = plt.contour(W1, W2, costs, values)
+
+    plt.figure(figsize=figure_size(scale=.5))
+    values = np.arange(1, 300, 30)**1.4
+    plt.contour(W1, W2, costs, values)
+    plt.xlabel(r"$w_0$")
+    plt.ylabel(r"$w_1$")
+    plt.title(r"$J(\mathbf{w})$")
+
+    steps = 6
+    h = SGDRegressor(
+        n_iter=1,
+        warm_start=True,
+        penalty="none",
+        eta0=0.039,
+        learning_rate="constant",
+        shuffle=False
+    )
+    h.intercept_ = np.array([25.0])
+    h.coef_ = np.array([0.5])
+    weights = []
+    colors = ["red", "green", "blue", "magenta", "cyan", "black"]
+    plot_weights(colors, 0, h.intercept_[0], h.coef_[0], weights)
+    for step in range(1, steps):
+        h.fit(x_train, y_train)
+        w0 = h.intercept_[0]
+        w1 = h.coef_[0]
+        plot_weights(colors, step, w0, w1, weights)
+    format_ticks()
+    file_path = os.path.join(path, "cost_function.pgf")
+    plt.savefig(file_path)
+
+
+    plt.figure(figsize=figure_size(scale=.5))
+    plt.xlabel(r"$x$")
+    plt.ylabel(r"$y$")
+    plt.plot(x_train, y_train, "o", label=r"$\mathcal{D}_{train}$")
+    step = 0
+    for w0, w1, color in weights:
+        label = r"$y = \mathbf{w}_" + str(step) + r"^T\tilde{\mathbf{x}}$"
+        y_pred = [
+            w1 * x_min + w0,
+            w1 * x_max + w0
+            ]
+        plt.plot(
+            [x_min, x_max],
+            y_pred,
+            c=color,
+            #label=label
+        )
+        step += 1
+    plt.title(r"$\mathcal{D}_{train}$")
+    format_ticks()
+    file_name = os.path.join(path, "d_train.pgf")
+    plt.savefig(file_name)
+
+
+def plot_weights(colors, step, w0, w1, weights):
+    color = colors[step]
+    weights.append((w0, w1, color))
+    plt.plot(w0, w1, "o", c=color)
+    plt.text(w0 + 1, w1, r"$\mathbf{w}_" + str(step) + r"$")
+
