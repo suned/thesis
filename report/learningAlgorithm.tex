@@ -1,6 +1,20 @@
 \section{Learning Algorithm}
 \label{learning_algorithm}
+Finding a function $h \in \mathcal{H}$ that maximises the likelihood is an optimisation problem. Optimisation is solved by answering the question, \textit{how does $J(\mathcal{W})$ change when we change $\mathcal{W}$?} which makes differential calculus the tool for the job. Sadly, no closed form solution exists to the set of equations obtained from $\frac{d}{d\mathcal{W}}J$. Neural network optimisation is therefore solved using an iterative algorithm called \textbf{gradient descent}, in which we choose initial values $\mathcal{W}_0$ for every weight, and then minimise $J$ by iteratively changing $\mathcal{W}_i$ by taking small steps in a promising direction.
+
 \subsection{Gradient Descent}
+\label{gradient_descent}
+The gradient of $\nabla J$ is a vector where each component is the partial derivative $\frac{\partial}{\partial w}J$ of $J$ with respect to a weight $w \in \mathcal{W}$:
+
+\begin{definition}[gradient]
+	\label{gradient}
+	Let $w_{l,u,v} = \mathbf{W}_{l,u,v}$ be the component at index $u,v$ of $\mathbf{W}_l$ in $h$, and let $J$ be defined as in definition \ref{negative_log-likelihood}. Then the gradient $\nabla J$ is:
+	$$
+	\nabla J = \begin{bmatrix} \frac{\partial}{\partial w_{1,v,u}}J \\ \\ \vdots \\ \\ \frac{\partial}{\partial w_{L,v,u}}J\end{bmatrix}
+	$$
+\end{definition}
+The gradient can be used for computing the rate of change of $J$ in the direction of a unit vector $\mathbf{u}$ by taking the dot product $\nabla J^T\mathbf{u}$. We would like to know in which direction $\mathbf{u}$ we should change $\mathcal{W}_i$ in order to make $J$ as small as possible. The dot product of $\nabla J^T\mathbf{u}$ is equal to $|\nabla J||\mathbf{u}|\cos \theta$ where $\theta$ is the angle between $\nabla J$ and $\mathbf{u}$. The direction $\mathbf{u}$ with the greatest positive rate of change of $J$ is the direction in which $\theta = 0\degree$, in other words, the same direction as $\nabla J$. The direction with the greatest negative rate of change of $J$ is the direction in which $\theta = 180\degree$, in other words, the direction $-\nabla J$. This means that we can make $J$ smaller by taking a small step $\epsilon$ in the direction $-\nabla J$.
+
 \subsection{Backpropagation}
 \subsection{Regularisation}
 \label{early_stopping}

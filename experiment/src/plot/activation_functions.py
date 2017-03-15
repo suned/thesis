@@ -1,6 +1,6 @@
 import numpy as np
 from matplotlib import pyplot as plt
-from util import figure_size, format_ticks
+from util import figure_size, format_ticks, remove_first_ylabel
 import os
 
 
@@ -27,6 +27,7 @@ def plot_sigmoid(output_dir):
     axis = plt.gca()
     axis.spines["left"].set_position("center")
     axis.yaxis.set_tick_params(direction="in", pad=-25)
+    remove_first_ylabel()
     plt.savefig(file_name)
 
 
@@ -57,4 +58,5 @@ def plot_relu(output_dir):
     axis = plt.gca()
     axis.spines["left"].set_position("center")
     axis.yaxis.set_tick_params(direction="in")
+    remove_first_ylabel()
     plt.savefig(file_name)

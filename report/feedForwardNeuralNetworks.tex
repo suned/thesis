@@ -80,6 +80,7 @@ We now have all the components we need to specify $\mathcal{H}$ as a set of neur
 For a particular $L$, $d_l$, and $\sigma$, each $h \in \mathcal{H}$ corresponds exactly to a unique assignment of real numbers to all of its weights. We can make the dependence of $h$ on its weights explicit by defining a set $\mathcal{W} = \{\mathbf{W}_1\, \dots \, \mathbf{W}_L\}$ and writing $h(\mathbf{x}; \mathcal{W})$ which means \textit{the function $h$ parameterised by the weights in $\mathcal{W}$}. In the next section we discuss how to choose the activation functions at the layers of the network.
 
 \subsection{Activation Functions}
+\label{activation_functions}
 Activation functions mimic the behaviour of neurons in the brain. A neuron emits a signal when the combined input it receives from other neurons exceeds a certain threshold. Activation functions achieve this by a variation of the step function, where an activation signal $a_{l,u}$ below the threshold is mapped to a value near zero, and an activation signal above the threshold is mapped to a value greater than zero. From a mathematical perspective, the role of activation functions is to introduce non-linearity in $h$, which allows it to approximate a much larger class of functions.
 \\\\
 Many networks use \textbf{sigmoid} activation functions such as the classical sigmoid function $\sigma(a) = \frac{1}{1 + e^-a}$. These functions have the advantage of being differentiable everywhere. As we will see in section \ref{learning_algorithm}, differential calculus is the fundamental tool for finding a good $h \in \mathcal{H}$, which makes differentiability a desirable quality. One drawback of sigmoid activation functions is that their derivates are small, as seen in figure \ref{sigmoid}. For example, we can show that $\max \frac{d\sigma}{da} = \frac{1}{4}$. As we will see in section \ref{learning_algorithm}, neural networks are trained by multiplying chains of derivatives. When these derivatives are smaller than 1, the magnitude of the derivative shrinks in the length of the chain of terms which can make learning from $\mathcal{D}_{train}$ extremely slow.
@@ -112,9 +113,15 @@ In words, the soft-max function makes sure that the output of $h$ is a valid pro
 \\\\
 Having designed the output layer of $h$ so that we can interpret its output as a conditional probability distribution, we can define an \textbf{objective function} that quantifies the appropriateness of a set of weights $\mathcal{W}$ as a probability using the samples in $\mathcal{D}_{train}$. This function is crucial for finding $g \in \mathcal{H}$. We study it in the next section.
 \subsection{Objective Function}
-We would like a function that lets us compare functions in $\mathcal{H}$ in terms of how well they perform on $\mathcal{D}_{train}$. Such a function is often called an objective function, since maximising this function can be seen as the objective of learning.
+We would like a function that lets us compare functions in $\mathcal{H}$ in terms of how well they predict the samples in $\mathcal{D}_{train}$. Such a function is often called an objective function, borrowing terminology from the mathematical field of optimisation.
 \\\\
-If we design $\mathcal{H}$ in such a way that every $h$ outputs a probability, we can use the principle of maximum likelihood to derive the objective function. Maximum likelihood estimation uses the likelihood function to compute the probability of $\mathcal{D}_{train}$ given a the parameters $\mathcal{W}$ of our neural network:
+In section \ref{activation_functions} we saw that the combination of one-hot encoding of the labels in $\mathcal{Y}$ and soft-max activation in the output layer of $h$ allows us to interpret $h(\mathbf{x})$ as a conditional probability distribution. In the following, we will use a convenient rewrite of the formula given in \ref{activation_functions}:
+$$
+P(\mathbf{y} \mid \mathbf{x}) = \prod\limits_{c=1}^C h(\mathbf{x};\mathcal{W})^{\mathbf{y}_c}_c
+$$
+This formulation works because $\mathbf{y}$ is a one-hot vector, which means just component of $\mathbf{y}$ is equal to 1, and all other components are 0. So if $\mathbf{y} = \begin{bmatrix}0 & 1 & 0 \end{bmatrix}^T$ and $h(\mathbf{x}) = \begin{bmatrix}.1 & .8 & .1 \end{bmatrix}^T$, then $P(\mathbf{y} \mid \mathbf{x}) = (0.1^0)(0.8^1)(0.1^0) = 0.8$.
+\\\\
+If we design $\mathcal{H}$ in such a way that every $h$ outputs a probability, we can use the principle of maximum likelihood to derive a plausible objective function. Maximum likelihood estimation uses the likelihood function to compute the probability of $\mathcal{D}_{train}$ given a the parameters $\mathcal{W}$ of our neural network:
 
 \begin{definition}[likelihood function]
 	\label{likelihood}
@@ -124,6 +131,8 @@ If we design $\mathcal{H}$ in such a way that every $h$ outputs a probability, w
 	$$
 \end{definition}
 \noindent
+Informally, we can think of the likelihood function as asking the question, \textit{assuming that $h(\mathbf{x})$ is the true distribution from which $\mathcal{D}_{train}$ was sampled, what is the probability of observing the samples in $\mathcal{D}_{train}$?} Using the likelihood function to find a good $h \in \mathcal{H}$ is a matter of finding a set of weights $\mathcal{W}$ that maximise the likelihood.
+\\\\ 
 Computing a large number of products of probabilities on a computer can be problematic because of \textbf{numerical underflow}. Since computers have limited precision, small positive numbers may be actually be represented as small negative numbers, which is bad because the likelihood function is a probability.
 \\\\
 To avoid numerical underflow, the \textbf{log-likelihood} $\ln P(\mathcal{D}_{train} \mid \mathcal{W})$ is often used instead. The logarithm turns the products into sums, which are entirely unproblematic for computers. Since the natural logarithm is a monotonic function, applying it to the likelihood function does not change the properties we are interested in.
@@ -134,6 +143,7 @@ Finally, most other objective functions for supervised machine learning are defi
 	\label{negative_log-likelihood}
 	Let $\mathcal{D}_{train}$ and $h(\mathbf{x}; \mathcal{W})$ be defined as in definition \ref{likelihood}. Then the negative log likelihood $-\ln P(\mathcal{D}_{train} \mid \mathcal{W})$ is:
 	$$
-	- \ln P(\mathcal{D}_{train} \mid \mathcal{W}) = - \sum\limits_{i=1}^N\sum\limits_{c=1}^C \mathbf{y}_{i,c} \ln h(\mathbf{x}_i;\mathcal{W})_c
+	J(\mathcal{W}) = - \ln P(\mathcal{D}_{train} \mid \mathcal{W}) = - \sum\limits_{i=1}^N\sum\limits_{c=1}^C \mathbf{y}_{i,c} \ln h(\mathbf{x}_i;\mathcal{W})_c
 	$$
 \end{definition}
+In the next section, we will see how to use the negative log-likelihood to find a good $h \in \mathcal{H}$.
