@@ -3,7 +3,7 @@ import math
 import numpy as np
 import random
 from matplotlib import pyplot as plt
-from util import figure_size, format_ticks
+from util import figure_size, format_ticks, move_spines_to_zero, remove_first_ylabel, remove_first_xlabel
 import os
 
 
@@ -22,7 +22,7 @@ def plot_gradient_steps(path):
     y = target_function(x)
     x = x.reshape((-1, 1))
     data = list(zip(x, y))
-    n = 30
+    n = 20
     d_train = random.sample(data, n)
     x_train, y_train = zip(*d_train)
     x_train = np.array(x_train).reshape((-1, 1))
@@ -40,24 +40,23 @@ def plot_gradient_steps(path):
         c = cost(x, y, h)
         costs[index] = c
 
-    plt.figure(figsize=figure_size(scale=.5))
+    plt.figure(figsize=figure_size())
     values = np.arange(1, 300, 30)**1.4
     plt.contour(W1, W2, costs, values)
     plt.xlabel(r"$w_0$")
-    plt.ylabel(r"$w_1$")
-    plt.title(r"$J(\mathbf{w})$")
+    #plt.title(r"$\hat{E}(\mathbf{w}, \mathcal{D}_{train})$")
 
     steps = 6
     h = SGDRegressor(
         n_iter=1,
         warm_start=True,
         penalty="none",
-        eta0=0.039,
+        eta0=0.037,
         learning_rate="constant",
         shuffle=False
     )
-    h.intercept_ = np.array([25.0])
-    h.coef_ = np.array([0.5])
+    h.intercept_ = np.array([-25.0])
+    h.coef_ = np.array([1.0])
     weights = []
     colors = ["red", "green", "blue", "magenta", "cyan", "black"]
     plot_weights(colors, 0, h.intercept_[0], h.coef_[0], weights)
@@ -68,10 +67,13 @@ def plot_gradient_steps(path):
         plot_weights(colors, step, w0, w1, weights)
     format_ticks()
     file_path = os.path.join(path, "cost_function.pgf")
+    move_spines_to_zero()
+    plt.ylabel(r"$w_1$", labelpad=-30)
+    remove_first_ylabel()
     plt.savefig(file_path)
 
 
-    plt.figure(figsize=figure_size(scale=.5))
+    plt.figure(figsize=figure_size())
     plt.xlabel(r"$x$")
     plt.ylabel(r"$y$")
     plt.plot(x_train, y_train, "o", label=r"$\mathcal{D}_{train}$")
@@ -89,9 +91,11 @@ def plot_gradient_steps(path):
             #label=label
         )
         step += 1
-    plt.title(r"$\mathcal{D}_{train}$")
+    plt.legend(loc="upper left")
     format_ticks()
     file_name = os.path.join(path, "d_train.pgf")
+    move_spines_to_zero()
+    remove_first_xlabel()
     plt.savefig(file_name)
 
 

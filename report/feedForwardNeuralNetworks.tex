@@ -1,7 +1,7 @@
 \section{Feed-Forward Neural Networks}
-A feed-forward neural network is a function $h(\mathbf{x})$. To understand how it works, it's instructive to look at each part of its name in isolation.
+A feed-forward neural network is a function $h: \mathcal{X} \mapsto \mathcal{Y}$. To understand how it works, it's instructive to look at each part of its name in isolation.
 \\\\
-$h$ is called a \textbf{network} because it's a composition of $L$ \textbf{layers} of other functions $f_l$. Each $f_l$ receives input from $f_{l-1}$. For example if $L = 2$, then $h(\mathbf{x}) = f_2(f_1(\mathbf{x}))$. The number of layers $L$ is called the \textbf{depth} of the network. $f_L$ is called the \textbf{output layer}. The remaining functions $f_1$ to $f_{L-1}$ are called \textbf{hidden layers}. Each $f_l$ outputs a vector $\mathbf{z}_l$ of dimension $d_l$. The size of these vectors determine the \textbf{width} of the network. We denote the input to $f_1$ as $\tilde{\mathbf{x}}$, which is identical to the input vector $\mathbf{x}$ to $h(\mathbf{x})$, except for an added \textbf{bias} component of 1, as described later in this section.
+$h$ is called a \textbf{network} because it's a composition of $L$ \textbf{layers} of other functions $f_l$. Each $f_l$ receives input from $f_{l-1}$. For example if $L = 2$, then $h(\mathbf{x}) = f_2(f_1(\mathbf{x}))$. The number of layers $L$ is called the \textbf{depth} of the network. $f_L$ is called the \textbf{output layer}. The remaining functions $f_1$ to $f_{L-1}$ are called \textbf{hidden layers}. Each $f_l$ outputs a vector $\mathbf{z}_l$ of dimension $d_l$. The size of these vectors determine the \textbf{width} of the network. We denote the input to $f_1$ as $\tilde{\mathbf{x}}$, which is identical to the input vector $\mathbf{x}$, except for an added \textbf{bias} component of 1, as described later in this section.
 \\\\
 The functions $f_1$ to $f_L$ are ordered by their index $l$. By ordered, we mean that the index of the innermost functions are smaller than the index of the outermost. $h$ is called a \textbf{feed-forward} network because each $f_l$ can receive input only from functions $f_i$ if $l > i$. In other words, it's not possible for a function $f_l$ to feed its own output into itself, or any other function that it receives input from. Networks where this restriction is removed are called \textbf{recurrent neural networks}, and will be discussed in section \ref{rnns}.
 \\\\
@@ -49,10 +49,10 @@ By gathering the weights in matrices $\mathbf{W}_l$, we have simplified our view
 		\node [neuron] (bias1)   at (3, 2)  {1}; 
 		\node [neuron] (sigma11) at (3, 1)  {$\sigma$};
 		\node [neuron] (sigma12) at (3, 0)  {$\sigma$};
-		\node []       (layer1)  at (3,-1)  {$\mathbf{z}_1 = \sigma(\mathbf{W}_1 \tilde{\mathbf{x}})$};
+		\node []       (layer1)  at (3,-1)  {$\sigma(\mathbf{W}_1 \tilde{\mathbf{x}}) = \mathbf{z}_1$};
 		\node [neuron] (sigma21) at (6, 1)  {$\sigma$};
 		\node [neuron] (sigma22) at (6, 0)  {$\sigma$};
-		\node []       (layer2)  at (6,-1)  {$h(\mathbf{x}) = \sigma(\mathbf{W_2 z}_1)$};
+		\node []       (layer2)  at (6,-1)  {$\sigma(\mathbf{W_2 z}_1) = h(\mathbf{x})$};
 		\node []	   (empty1)  at (7, 1) {};
 		\node []       (empty2)  at (7, 0) {};   
 		
@@ -72,12 +72,12 @@ By gathering the weights in matrices $\mathbf{W}_l$, we have simplified our view
 		\draw (sigma21) edge (empty1);
 		\draw (sigma22) edge (empty2);
 	\end{tikzpicture}
-	\caption{A visual representation of $h(\mathbf{x}) = f_2(f_1(\mathbf{x}))$. The activation at each layer $\mathbf{a}_l$ is computed by $\mathbf{W}_l\mathbf{z}_{l-1}$. The output at each layer is computed by element-wise application of the activation function of $\sigma(\mathbf{a}_l)$.}
+	\caption{A visual representation of $h(\tilde{\mathbf{x}}) = f_2(f_1(\tilde{\mathbf{x}}))$. The activation at each layer $\mathbf{a}_l$ is computed by $\mathbf{W}_l\mathbf{z}_{l-1}$. The output at each layer is computed by element-wise application of the activation function of $\sigma(\mathbf{a}_l)$.}
 	\label{neural_network}
 \end{figure}
 \noindent
 We now have all the components we need to specify $\mathcal{H}$ as a set of neural networks. The set is defined by the depth of the networks $L$, the number of units in each layer $d_l$ , and the activation function $\sigma$.
-For a particular $L$, $d_l$, and $\sigma$, each $h \in \mathcal{H}$ corresponds exactly to a unique assignment of real numbers to all of its weights. We can make the dependence of $h$ on its weights explicit by defining a set $\mathcal{W} = \{\mathbf{W}_1\, \dots \, \mathbf{W}_L\}$ and writing $h(\mathbf{x}; \mathcal{W})$ which means \textit{the function $h$ parameterised by the weights in $\mathcal{W}$}. In the next section we discuss how to choose the activation functions at the layers of the network.
+For a particular $L$, $d_l$, and $\sigma$, each $h \in \mathcal{H}$ corresponds exactly to a unique assignment of real numbers to all of its weights. We can make the dependence of $h$ on its weights explicit by defining a vector $\mathbf{w} = \begin{bmatrix} w_{1,u,v} \dots w_{L,u,v}\end{bmatrix}$ and writing $h(\mathbf{x}, \mathbf{w})$ which means \textit{the function $h$ parameterised by the weight vector $\mathbf{w}$}. In the next section we discuss how to choose the activation functions at the layers of the network.
 
 \subsection{Activation Functions}
 \label{activation_functions}
@@ -99,11 +99,11 @@ Because of this shrinking problem, the default recommendation today is to use \t
 	\label{relu}
 \end{figure}
 \\\\
-It's common to use different activation functions for the hidden layers and the output layer. Often we would like the output of $h$ to be a probability distribution over values in the label space $\mathcal{Y}$, since this makes it possible to design the so called \textbf{cost functions} with a principled technique \textbf{maximum likelihood}.
+Often we would like the output of $h$ to be a probability distribution over values in the label space $\mathcal{Y}$, since this makes it possible to design the so called \textbf{cost functions} with a principled technique \textbf{maximum likelihood}. For this reason it's common to use different activation functions in the output layer. 
 
 For example, named entity recognition can be seen as a multi-class classification problem, where each token in a sentence must be assigned one of a fixed set of $C$ labels. To frame this as a probabilistic problem, we can encode each token label $\mathbf{y}$ as a vector of $C$ probabilities such that component $c$ of $\mathbf{y}_i \in \mathcal{D}_{train}$ is equal to 1 if $\mathbf{x}_i \in \mathcal{D}_{train}$ belongs to class $c$. All other components in $\mathbf{y}_i$ are equal to 0. This is known as \textbf{one-hot} encoding. $\mathbf{y}$ can be seen as a conditional probability distribution over each possible label given $\mathbf{x}_i$, that places all of the probability mass on label $c$.
 \\\\
-With one hot encoding, we can design $h$ to output a one-hot vector with $C$ components, where each component $c \in h$ gives the probability that $\mathbf{x}$ has class $c$. More formally, we can interpret $h(\mathbf{x})$ as conditional probability distribution $h(\mathbf{x})_c = P(Y = c | \mathbf{x})$ parameterised by the set of weights $\mathcal{W}$.
+With one hot encoding, we can design $h$ to output vector with $C$ components, where each component $c \in h$ gives the probability that $\mathbf{x}$ has class $c$. More formally, we can interpret $h(\mathbf{x})$ as conditional probability distribution $h(\mathbf{x})_c = P(Y = c | \mathbf{x})$.
 \\\\
 This type of output can be achieved by using the so-called \textbf{soft-max} activation function in the output layer. The soft-max activation is given by 
 $$
@@ -111,39 +111,43 @@ $$
 $$ 
 In words, the soft-max function makes sure that the output of $h$ is a valid probability distribution, firstly by making sure that each component of $h(\mathbf{x})$ is positive by taking the exponent, and by making sure that $\sum_{c=1}^Ch(\mathbf{x})_c = 1$ by dividing by the sum of all the exponentiated components. The last point means that unlike the other activation functions we have seen in this section, the soft-max must receive as input the vector $\mathbf{a}_L$ of all activations in layer $L$.
 \\\\
-Having designed the output layer of $h$ so that we can interpret its output as a conditional probability distribution, we can define an \textbf{objective function} that quantifies the appropriateness of a set of weights $\mathcal{W}$ as a probability using the samples in $\mathcal{D}_{train}$. This function is crucial for finding $g \in \mathcal{H}$. We study it in the next section.
+Having designed the output layer of $h$ so that we can interpret its output as a conditional probability distribution, we can define the training error $\hat{E}(h, \mathcal{D}_{train})$, sometimes also called the \textbf{objective function} by the maximum likelihood principle, that quantifies the appropriateness of a set of weights $\mathcal{W}$ as a probability using the samples in $\mathcal{D}_{train}$. This function is crucial for finding $g \in \mathcal{H}$. We study it in the next section.
+
 \subsection{Objective Function}
+\label{objectiveFunction}.
 We would like a function that lets us compare functions in $\mathcal{H}$ in terms of how well they predict the samples in $\mathcal{D}_{train}$. Such a function is often called an objective function, borrowing terminology from the mathematical field of optimisation.
 \\\\
 In section \ref{activation_functions} we saw that the combination of one-hot encoding of the labels in $\mathcal{Y}$ and soft-max activation in the output layer of $h$ allows us to interpret $h(\mathbf{x})$ as a conditional probability distribution. In the following, we will use a convenient rewrite of the formula given in \ref{activation_functions}:
 $$
-P(\mathbf{y} \mid \mathbf{x}) = \prod\limits_{c=1}^C h(\mathbf{x};\mathcal{W})^{\mathbf{y}_c}_c
+P(\mathbf{y} \mid \mathbf{x}) = \prod\limits_{c=1}^C h(\mathbf{x},\mathbf{w})^{\mathbf{y}_c}_c
 $$
 This formulation works because $\mathbf{y}$ is a one-hot vector, which means just component of $\mathbf{y}$ is equal to 1, and all other components are 0. So if $\mathbf{y} = \begin{bmatrix}0 & 1 & 0 \end{bmatrix}^T$ and $h(\mathbf{x}) = \begin{bmatrix}.1 & .8 & .1 \end{bmatrix}^T$, then $P(\mathbf{y} \mid \mathbf{x}) = (0.1^0)(0.8^1)(0.1^0) = 0.8$.
 \\\\
-If we design $\mathcal{H}$ in such a way that every $h$ outputs a probability, we can use the principle of maximum likelihood to derive a plausible objective function. Maximum likelihood estimation uses the likelihood function to compute the probability of $\mathcal{D}_{train}$ given a the parameters $\mathcal{W}$ of our neural network:
+If we design $\mathcal{H}$ in such a way that every $h$ outputs a probability, we can use the principle of maximum likelihood to derive a plausible objective function. Maximum likelihood estimation uses the likelihood function to compute the probability of $\mathcal{D}_{train}$ by interpreting $h$ as a probability distribution parameterised by $\mathbf{w}$:
 
 \begin{definition}[likelihood function]
 	\label{likelihood}
-	Let $\mathcal{D}_{train} = \{(\mathbf{x}_i, \mathbf{y}_i)\}$ be a set of $N$ training examples, where each $\mathbf{y}_i$ is a $C$ dimensional one-hot vector. Let $h(\mathbf{x}; \mathcal{W})$ be a neural network which outputs conditional probability distributions over the $C$ possible classes, such that $\sum_{c=1}^C h(\mathbf{x} ; \mathcal{W})_c = 1$ and $0 \leq c \leq 1 \,\forall c \in h(\mathbf{x};\mathcal{W})$. Furthermore, let the notation $\mathbf{y}_{i,c}$ denote the $c$'th component of the one-hot label for example $i$. Then the likelihood $P(\mathcal{D}_{train} \mid \mathcal{W})$ is:
+	Let $\mathcal{D}_{train} = \{(\mathbf{x}_i, \mathbf{y}_i)\}$ be a set of $N$ training examples, where each $\mathbf{y}_i$ is a $C$ dimensional one-hot vector. Let $h(\mathbf{x}, \mathbf{w})$ be a neural network which outputs conditional probability distributions over the $C$ possible classes, such that $\sum_{c=1}^C h(\mathbf{x}, \mathbf{w})_c = 1$ and $0 \leq c \leq 1 \,\forall c \in h(\mathbf{x}, \mathbf{w})$. Furthermore, let the notation $\mathbf{y}_{i,c}$ denote the $c$'th component of the one-hot label for example $i$. Then the likelihood $P(\mathcal{D}_{train} \mid \mathbf{w})$ is:
 	$$
-	P(\mathcal{D}_{train} \mid \mathcal{W}) = \prod\limits_{i=1}^N\prod\limits_{c=1}^C h(\mathbf{x}_i;\mathcal{W})_c^{\mathbf{y}_{i,c}}
+	P(\mathcal{D}_{train} \mid \mathbf{w}) = \prod\limits_{i=1}^N\prod\limits_{c=1}^C h(\mathbf{x}_i, \mathbf{w})_c^{\mathbf{y}_{i,c}}
 	$$
 \end{definition}
 \noindent
-Informally, we can think of the likelihood function as asking the question, \textit{assuming that $h(\mathbf{x})$ is the true distribution from which $\mathcal{D}_{train}$ was sampled, what is the probability of observing the samples in $\mathcal{D}_{train}$?} Using the likelihood function to find a good $h \in \mathcal{H}$ is a matter of finding a set of weights $\mathcal{W}$ that maximise the likelihood.
+Informally, we can think of the likelihood function as asking the question, \textit{assuming that $h(\mathbf{x})$ is the true distribution from which $\mathcal{D}_{train}$ was sampled, what is the probability of observing the samples in $\mathcal{D}_{train}$?} Using the likelihood function to find a good $h \in \mathcal{H}$ is a matter of finding a weight vector $\mathbf{w}$ that maximise the likelihood of observing $\mathcal{D}_{train}$.
 \\\\ 
 Computing a large number of products of probabilities on a computer can be problematic because of \textbf{numerical underflow}. Since computers have limited precision, small positive numbers may be actually be represented as small negative numbers, which is bad because the likelihood function is a probability.
 \\\\
 To avoid numerical underflow, the \textbf{log-likelihood} $\ln P(\mathcal{D}_{train} \mid \mathcal{W})$ is often used instead. The logarithm turns the products into sums, which are entirely unproblematic for computers. Since the natural logarithm is a monotonic function, applying it to the likelihood function does not change the properties we are interested in.
 \\\\
-Finally, most other objective functions for supervised machine learning are defined in terms of error or disagreement between the output of $h$ and $y$. In this view, searching for a good $h \in \mathcal{H}$ becomes a minimisation problem. For consistency, maximum likelihood estimation is often turned into a minimisation problem by using the \textbf{negative log-likelihood} $-\ln P(\mathcal{D}_{train} \mid \mathcal{W})$. Minimising the negative log-likelihood is clearly identical to maximising the likelihood.
+Finally, most other objective functions for supervised machine learning are defined in terms of training error $\hat{E}(h, mathcal{D}_{train}$. In this view, searching for a good $h \in \mathcal{H}$ becomes a minimisation problem. For consistency, maximum likelihood estimation is often turned into a minimisation problem by using the \textbf{negative log-likelihood} $-\ln P(\mathcal{D}_{train} \mid \mathcal{W})$. In addition, most error measures are invariant to dataset size which makes it easy to compare the performance of a model on different data sets. To give the negative log-likelihood this property, it's common to divide by $N$, giving what is called the \textbf{average negative log-likelihood}. Minimising the average negative log-likelihood is clearly identical to maximising the likelihood, since $\max f(\mathbf{x}) = \min -f(\mathbf{x})$, and dividing by $N$ doesn't change the optimum.
 
-\begin{definition}[negative log-likelihood]
+\begin{definition}[average negative log-likelihood]
 	\label{negative_log-likelihood}
 	Let $\mathcal{D}_{train}$ and $h(\mathbf{x}; \mathcal{W})$ be defined as in definition \ref{likelihood}. Then the negative log likelihood $-\ln P(\mathcal{D}_{train} \mid \mathcal{W})$ is:
 	$$
-	J(\mathcal{W}) = - \ln P(\mathcal{D}_{train} \mid \mathcal{W}) = - \sum\limits_{i=1}^N\sum\limits_{c=1}^C \mathbf{y}_{i,c} \ln h(\mathbf{x}_i;\mathcal{W})_c
+	\hat{E}(\mathbf{w}, \mathcal{D}_{train}) = - \frac{1}{N}\ln P(\mathcal{D}_{train} \mid \mathbf{w}) = - \frac{1}{N}\sum\limits_{i=1}^N\sum\limits_{c=1}^C \mathbf{y}_{i,c} \ln h(\mathbf{x}_i, \mathbf{w})_c
 	$$
 \end{definition}
-In the next section, we will see how to use the negative log-likelihood to find a good $h \in \mathcal{H}$.
+This error measure is also known as \textbf{cross-entropy error}, in which the term $-\sum_{c=1}^C \mathbf{y}_{i,c} \ln h(\mathbf{x}_i, \mathbf{w})_c$ is taken as the error measure $e(\mathbf{y}_i, h(\mathbf{x}_i))$, which allows us to write $\hat{E}$ in the familiar form used in section \ref{statistical_learning_theory}: $\hat{E}(h, \mathcal{D}_{train}) = \frac{1}{N}\sum_{i=1}^N e(h(\mathbf{x}_i), \mathbf{y}_i)$.
+
+In the next section, we will see how to use the average negative log-likelihood to find a good $h \in \mathcal{H}$.

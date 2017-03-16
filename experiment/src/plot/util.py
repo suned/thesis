@@ -14,6 +14,17 @@ def remove_first_ylabel():
     axis.yaxis.majorTicks[0].set_visible(False)
 
 
+def remove_first_xlabel():
+    axis = plt.gca()
+    axis.xaxis.majorTicks[0].set_visible(False)
+
+
+def move_spines_to_zero():
+    axis = plt.gca()
+    axis.spines['left'].set_position("zero")
+    axis.spines['bottom'].set_position("zero")
+
+
 def figure_size(scale=1):
     fig_width_pt = 418.25368
     inches_per_pt = 1.0/72.27

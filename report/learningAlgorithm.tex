@@ -1,26 +1,42 @@
 \section{Learning Algorithm}
 \label{learning_algorithm}
-Finding a function $h \in \mathcal{H}$ that maximises the likelihood is an optimisation problem. Optimisation is solved by answering the question, \textit{how does $J(\mathcal{W})$ change when we change $\mathcal{W}$?} which makes differential calculus the tool for the job. Sadly, no closed form solution exists to the set of equations obtained from $\frac{d}{d\mathcal{W}}J$. Neural network optimisation is therefore solved using an iterative algorithm called \textbf{gradient descent}, in which we choose initial values $\mathcal{W}_0$ for every weight, and then minimise $J$ by iteratively changing $\mathcal{W}_i$ by taking small steps in a promising direction.
+Finding a function $h \in \mathcal{H}$ that maximises the likelihood of $\mathcal{D}_{train}$ is an optimisation problem. Optimisation is solved by answering the question: \textit{how does $\hat{E}$ change when we change $h$?} We answer questions of this type with differential calculus. Sadly, finding the $h$ which maximises the likelihood by analytical differentiation is impossible. Neural network optimisation is therefore solved using an iterative algorithm called \textbf{gradient descent}, which we describe in this section. We then explore an algorithm for computing the gradient of $\hat{E}$ called \textbf{backpropagation}. Finally, we look into \textbf{regularisation} which are tools for constraining the learning algorithm in order to avoid overfitting. Lastly, we describe a specific learning algorithm called \textbf{Adam}, an efficient variation on gradient descent.
 
 \subsection{Gradient Descent}
 \label{gradient_descent}
-The gradient of $\nabla J$ is a vector where each component is the partial derivative $\frac{\partial}{\partial w}J$ of $J$ with respect to a weight $w \in \mathcal{W}$:
+We want to find a $h \in \mathcal{H}$ that minimises $\hat{E}$ as described in section \ref{objectiveFunction}. Each $h$ is defined exactly be the weight vector $\mathbf{w}$. $\hat{E}$ can't be minimised analytically, since its derivative with respect to $\mathbf{w}$ is a system of non-linear equations, which in general does not have an analytical solution. We therefore look for $h$ by choosing an initial weight vector $\mathbf{w}_0$, and iteratively reduce $\hat{E}$: In iteration $i$, the weight vector $\mathbf{w}_i$ is found by taking a small step $\eta$ in a direction given by a vector $\mathbf{v}$, or more formally: $\mathbf{w}_i = \mathbf{w}_{i-1} + \eta\mathbf{v}$. The main question is, which direction should we choose? 
+\\\\ 
+$\hat{E}$'s direction of steepest descent at each $\mathbf{w}_i$ is given by the gradient $\nabla\hat{E}$. $\nabla \hat{E}$ is a vector where each component is a partial derivative $\frac{\partial}{\partial w}\hat{E}$ with respect to a weight $w \in \mathbf{w}$:
 
 \begin{definition}[gradient]
 	\label{gradient}
-	Let $w_{l,u,v} = \mathbf{W}_{l,u,v}$ be the component at index $u,v$ of $\mathbf{W}_l$ in $h$, and let $J$ be defined as in definition \ref{negative_log-likelihood}. Then the gradient $\nabla J$ is:
+	Let $w_{l,u,v} \in \mathbf{w}$ be the component at index $u,v$ of $\mathbf{W}_l$ in $h$, and let $\hat{E}$ be defined as in definition \ref{negative_log-likelihood}. Then the gradient $\nabla \hat{E}$ is:
 	$$
-	\nabla J = \begin{bmatrix} \frac{\partial}{\partial w_{1,v,u}}J \\ \\ \vdots \\ \\ \frac{\partial}{\partial w_{L,v,u}}J\end{bmatrix}
+	\nabla \hat{E} = \begin{bmatrix} \frac{\partial}{\partial w_{1,v,u}}\hat{E} \\ \\ \vdots \\ \\ \frac{\partial}{\partial w_{L,v,u}}\hat{E}\end{bmatrix}
 	$$
 \end{definition}
-The gradient can be used for computing the rate of change of $J$ in the direction of a unit vector $\mathbf{u}$ by taking the dot product $\nabla J^T\mathbf{u}$. We would like to know in which direction $\mathbf{u}$ we should change $\mathcal{W}_i$ in order to make $J$ as small as possible. The dot product of $\nabla J^T\mathbf{u}$ is equal to $|\nabla J||\mathbf{u}|\cos \theta$ where $\theta$ is the angle between $\nabla J$ and $\mathbf{u}$. The direction $\mathbf{u}$ with the greatest positive rate of change of $J$ is the direction in which $\theta = 0\degree$, in other words, the same direction as $\nabla J$. The direction with the greatest negative rate of change of $J$ is the direction in which $\theta = 180\degree$, in other words, the direction $-\nabla J$. This means that we can make $J$ smaller by taking a small step $\epsilon$ in the direction $-\nabla J$.
+The gradient can be used for computing the rate of change of $\hat{E}$ in the direction of a unit vector $\mathbf{u}$ by taking the dot product $\mathbf{u}^T\nabla \hat{E}$. We would like to know in which direction $\mathbf{u}$ we should change $\mathbf{w}_i$ in order to make $\hat{E}$ as small as possible. The dot product of $\mathbf{u}^T\nabla \hat{E}$ is equal to $|\nabla \hat{E}||\mathbf{u}|\cos \theta$ where $\theta$ is the angle between $\nabla \hat{E}$ and $\mathbf{u}$. The direction $\mathbf{u}$ with the greatest positive rate of change of $\hat{E}$ is the direction in which $\theta = 0\degree$, in other words, the same direction as $\nabla \hat{E}$. The direction with the greatest negative rate of change of $\hat{E}$ is the direction in which $\theta = 180\degree$, in other words, the direction $-\nabla \hat{E}$. This means that we can make $\hat{E}$ smaller by taking a small step $\eta$ in the direction $-\nabla \hat{E}$, such that $\mathbf{w}_i = \mathbf{w}_{i-1} - \eta\nabla\hat{E}$. A small example is given in figure \ref{gradient_descent_example_a} and \ref{gradient_descent_example_b}.
+\\\\
+One challenge of gradient descent is that $\nabla \hat{E} = \frac{1}{N}\sum_{i=1}^N\nabla e(h(\mathbf{x}_i, \mathbf{y}_i)$ is based on all the examples in $\mathcal{D}_{train}$. This means that computing $\nabla \hat{E}$ requires one full iteration over the training set. If the training set is large, this means that every update to the weights $\mathbf{w}$ takes a long time, which makes learning slow. \textbf{Stochastic gradient descent} is a common variation of gradient descent which addresses this problem. In stochastic gradient descent, a single training example $(\mathbf{x}_i, \mathbf{y}_i)$ is sampled from $\mathcal{D}_{train}$. Instead updating $\mathbf{w}_i$ by the gradient $-\nabla \hat{E}$ over all the training examples, we update the weights based on the gradient of a single example $\mathbf{w}_i = \mathbf{w}_{i-1}-\eta\nabla e(h(\mathbf{x}_i, \mathbf{y}_i)$. Since each sample in $\mathcal{D}_{train}$ can be drawn with probability $\frac{1}{N}$, stochastic gradient descent is identical to gradient descent in expectation:
+$$
+\mathbb{E}(-\nabla e(h(\mathbf{x}_i), \mathbf{y}_i)) = \frac{1}{N}\sum\limits_{i=1}^N -\nabla e(h(\mathbf{x}_i), \mathbf{y}_i) = -\nabla\hat{E}
+$$
 
 \begin{figure}
-	\input{img/cost_function.pgf}
+	\hspace{9mm}\input{img/cost_function.pgf}
+	\caption{Level curves of squared training error $\hat{E}(h, \mathcal{D}_{train}) = \frac{1}{N}\sum_{i=1}^N(h(\tilde{\mathbf{x}}) - y_i)^2$ for a toy $\mathcal{D}_{train}$ shown in \ref{gradient_descent_example_b}, and the simple $\mathcal{H} = \{h = \mathbf{w}^T\tilde{\mathbf{x}} \mid \mathbf{w} \in \mathbb{R}^2\}$. $\hat{E}$ has its minimum at $(0, 5)$. Each colored dot corresponds to a step $\mathbf{w}_i$ in gradient descent using a fixed learning rate $\eta$. The first step from $\mathbf{w}_0$ to $\mathbf{w}_1$ makes a lot of progress towards the minimum, and each subsequent update to $\mathbf{w}_i$ is much less dramatic.}
+	\label{gradient_descent_example_a}
+	\vspace{10mm}
 	\input{img/d_train.pgf}
+	\caption{The training data $\mathcal{D}_{train}$ used in figure \ref{gradient_descent_example_a}. The colored lines correspond to $h(\tilde{\mathbf{x}}, \mathbf{w}_i) = 0$ for each weight vector $\mathbf{w}_i$ found by gradient descent in figure \ref{gradient_descent_example_a}, such that for example $h(\tilde{\mathbf{x}}, \mathbf{w}_0) = 0$ is given by the red line. We see as gradient descent makes $\hat{E}$ smaller, the lines fit $\mathcal{D}_{train}$ better.}
+	\label{gradient_descent_example_b}
 \end{figure}
-
+\noindent
+Another practical issue of using gradient descent is how to choose the learning rate $\eta$. We investigate a method called Adam that uses a heuristic to select $\eta$ dynamically in each iteration in section \ref{adam}.
+\\\\
+Gradient descent gives us an algorithm for minimising $\hat{E}$ using $\nabla\hat{E}$. In the next section we explore an algorithm for computing $\nabla\hat{E}$ called backpropagation.
 \subsection{Backpropagation}
 \subsection{Regularisation}
 \label{early_stopping}
 \subsection{Adam}
+\label{adam}
