@@ -76,6 +76,17 @@ By gathering the weights in matrices $\mathbf{W}_l$, we have simplified our view
 	\label{neural_network}
 \end{figure}
 \noindent
+As we shall see in section \ref{learningAlgorithm}, it's often useful to compute the output of $h$ not of a single training sample $\mathbf{x}_i$, but of a \textbf{batch} of $m$ examples $\mathbf{X} = \begin{bmatrix} \mathbf{x}_1 & \dots & \mathbf{x}_m \end{bmatrix}^T$, such that each $\mathbf{x}_1$ to $\mathbf{x}_m$ is a row of the matrix $\mathbf{X}$. We can of course equally well arrange the vectors $\tilde{\mathbf{x}}_i$ of inputs with added bias components in a matrix to get:
+$$
+\tilde{\mathbf{X}} = \begin{bmatrix}
+	\tilde{\mathbf{x}}_1 & \dots & \tilde{\mathbf{x}}_m
+\end{bmatrix}^T
+$$
+
+In this batch processing scheme, the activation at the first layer is an entire matrix $\mathbf{A}_1 = \mathbf{X}\mathbf{W}_1$, such that row $i$ of $\mathbf{A}_1$ is identical to the activation vector $\mathbf{a}_1$ for sample $\mathbf{x}_i$ in the batch. Similarly, $\mathbf{Z}_1$ is obtained by applying the activation function $\sigma$ element wise to $\mathbf{A}_1$, such that $(\sigma(\mathbf{A}_1))_{(i,j)} = (\mathbf{Z}_1)_{(i,j)}$. In general, the output of layer $l$ is $\mathbf{Z}_l = \sigma(\mathbf{Z}_{l-1}\mathbf{W}_l)$.
+\\\\
+In general, the input space $\mathcal{X}$ may not consist of simple vectors, but even matrices or full multi-dimensional tensors, for instance if the training data is color images.
+\\\\
 We now have all the components we need to specify $\mathcal{H}$ as a set of neural networks. The set is defined by the depth of the networks $L$, the number of units in each layer $d_l$ , and the activation function $\sigma$.
 For a particular $L$, $d_l$, and $\sigma$, each $h \in \mathcal{H}$ corresponds exactly to a unique assignment of real numbers to all of its weights. We can make the dependence of $h$ on its weights explicit by defining a vector $\mathbf{w} = \begin{bmatrix} w_{1,u,v} \dots w_{L,u,v}\end{bmatrix}$ and writing $h(\mathbf{x}, \mathbf{w})$ which means \textit{the function $h$ parameterised by the weight vector $\mathbf{w}$}. In the next section we discuss how to choose the activation functions at the layers of the network.
 

@@ -1,5 +1,5 @@
 \section{Learning Algorithm}
-\label{learning_algorithm}
+\label{learningAlgorithm}
 Finding a function $h \in \mathcal{H}$ that maximises the likelihood of $\mathcal{D}_{train}$ is an optimisation problem. Optimisation is solved by answering the question: \textit{how does $\hat{E}$ change when we change $h$?} We answer questions of this type with differential calculus. Sadly, finding the $h$ which maximises the likelihood by analytical differentiation is impossible. Neural network optimisation is therefore solved using an iterative algorithm called \textbf{gradient descent}, which we describe in this section. We then explore an algorithm for computing the gradient of $\hat{E}$ called \textbf{backpropagation}. Finally, we look into \textbf{regularisation} which are tools for constraining the learning algorithm in order to avoid overfitting. Lastly, we describe a specific learning algorithm called \textbf{Adam}, an efficient variation on gradient descent.
 
 \subsection{Gradient Descent}
