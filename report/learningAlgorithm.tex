@@ -4,15 +4,15 @@ Finding a function $h \in \mathcal{H}$ that maximises the likelihood of $\mathca
 
 \subsection{Gradient Descent}
 \label{gradient_descent}
-We want to find a $h \in \mathcal{H}$ that minimises $\hat{E}$ as described in section \ref{objectiveFunction}. Each $h$ is defined exactly be the weight vector $\mathbf{w}$. $\hat{E}$ can't be minimised analytically, since its derivative with respect to $\mathbf{w}$ is a system of non-linear equations, which in general does not have an analytical solution. We therefore look for $h$ by choosing an initial weight vector $\mathbf{w}_0$, and iteratively reduce $\hat{E}$: In iteration $i$, the weight vector $\mathbf{w}_i$ is found by taking a small step $\eta$ in a direction given by a vector $\mathbf{v}$, or more formally: $\mathbf{w}_i = \mathbf{w}_{i-1} + \eta\mathbf{v}$. The main question is, which direction should we choose? 
+We want to find a $h \in \mathcal{H}$ that minimises $\hat{E}$ as described in section \ref{objectiveFunction}. Each $h$ is defined exactly by the weight vector $\mathbf{w}$. $\hat{E}$ can't be minimised analytically, since its derivative with respect to $\mathbf{w}$ is a system of non-linear equations, which in general does not have an analytical solution. We therefore look for $h$ by choosing an initial weight vector $\mathbf{w}_0$, and iteratively reduce $\hat{E}$: In iteration $i$, the weight vector $\mathbf{w}_i$ is found by taking a small step $\eta$ in a direction given by a vector $\mathbf{v}$, or more formally: $\mathbf{w}_i = \mathbf{w}_{i-1} + \eta\mathbf{v}$. The main question is, which direction should we choose? 
 \\\\ 
 $\hat{E}$'s direction of steepest descent at each $\mathbf{w}_i$ is given by the gradient $\nabla\hat{E}$. $\nabla \hat{E}$ is a vector where each component is a partial derivative $\frac{\partial}{\partial w}\hat{E}$ with respect to a weight $w \in \mathbf{w}$:
 
 \begin{definition}[gradient]
 	\label{gradient}
-	Let $w_{l,u,v} \in \mathbf{w}$ be the component at index $u,v$ of $\mathbf{W}_l$ in $h$, and let $\hat{E}$ be defined as in definition \ref{negative_log-likelihood}. Then the gradient $\nabla \hat{E}$ is:
+	Let $w^{(l)}_{ij} \in \mathbf{w}$ be every weight in $h$, and let $\hat{E}$ be defined as in definition \ref{negative_log-likelihood}. Then the gradient $\nabla \hat{E}$ is:
 	$$
-	\nabla \hat{E} = \begin{bmatrix} \frac{\partial}{\partial w_{1,v,u}}\hat{E} \\ \\ \vdots \\ \\ \frac{\partial}{\partial w_{L,v,u}}\hat{E}\end{bmatrix}
+	\nabla \hat{E} = \begin{bmatrix} \frac{\partial}{\partial w^{(1)}_{ij}\hat{E}} \\ \\ \vdots \\ \\ \frac{\partial}{\partial w^{(L)}_{ij}}\hat{E}\end{bmatrix}
 	$$
 \end{definition}
 The gradient can be used for computing the rate of change of $\hat{E}$ in the direction of a unit vector $\mathbf{u}$ by taking the dot product $\mathbf{u}^T\nabla \hat{E}$. We would like to know in which direction $\mathbf{u}$ we should change $\mathbf{w}_i$ in order to make $\hat{E}$ as small as possible. The dot product of $\mathbf{u}^T\nabla \hat{E}$ is equal to $|\nabla \hat{E}||\mathbf{u}|\cos \theta$ where $\theta$ is the angle between $\nabla \hat{E}$ and $\mathbf{u}$. The direction $\mathbf{u}$ with the greatest positive rate of change of $\hat{E}$ is the direction in which $\theta = 0\degree$, in other words, the same direction as $\nabla \hat{E}$. The direction with the greatest negative rate of change of $\hat{E}$ is the direction in which $\theta = 180\degree$, in other words, the direction $-\nabla \hat{E}$. This means that we can make $\hat{E}$ smaller by taking a small step $\eta$ in the direction $-\nabla \hat{E}$, such that $\mathbf{w}_i = \mathbf{w}_{i-1} - \eta\nabla\hat{E}$. A small example is given in figure \ref{gradient_descent_example_a} and \ref{gradient_descent_example_b}.
@@ -24,19 +24,122 @@ $$
 
 \begin{figure}
 	\hspace{9mm}\input{img/cost_function.pgf}
-	\caption{Level curves of squared training error $\hat{E}(h, \mathcal{D}_{train}) = \frac{1}{N}\sum_{i=1}^N(h(\tilde{\mathbf{x}}) - y_i)^2$ for a toy $\mathcal{D}_{train}$ shown in \ref{gradient_descent_example_b}, and the simple $\mathcal{H} = \{h = \mathbf{w}^T\tilde{\mathbf{x}} \mid \mathbf{w} \in \mathbb{R}^2\}$. $\hat{E}$ has its minimum at $(0, 5)$. Each colored dot corresponds to a step $\mathbf{w}_i$ in gradient descent using a fixed learning rate $\eta$. The first step from $\mathbf{w}_0$ to $\mathbf{w}_1$ makes a lot of progress towards the minimum, and each subsequent update to $\mathbf{w}_i$ is much less dramatic.}
+	\caption{Level curves of squared training error $\hat{E}(h, \mathcal{D}_{train}) = \frac{1}{N}\sum_{i=1}^N(h(\mathbf{x}_i) - y_i)^2$ for a toy $\mathcal{D}_{train}$ shown in \ref{gradient_descent_example_b}, and the simple $\mathcal{H} = \{h = \mathbf{w}^T\mathbf{x}^{(0)} \mid \mathbf{w} \in \mathbb{R}^2\}$. $\hat{E}$ has its minimum at $(0, 5)$. Each colored dot corresponds to a step $\mathbf{w}_i$ in gradient descent using a fixed learning rate $\eta$. The first step from $\mathbf{w}_0$ to $\mathbf{w}_1$ makes a lot of progress towards the minimum, and each subsequent update to $\mathbf{w}_i$ is much less dramatic.}
 	\label{gradient_descent_example_a}
 	\vspace{10mm}
 	\input{img/d_train.pgf}
-	\caption{The training data $\mathcal{D}_{train}$ used in figure \ref{gradient_descent_example_a}. The colored lines correspond to $h(\tilde{\mathbf{x}}, \mathbf{w}_i) = 0$ for each weight vector $\mathbf{w}_i$ found by gradient descent in figure \ref{gradient_descent_example_a}, such that for example $h(\tilde{\mathbf{x}}, \mathbf{w}_0) = 0$ is given by the red line. We see as gradient descent makes $\hat{E}$ smaller, the lines fit $\mathcal{D}_{train}$ better.}
+	\caption{The training data $\mathcal{D}_{train}$ used in figure \ref{gradient_descent_example_a}. The colored lines correspond to $h(\mathbf{x}, \mathbf{w}_i) = 0$ for each weight vector $\mathbf{w}_i$ found by gradient descent in figure \ref{gradient_descent_example_a}, such that for example $h(\mathbf{x}, \mathbf{w}_0) = 0$ is given by the red line. We see as gradient descent makes $\hat{E}$ smaller, the lines fit $\mathcal{D}_{train}$ better.}
 	\label{gradient_descent_example_b}
 \end{figure}
 \noindent
 Another practical issue of using gradient descent is how to choose the learning rate $\eta$. We investigate a method called Adam that uses a heuristic to select $\eta$ dynamically in each iteration in section \ref{adam}.
 \\\\
 Gradient descent gives us an algorithm for minimising $\hat{E}$ using $\nabla\hat{E}$. In the next section we explore an algorithm for computing $\nabla\hat{E}$ called backpropagation.
+
 \subsection{Backpropagation}
+We want to compute $\nabla\hat{E}$ in order to use gradient descent to make $\hat{E}$ small. Because of the sum and product rules of differential calculus, we can simplify our analysis by computing $\nabla\hat{E}$ of a single example $(\mathbf{x}, \mathbf{y})$:
+$$
+\nabla \hat{E} = \nabla \frac{1}{N}\sum e(h(\mathbf{x}_i), \mathbf{y}_i) = \frac{1}{N}\sum \nabla e(h(\mathbf{x}_i), \mathbf{y}_i)
+$$
+In our explanation we will use the cross-entropy error $e(h(\mathbf{x}), \mathbf{y}) = -\sum_{c=1}^Cy_c \ln h(\mathbf{x})_c$ as an example. 
+\\\\
+If we can derive a generic formula for a single element $\frac{\partial e}{\partial w^{(l)}_{ij}}$ of $\nabla e$, we can compute all of $\nabla e$. The partial derivative is asking the question \textit{how does $e$ change if we change $w^{(l)}_{ij}$?} The weight $w^{(l)}_{ij}$ influences $e$ only through the activation $a^{(l)}_{j}$. We can therefore decompose the derivative using the chain rule of calculus:
+$$
+\frac{\partial e}{\partial w^{(l)}_{ij}} = \frac{\partial e}{\partial a^{(l)}_j} \frac{\partial a^{(l)}_j}{\partial w^{(l)}_{ij}}
+$$
+The term $\frac{\partial a^{(l)}_j}{\partial w^{(l)}_{ij}}$ is easy to compute, because $a^{(l)}_{j}$ depends directly on $w^{(l)}_{ij}$ in a simple sum:
+$$
+\frac{\partial a^{(l)}_j}{\partial w^{(l)}_{ij}} = \frac{\partial}{\partial w^{(l)}_{ij}} \sum\limits_{k=0}^{d^{(l-1)}} w^{(l)}_{kj} x^{(l-1)}_{k} = x^{l-1}_{i}
+$$
+\\\\
+The term $\frac{\partial e}{\partial a^{(l)}_j}$ is more involved since $a^{(l)}_j$ influences $e$ through units in layers $m > l$ that directly or indirectly receives input from unit $j$ in layer $l$. Computing $\frac{\partial e}{\partial a^{(l)}_j}$ therefore requires a number of applications of the chain rule that depend on the number of layers between $a^{(l)}_j$ and the output. The backpropagation algorithm solves this problem by defining $\delta^{(l)}_j = \frac{\partial e}{\partial a^{(l)}_j}$, and deriving a recursive formula for $\delta^{(l)}_{j}$ that relates it to $\delta^{(l-1)}_j$.
+
+We start by computing $\delta^{(L)}_j$, since the activation in the output layer $a^{(L)}_j$ influences $e$ directly and can therefore be used as a base case for the recursion, that doesn't depend on any other $\delta^{(l)}_j$
+\\\\
+Lets start by rewriting $e$ in terms of the output of layer $L$:
+$$
+e(h(\mathbf{x}), \mathbf{y}) = - \sum\limits_{c=0}^C y_c \ln x^{(L)}_c
+$$
+Where $x^{(L)}_c$ is the output of unit $c$ in the output layer. When using soft-max activation in the output layer would mean that $x^{(L)}_c = \sigma(\mathbf{a}^{(L)})_c = \frac{\me^{a^{(l)}_c}}{\sum_{i=1}^C\me^{a^{(l)}_i}}$.
+\\\\
+Since $a^{(L)}_j$ affects $e$ through the soft-max activation, we will need to compute the derivative of the soft-max activation with respect to the activation $\frac{\partial x^{(L)}_i}{\partial a^{(L)}_j}$ in order to compute $\delta^{(L)}_j$. This derivative is different depending on which output $x^{(L)}_i$, and which activation $a^{(L)}_j$ we consider.
+
+If $i = j$, that is, we are taking the derivative of the output of a unit with respect to its activation, we get:
+\begin{align*}
+	\frac{\partial x^{(L)}_i}{\partial a^{(L)}_i} &= \frac{\partial}{\partial a^{(L)}_i} \frac{\me^{a^{(L)}_i}}{\sum\limits_{c=1}^C \me^{a^{(L)}_c}}
+	= \frac{\me^{a^{(L)}_i}\sum\limits_{c=1}^C \me^{a^{(L)}_c} - \me^{a^{(L)}_i}\me^{a^{(L)}_i}}{\left( \sum\limits_{c=1}^C \me^{a^{(L)}_c} \right)^2}
+	= \frac{\me^{a^{(L)}_i}}{\sum\limits_{c=1}^C \me^{a^{(L)}_c}} \frac{\left( \sum\limits_{c=1}^C \me^{a^{(L)}_c} \right) - \me^{a^{(L)}_i}}{\sum\limits_{c=1}^C \me^{a^{(L)}_c}} \\
+	&= \frac{\me^{a^{(L)}_i}}{\sum\limits_{c=1}^C \me^{a^{(L)}_c}} \left( 1 - \frac{\me^{a^{(L)}_i}}{\sum\limits_{c=1}^C \me^{a^{(L)}_c}} \right)\\
+	&= x^{(L)}_i(1 - x^{(L)}_i)
+\end{align*}
+If $i \neq j$, in other words, if we are taking the derivative of the output of a unit with respect to the activation of another unit, we get:
+\begin{align*}
+	\frac{\partial x^{(L)}_i}{\partial a^{(L)}_j} = \frac{0 - \me^{a^{(L)}_i} \me^{a^{(L)}_j}}{\left( \sum\limits_{c=1}^C \me^{a^{(L)}_c} \right)^2} = - \frac{\me^{a^{(L)}_i}}{\sum\limits_{c=1}^C \me^{a^{(L)}_c}} \frac{\me^{a^{(L)}_j}}{\sum\limits_{c=1}^C \me^{a^{(L)}_c}} = - x^{(L)}_i x^{(L)}_j
+\end{align*}
+
+Armed with $\frac{\partial x^{(L)}_i}{\partial a^{(L)}_j}$, we can go on to compute $\delta^{(L)}_j$:
+\begin{align*}
+	\delta^{(L)}_j 
+	&= \frac{\partial e}{\partial a^{L}_j}
+	= - \sum\limits_{c=1}^C y_c \frac{\partial}{\partial a^{L}_j}\ln x^{(L)}_c
+	=  - \sum\limits_{c=1}^C y_c \frac{1}{x^{(L)}_c}\frac{\partial x^{(L)}_c}{\partial a^{(L)}_j}
+	= - \frac{y_j}{x^{(L)}_j} \frac{\partial x^{(L)}_j}{\partial a^{(L)}_j} - \sum\limits_{c \neq j}^C \frac{y_c}{x^{(L)}_c} \frac{\partial x^{(L)}_c}{\partial a^{(L)}_j}\\
+	&= - \frac{y_j}{x^{(L)}_j} x^{(L)}_j(1 - x^{(L)}_j)  - \sum\limits_{c \neq j}^C \frac{y_c}{x^{(L)}_c} (-x^{(L)}_c x^{(L)}_j)
+	= - y_j + y_j x^{(L)}_j + \sum\limits_{c \neq j}^C y_c x^{(L)}_j\\
+	&= - y_j + \sum\limits_{c = 1}^C y_c x^{(L)}_j
+	= - y_j + x^{(L)}_j \sum\limits_{c = 1}^C y_c\\
+	&=  x^{(L)}_j - y_j
+\end{align*}
+Finally, we see that the derivative of the error with respect to the activation of unit $j$ in the output layer is simply $x^{(L)}_j - y_j$.
+\\\\
+Having derived a formula for $\delta^{(L)}_j$, we can go on to recursively derive $\delta^{(l-1)}_i$. Since $e$ depends on $a^{(l-1)}_i$ only through $x^{(l-1)}_i$, we can use the chain rule to decompose $\delta^{(l-1)}_i$:
+$$
+\delta^{(l-1)}_i = \frac{\partial e}{\partial a^{(l-1)}_i} = \frac{\partial e}{\partial x^{(l-1)}_i} \frac{\partial x^{(l-1)}_i}{\partial a^{(l-1)}_i}
+$$
+The derivative of the output of unit $i$ with respect to its input is simply the derivative of the activation function $\sigma$. We leave this generic here:
+$$
+\frac{\partial x^{(l-1)}_i}{\partial a^{(l-1)}_i} = \sigma'(a^{(l-1)}_i)
+$$
+Since $e$ depends on $x^{(l-1)}_i$ through the activation of every unit $j$ that $i$ is connected to, the chain rule tells us that we must sum the effects on $e$ of changing $x^{(l-1)}_i$:
+$$
+\frac{\partial e}{\partial x^{(l-1)}_i} 
+= \sum\limits_{i=1}^{d^{(l)}} \frac{\partial a^{(l)}_j}{\partial x^{(l-1)}_i} \frac{\partial e}{\partial a^{(l)}_j}
+= \sum\limits_{i=1}^{d^{(l)}} w^{(l)}_{ij} \delta^{(l)}_j
+$$
+We now finally have a recursive formula for $\delta^{(l-1)}_i$:
+$$
+\delta^{(l-1)}_i = \frac{\partial e}{\partial a^{(l-1)}_i}
+= \sigma'(a^{(l-1)}_i) \sum\limits_{j=1}^{d^{(l)}} w^{(l)}_{ij} \delta^{(l)}_j
+$$
+To summarise, we now have a recursive formula for every weight component of the gradient $\frac{\partial e}{\partial w^{(l)}_{ij}}$ given by:
+$$
+\pderiv{e}{w^{(l)}_{ij}} = x^{(l-1)}_i \delta^{(l)}_j,\quad \delta^{(l)}_j = \sigma'(a^{(l)}_i) \sum\limits_{i=1}^{d^{(l+1)}} w^{(l+1)}_{ij} \delta^{(l+1)}_j
+$$
+
 \subsection{Regularisation}
+In section \ref{statistical_learning_theory} we saw that the distance between $E$ and $\hat{E}(h, \mathcal{D}_{train})$ is bounded by a function that's roughly a measure of the diversity of $\mathcal{H}$. In this section we discuss techniques for restricting the learning algorithm to search only in subsets of $\mathcal{H}$, with the aim of reducing $E$. These techniques are collectively known as regularisation.
+\\\\
+For a $\mathcal{H}$ thats parameterized by a weight vector $\mathbf{w}$, such as the hypothesis space given by a particular neural network architecture, we can limit the region of weight space that our learning algorithm is allowed to consider by imposing the constraint that the norm of $\mathbf{w}$ must be smaller than some constant $C$. This has the effect that the weights can be selected only from a limited spherical region around the origin. This reduces the effective number of different hypotheses available during learning, and the Vapnik-Chervonenkis bound gives us confidence that this should improve generalisation.
+\\\\
+If the weights $\mathbf{w}^*$ that minimises the unconstrained training error $\hat{E}(\mathbf{w}, \mathcal{D}_{train})$ lie outside this ball, then the weights $\bar{\mathbf{w}}$ that minimises $\hat{E}$ while still satisfying the constraint $\bar{\mathbf{w}}^T\bar{\mathbf{w}} \leq C$, must have norm equal to $C$, in other words lie on the surface of the sphere with radius $C$. The normal vector to this surface at any $\mathbf{w}$ is $\mathbf{w}$ itself. At $\bar{\mathbf{w}}$, the normal vector must point in the exact opposite direction of $\nabla \hat{E}$, since otherwise $\nabla \hat{E}$ would have a component in along the border of the constraint sphere, and we could decrease $\hat{E}$ by moving along the border of the sphere in the direction of $\nabla \hat{E}$ and still satisfy the constraint. In other words, the following equality holds for $\bar{\mathbf{w}}$:
+$$
+\nabla \trerror{\bar{\vector{w}}} = -2\lambda\bar{\mathbf{w}}
+$$
+Where $\lambda$ is some proportionality constant. Equivalently, $\bar{\mathbf{w}}$ satisfy:
+$$
+\nabla (\trerror{\bar{\vector{w}}} + \lambda\bar{\mathbf{w}}^T\bar{\mathbf{w}}) = \mathbf{0}
+$$
+Because $\nabla(\bar{\mathbf{w}}^T\bar{\mathbf{w}}) = 2\bar{\mathbf{w}}$. In other words, for some $\lambda > 0$, $\bar{\mathbf{w}}$ minimises a new error function which we will call \textbf{augmented error} $\augerror$:
+$$
+\augerror = \hat{E}(\mathbf{w}, \mathcal{D}_{train}) + \lambda\mathbf{w}^T\mathbf{w}
+$$
+This means that the problem of minimising $\hat{E}(\mathbf{w}, \mathcal{D}_{train})$ constrained by $\mathbf{w}^T\mathbf{w} \leq C$ is equivalent of minimising $\augerror$. This is useful because minimising $\augerror$ can be done by gradient descent, which makes it a useful regularisation scheme for neural networks where analytical solutions are not possible in general.
+\\\\
+This particular form of regularisation, where a penalty on the norm of the weight vector is added to the minimisation objective, is called \textbf{weight decay}. To see why, lets consider a single step of the gradient descent algorithm when minimising $\augerror$. In iteration $i$, the weight vector $\vector{w}_i$ is given by:
+$$
+\vector{w}_i = \vector{w}_{i-1} - \eta \nabla \augerror = \vector{w}_{i-1}(1 - 2\eta\lambda) - \eta \nabla \trerror{\vector{w}_{i-1}}	
+$$
+In words, the added norm penalty of $\augerror$ has the effect of pulling the vector $\vector{w}_i$ towards $\vector{0}$, by multiplying by $1 - 2\eta\lambda$ in each iteration. In this way, weight decay is limiting the region that gradient descent can explore in a finite number of iterations, and is therefore limiting the diversity of $\hypspace$.
 \label{early_stopping}
 \subsection{Adam}
-\label{adam}
+\label{adam} 	

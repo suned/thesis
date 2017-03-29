@@ -25,8 +25,8 @@
 % Change section headings
 \sectionfont{\Large\sffamily}
 \subsectionfont{\normalsize\sffamily}
-\chapternumberfont{\huge\mdseries}
 \chapterfont{\sffamily}
+\chapternumberfont{\huge\mdseries\sffamily}
 
 
 % Put section numbers in margin
@@ -46,6 +46,17 @@ the#1\endcsname\quad}}
 % Math commands
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\expect}{\mathbb{E}}
+\newcommand{\dtrain}{\mathcal{D}_{train}}
+\newcommand{\me}{\mathrm{e}}
+\newcommand{\pderiv}[2]{\ensuremath\frac{\partial #1}{\partial #2}}
+\newcommand{\emperror}[2]{\ensuremath\hat{E}(#1, #2)}
+\newcommand{\trerror}[1]{\emperror{#1}{\dtrain}}
+\renewcommand{\vector}[1]{\mathbf{#1}}
+\newcommand{\dotp}[2]{\ensuremath\vector{#1}^T\vector{#2}}
+\newcommand{\augerror}{\ensuremath\bar{E}(\vector{w}, \dtrain)}
+\newcommand{\hypspace}{\mathcal{H}}
+\newcommand{\fspace}{\mathcal{X}}
+\newcommand{\lspace}{\mathcal{Y}}
 %
 % Mini-manual til ku-forside pakken:
 %
