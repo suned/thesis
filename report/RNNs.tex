@@ -1,1 +1,23 @@
-\section{Neural Language Models}
+\section{Word Vectors}
+The way text is represented in a computer doesn't in general encode any information about semantic similarities between words or sentences. Instead, text is most often represented as sequences of discrete symbols. Learning a $h$ that maps from discrete features without any concept of distance, such as words, to a prediction, such as the presence of a named entity, may be more difficult than learning a mapping from continuous features to a prediction, since a continuous function can be expected to have some smoothness properties, i.e similar inputs should have similar outputs \citep{bengio2003}.
+\\\\
+For this reason some effort has been devoted to designing real-valued vector representation of words, so called \textbf{word vectors}, that encode semantic similarities, such that words with similar meaning are close to each other in word-vector space. The notion of "meaning" of a word is a philosophically challenging one. A simple definition which leads to simple but useful algorithms is that words have similar meaning if they are used in similar contexts.
+
+This leads to the idea of representing words as vectors of co-occurrence counts. Two words $w_i$ and $w_j$ co-occur in a context of $c$ words, if $w_j$ appears somewhere in a window of $c$ words from $w_i$ in some piece of text. By representing $w_i$ as a vector $\vector{w}_i \in \mathbb{R}^V$ of co-occurrence counts for the $V$ words in some vocabulary, words that occur in similar contexts will be close to each other in co-occurrence vector space.
+\\\\
+The main problems with this representation is that $V$ may be very large, and $\vector{w}_i$ may be very sparse, that is, most of its components are 0 since most words never co-occur together. Recent solutions to this problem learn lower dimensional word vectors using co-occurrence statistics. \textbf{GloVe} is a recent and successful technique for learning word vectors that encode much useful syntactic and semantic information \citep{pennington2014}. In GloVe, each word $w_i$ is represented by a word vectors $\vector{w}_i$, and a context word vector $\tilde{\vector{w}}_i$. The vectors are initialised randomly
+
+ Glove vectors are learned by minimising the objective function:
+$$
+\sum\limits_{i=1}^V\sum\limits_{i=1}^V f(\matrix{X}_{ij})(\vector{w}_i^T\tilde{\vector{w}}_j + b_i + \tilde{b}_j - \ln \matrix{X}_{ij})^2
+$$
+Where $\matrix{X}_{ij}$ is the co-occurrence count for word $w_i$ and $w_j$, and $b_i$ and $\tilde{b}_j$ are bias terms. $f$ is a weighting function that gives low weight to infrequent terms and caps extremely frequent terms, defined as:
+$$
+f(x) = \begin{cases}
+	(x / x_{max})^{3/4} & \text{when $x < x_{max}$} \\
+	1 & \text{otherwise}
+\end{cases}
+$$
+Minimising this objective leads to word vectors whose dot products are close to log-co-occurrence counts for the words they represent. It can be shown that this has the effect that word vector differences encode information about ratios of log-co-occurrence probabilities which are highly informative of semantic similarity.
+\\\\
+It is now common practice to incorporate word vectors in neural network models for natural language processing tasks in a so called embedding layer. In this scheme, the components of the word vectors are parameters that can be trained by back propagation to yield word vector representations that are informative for a given task. These word embedding vectors, or simply word embeddings, can be initialised with small random components as any other neural network parameter, or they can be initialised with pre-learned word vectors, for example GloVe vectors.

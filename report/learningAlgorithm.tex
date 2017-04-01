@@ -140,6 +140,6 @@ $$
 \vector{w}_i = \vector{w}_{i-1} - \eta \nabla \augerror = \vector{w}_{i-1}(1 - 2\eta\lambda) - \eta \nabla \trerror{\vector{w}_{i-1}}	
 $$
 In words, the added norm penalty of $\augerror$ has the effect of pulling the vector $\vector{w}_i$ towards $\vector{0}$, by multiplying by $1 - 2\eta\lambda$ in each iteration. In this way, weight decay is limiting the region that gradient descent can explore in a finite number of iterations, and is therefore limiting the diversity of $\hypspace$.
-\label{early_stopping}
+
 \subsection{Adam}
-\label{adam} 	
+\label{adam}

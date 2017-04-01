@@ -72,7 +72,6 @@ def plot_gradient_steps(path):
     remove_first_ylabel()
     plt.savefig(file_path)
 
-
     plt.figure(figsize=figure_size())
     plt.xlabel(r"$x$")
     plt.ylabel(r"$y$")
@@ -87,8 +86,7 @@ def plot_gradient_steps(path):
         plt.plot(
             [x_min, x_max],
             y_pred,
-            c=color,
-            #label=label
+            c=color
         )
         step += 1
     plt.legend(loc="upper left")
