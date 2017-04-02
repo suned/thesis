@@ -24,3 +24,7 @@ Install requirements:
 
 If using a virtual environment (recommended), be sure to install in the same
 environment as `tensorflow` or `theano` is installed.
+
+Download `spacy` models:
+
+    > python -m spacy download en
