@@ -3,3 +3,5 @@ matplotlib
 numpy
 scikit-learn
 funcparserlib
+colorlog
+keras

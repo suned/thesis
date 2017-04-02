@@ -2,8 +2,14 @@ import spacy
 from . import tokenization
 
 
-class BadOffsetError(Exception):
+class BadTokenizationError(Exception):
     pass
+
+
+def format_arguments(arguments):
+    if arguments is None:
+        return ""
+    return "(" + arguments[0] + "," + arguments[1] + ")"
 
 
 class GroundTruth:
@@ -19,8 +25,10 @@ class GroundTruth:
         self.sentence = tokenization.tokenize(sentence)
         self.e1 = self._offset_to_index(e1_offset)
         self.e2 = self._offset_to_index(e2_offset)
-        self.relation = relation
-        self.arguments = self._ids_to_index(arguments)
+        self.relation = (
+            relation
+            + format_arguments(arguments)
+        )
 
     def _offset_to_index(self, e1_offset):
         start_char, end_char = e1_offset
@@ -32,7 +40,7 @@ class GroundTruth:
                 end_index = i
                 break
         if start_index is None or end_index is None:
-            raise BadOffsetError()
+            raise BadTokenizationError()
         return start_index, end_index
 
     def _ids_to_index(self, arguments):
@@ -57,14 +65,7 @@ class GroundTruth:
         if not after_e2[0].is_punct:
             e2 += " "
         sentence = before_e1 + e1 + between_es + e2 + after_e2.string
-        relation = self.relation
-        if self.arguments is not None:
-            arg1, arg2 = self.arguments
-            if arg1 == self.e1:
-                relation += "(e1,e2)"
-            else:
-                relation += "(e2,e1)"
-        return relation + " : " + sentence
+        return self.relation + " : " + sentence
 
     def __repr__(self):
         return self.__str__()

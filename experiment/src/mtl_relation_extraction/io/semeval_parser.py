@@ -1,5 +1,6 @@
 from funcparserlib import lexer, parser
-from ..ground_truth import GroundTruth
+from ..ground_truth import GroundTruth, BadTokenizationError
+from .. import log
 
 
 def tokenize(s):
@@ -98,14 +99,18 @@ def parse(s):
         sent_id, sent, rel_type, args = rel
         sent_string = make_sentence_string(sent)
         e1_offset, e2_offset = sentence_to_offset(sent)
-        return GroundTruth(
-            sent_id,
-            sent_string,
-            e1_offset,
-            e2_offset,
-            rel_type,
-            args
-        )
+        try:
+            return GroundTruth(
+                sent_id,
+                sent_string,
+                e1_offset,
+                e2_offset,
+                rel_type,
+                args
+            )
+        except BadTokenizationError as e:
+            log.error("Tokenization error detected in: " + str(sent_id))
+            return None
 
     number = toktype("Number") >> int
     sentence_id = number
@@ -172,5 +177,14 @@ def parse(s):
     semeval = relations + eof
 
     tokens = tokenize(s)
-    return semeval.parse(tokens)
+    relations = semeval.parse(tokens)
+    return [relation for relation in relations
+            if relation is not None]
+
+
+def read_file(path):
+    log.info("Parsing SemEval10 file %s", path)
+    with open(path) as f:
+        s = f.read()
+    return parse(s)
 

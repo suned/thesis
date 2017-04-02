@@ -8,11 +8,16 @@ Project plan can be found [here](https://app.teamweek.com/#p/dwtqvjq2igcforiqfie
 To generate report do:
 
     > cd report; make
-    
+
 The latest built version can be found [here](https://github.com/suned/thesis/raw/master/report/sune_debel_master_thesis.pdf).
 ## Dependencies
 [texlive](https://www.tug.org/texlive/)
 
 # Experiment
+## Dependencies
+ - [tensorflow](https://www.tensorflow.org/install/) or [theano](http://deeplearning.net/software/theano/install.html)
 
-To be announced...
+## Run Instructions
+Install requirements:
+
+    > pip install -r experiment/requirements.txt
