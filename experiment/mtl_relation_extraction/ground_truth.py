@@ -1,4 +1,6 @@
-import spacy
+import numpy
+from keras.preprocessing import sequence
+
 from . import tokenization
 
 
@@ -51,6 +53,21 @@ class GroundTruth:
             return self.e1, self.e2
         else:
             return self.e2, self.e1
+
+    def feature_vector(self, max_len):
+        vector = numpy.array([token.rank if token.has_vector else 0
+                             for token in self.sentence])
+        return sequence.pad_sequences([vector], maxlen=max_len)[0]
+
+    def position_vectors(self, max_len):
+        e1_position_vector = []
+        e2_position_vector = []
+        pad = len(self.sentence) - max_len
+        for i in range(pad, len(self.sentence)):
+            e1_position_vector.append(abs(i - self.e1[0]))
+            e2_position_vector.append(abs(i - self.e2[0]))
+        return (numpy.array(e1_position_vector),
+                numpy.array(e2_position_vector))
 
     def __str__(self):
         e1_start, e1_end = self.e1

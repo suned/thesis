@@ -4,4 +4,6 @@ numpy
 scikit-learn
 funcparserlib
 colorlog
+tensorflow
 keras
+pandas

@@ -1,9 +1,13 @@
 from funcparserlib import lexer, parser
-from ..ground_truth import GroundTruth, BadTokenizationError
+import numpy
+from typing import (
+    List
+)
 from .. import log
+from ..ground_truth import GroundTruth, BadTokenizationError
 
 
-def tokenize(s):
+def tokenize(s: str) -> List[lexer.Token]:
     def choice(choices):
         return r"|".join(choices)
 
@@ -85,7 +89,7 @@ def sentence_to_offset(sent):
     return (e1_start, e1_end), (e2_start, e2_end)
 
 
-def parse(s):
+def parse(s: str) -> List[GroundTruth]:
     def tokval(x):
         return x.value
 
@@ -178,12 +182,14 @@ def parse(s):
 
     tokens = tokenize(s)
     relations = semeval.parse(tokens)
-    return [relation for relation in relations
-            if relation is not None]
+    return numpy.array(
+        [relation for relation in relations
+         if relation is not None]
+    )
 
 
-def read_file(path):
-    log.info("Parsing SemEval10 file %s", path)
+def read_file(path: str) -> List[GroundTruth]:
+    log.info("Parsing SemEval file %s", path)
     with open(path) as f:
         s = f.read()
     return parse(s)

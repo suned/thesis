@@ -26,7 +26,16 @@ _parser.add_argument(
     "--data_path",
     type=str,
     default=os.environ["MTL_DATA"],
-    help="Path to relation data."
+    help="""Path to relation data. The contents of this folder is
+         expected to have the structure:
+            data_folder/
+            |    SemEval2010/
+            |    |    train.txt
+            |    |    test.txt
+            |    OpenIE/
+            |    |    train.txt
+            |    |    test.txt
+         """
 )
 
 _args = _parser.parse_args()
