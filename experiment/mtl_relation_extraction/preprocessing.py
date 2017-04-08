@@ -17,7 +17,10 @@ def max_distance(relations):
 
 
 def max_sentence_length(relations):
-    return max_distance(relations) + config.max_len_buffer
+    if config.dynamic_max_len:
+        return max_distance(relations) + config.max_len_buffer
+    else:
+        return config.max_len
 
 
 def longest_sentence(relations):

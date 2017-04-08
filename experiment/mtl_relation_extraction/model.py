@@ -113,13 +113,14 @@ def get_embeddings(vocab):
 
 
 def fit():
-    best_validation_f1 = float("-inf")
+    best_validation_loss = float("inf")
     best_weights = None
     log.info(
         "Training model with %i training samples, %i validation samples",
         len(target_task.train_relations),
         len(target_task.validation_relations)
     )
+    epochs_without_improvement = 0
     for epoch in range(1, config.epochs):
         batch_input, batch_labels = target_task.get_batch()
         epoch_stats = target_task.pipeline.batch_fit(
@@ -127,27 +128,36 @@ def fit():
             batch_labels,
             validation_data=target_task.validation_set()
         )
-        training_f1 = epoch_stats.history["loss"][0]
-        validation_f1 = epoch_stats.history["val_loss"][0]
+        training_loss = epoch_stats.history["loss"][0]
+        validation_loss = epoch_stats.history["val_loss"][0]
 
-        if validation_f1 > best_validation_f1:
+        if validation_loss < best_validation_loss:
             optimum = "*"
-            best_validation_f1 = validation_f1
+            best_validation_loss = validation_loss
             best_weights = target_task.model.get_weights()
+            epochs_without_improvement = 0
         else:
             optimum = ""
+            epochs_without_improvement += 1
         log.info(
-            "Epoch %i \t: Training F1: %f | Validation F1: %f %s",
+            "Epoch %i \t: Training loss: %f | Validation loss: %f %s",
             epoch,
-            training_f1,
-            validation_f1,
+            training_loss,
+            validation_loss,
             optimum
         )
-        if training_f1 >.99:
+        if training_loss < .01:
             log.info("Training F1 maximised. Stopping")
             break
-    log.info("Finished training with best f1: %i", best_validation_f1)
+        if epochs_without_improvement > config.patience:
+            log.info("Patience exceeded. Stopping")
+            break
+    log.info(
+        "Finished training with best loss: %i",
+        best_validation_loss
+    )
     target_task.model.set_weights(best_weights)
+    log.info("Validation F1: %f", target_task.validation_f1())
 
 
 def train():

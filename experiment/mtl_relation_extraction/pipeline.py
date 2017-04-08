@@ -33,7 +33,10 @@ class Pipeline:
             test_input,
             verbose=config.keras_verbosity
         )
-        y_indices = y_one_hot.argmax(axis=1)
+        return self.one_hot2relations(y_one_hot)
+
+    def one_hot2relations(self, one_hot):
+        y_indices = one_hot.argmax(axis=1)
         return self.encoder.inverse_transform(y_indices)
 
     def evaluate(self, test_input, labels, *args, **kwargs):
@@ -41,7 +44,7 @@ class Pipeline:
         return self.model.evaluate(
             test_input,
             one_hot_labels,
-            verbose=config.keras_verbosity
+            verbose=config.keras_verbosity,
             *args,
             **kwargs
         )

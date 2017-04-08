@@ -16,7 +16,7 @@ def split(features):
     iterator = model_selection.ShuffleSplit(
             n_splits=1,
             random_state=config.random_state,
-            test_size=.2
+            test_size=config.validation_ratio
     )
     return next(
         iterator.split(features)
@@ -80,7 +80,6 @@ class Task:
         self.encoder = preprocessing.LabelEncoder()
         self.encoder.fit(self.train_labels)
         self.num_classes = len(self.encoder.classes_)
-
 
     def get_batch(self):
         n = len(self.train_features)
