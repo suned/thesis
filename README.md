@@ -6,8 +6,10 @@ Project plan can be found [here](https://app.teamweek.com/#p/dwtqvjq2igcforiqfie
 
 # Report
 ## Dependencies
-[texlive](https://www.tug.org/texlive/).
-[ku-forside](http://www.math.ku.dk/~m00cha/). (Place in texmf/tex folder).
+- [texlive](https://www.tug.org/texlive/)
+- [ku-forside](http://www.math.ku.dk/~m00cha/) (Place in texmf/tex folder).
+
+## Build Instructions
 To generate report do:
 
     > cd report; make
