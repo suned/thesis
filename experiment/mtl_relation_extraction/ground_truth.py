@@ -34,16 +34,21 @@ class GroundTruth:
 
     def _offset_to_index(self, e1_offset):
         start_char, end_char = e1_offset
+        start_index, end_index = self._find_token(start_char, end_char)
+        if start_index is None or end_index is None:
+            raise BadTokenizationError()
+        return start_index, end_index
+
+    def _find_token(self, start_char, end_char):
         start_index = end_index = None
         for i, token in enumerate(self.sentence):
             if token.idx == start_char:
                 start_index = i
             if (token.idx + len(token.text) == end_char or
-                token.idx + len(token.text) - 1 == end_char):
+                                token.idx + len(
+                                token.text) - 1 == end_char):
                 end_index = i
                 break
-        if start_index is None or end_index is None:
-            raise BadTokenizationError()
         return start_index, end_index
 
     def _ids_to_index(self, arguments):

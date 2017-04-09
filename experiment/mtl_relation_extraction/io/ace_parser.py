@@ -2,6 +2,7 @@ import os
 from _elementtree import ParseError
 from xml.etree import ElementTree
 import io
+from nltk import sent_tokenize
 
 import spacy
 
@@ -56,27 +57,41 @@ def get_role(arg):
     return arg.attrib["ROLE"]
 
 
+def in_sentence(sentence, arg, text):
+    arg_start, arg_end = arg
+    sent_start = text.find(sentence)
+    sent_end = sent_start + len(sentence)
+    return arg_start >= sent_start and arg_end <= sent_end
+
+
 def find_sentence(text, arg1, arg2):
     arg1_start, arg1_end = arg1
     arg2_start, arg2_end = arg2
-    doc = nlp(text)
-    for sent in doc.sents:
-        sent_start = sent.start_char
-        sent_end = sent.end_char
-        if (arg1_start >= sent_start and
-                    arg1_end <= sent_end and
-                    arg2_start >= sent_start and
-                    arg2_end <= sent_end):
-            arg1_in_sentence = (arg1_start - sent_start,
-                                arg1_end - sent_start + 1)
-            arg2_in_sentence = (arg2_start - sent_start,
-                                arg2_end - sent_start + 1)
-            return (
-                sent.text.replace("\n", " "),
-                arg1_in_sentence,
-                arg2_in_sentence
+    sents = sent_tokenize(text)
+    for i, sent in enumerate(sents):
+        sent_start = text.find(sent)
+        if (in_sentence(sent, arg1, text)
+            and in_sentence(sent, arg2, text)):
+            arg1_in_sent, arg2_in_sent = get_in_sentence_indices(
+                arg1_start,
+                arg1_end,
+                arg2_start,
+                arg2_end,
+                sent_start
             )
+            return sent, arg1_in_sent, arg2_in_sent
     raise NoSentenceFondException()
+
+
+def get_in_sentence_indices(arg1_start, arg1_end, arg2_start, arg2_end, sent_start):
+    arg1_in_sentence = (arg1_start - sent_start,
+                        arg1_end - sent_start + 1)
+    arg2_in_sentence = (arg2_start - sent_start,
+                        arg2_end - sent_start + 1)
+    return (
+        arg1_in_sentence,
+        arg2_in_sentence
+    )
 
 
 def make_relation(sentence, arg1, arg2, relation_type, role):
@@ -108,11 +123,21 @@ def get_relations(apf_file):
             arguments = get_arguments(relation)
             for role, arg1, arg2 in arguments:
                 try:
-                    sentence, arg1, arg2 = find_sentence(text, arg1,
-                                                         arg2)
+                    (sentence,
+                     arg1_sent_idx,
+                     arg2_sent_idx) = find_sentence(
+                        text,
+                        arg1,
+                        arg2
+                    )
                     all_relations.append(
-                        make_relation(sentence, arg1, arg2,
-                                      relation_type, role)
+                        make_relation(
+                            sentence,
+                            arg1_sent_idx,
+                            arg2_sent_idx,
+                            relation_type,
+                            role
+                        )
                     )
                 except NoSentenceFondException:
                     log.error(
@@ -133,8 +158,6 @@ def get_relations(apf_file):
             relation_id
         )
     except ParseError as e:
-        import ipdb
-        ipdb.sset_trace()
         log.error("Parse error in ACE doc %s", doc_id)
     return all_relations
 
@@ -152,10 +175,12 @@ def get_text(sgm_path):
         xml = f.read()
         xml_escaped = xml.replace("&", "&amp;")
         text = (""
-            .join(ElementTree.parse(io.StringIO(xml_escaped))
-            .find(".").itertext())
-            .replace("\n", " "))
-        return text.replace("&amp;", "&")
+            .join(
+                ElementTree.parse(
+                    io.StringIO(xml_escaped)
+                ).find(".").itertext()
+            ).replace("\n", " "))
+        return text
 
 
 def read_files(path):
