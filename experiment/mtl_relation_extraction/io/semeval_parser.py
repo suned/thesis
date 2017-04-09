@@ -113,7 +113,7 @@ def parse(s: str) -> List[GroundTruth]:
                 args
             )
         except BadTokenizationError as e:
-            log.error("Tokenization error detected in: " + str(sent_id))
+            log.error("Tokenization error detected in sentence: " + str(sent_id))
             return None
 
     number = toktype("Number") >> int
@@ -189,7 +189,6 @@ def parse(s: str) -> List[GroundTruth]:
 
 
 def read_file(path: str) -> List[GroundTruth]:
-    log.info("Parsing SemEval file %s", path)
     with open(path) as f:
         s = f.read()
     return parse(s)

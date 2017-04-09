@@ -1,10 +1,14 @@
 import numpy
 import spacy
-from keras import layers
+from keras import layers, models
 from mtl_relation_extraction import log, hyperparameters, config
-from .tasks import load_tasks, target_task
+from .tasks import load_tasks, target_task, all_tasks
 
 nlp = spacy.load("en")
+
+log_header = """Epoch\t\tTask\t\tTraining Loss\t\tValidation Loss
+======================================================================="""
+log_line = """%i\t\t%s\t\t%f\t\t%f %s"""
 
 
 def make_word_embedding():
@@ -13,38 +17,55 @@ def make_word_embedding():
     return layers.Embedding(
         input_dim=embeddings.shape[0],
         output_dim=embeddings.shape[1],
-        trainable=True,
+        trainable=config.train_word_embeddings,
         weights=[embeddings],
         name="word_embedding"
     )
 
 
 def compile_models():
-    position1_input, position2_input, word_input = make_inputs()
-    shared_layers = make_shared_layers(
-        position1_input,
-        position2_input,
-        word_input
-    )
     log.info("Compiling models")
-    target_task.compile_model(
-        shared_layers=shared_layers,
-        inputs=[
-            word_input,
-            position1_input,
-            position2_input
-        ]
+    word_input, position1_input, position2_input = make_inputs()
+    shared_layers = make_shared_layers(
+        word_input,
+        position1_input,
+        position2_input
     )
+    inputs = [
+        word_input,
+        position1_input,
+        position2_input
+    ]
+    log.info("Compiling models")
+
+    for task in all_tasks:
+        output = task.get_output(
+            shared_layers=shared_layers
+        )
+        model = models.Model(
+            inputs=inputs,
+            outputs=output
+        )
+        model.compile(
+            optimizer=config.optimizer,
+            loss="categorical_crossentropy"
+        )
+        task.model = model
+
+
+def get_num_positions():
+    return max(task.num_positions for task in all_tasks)
 
 
 def make_shared_layers(position1_input, position2_input, word_input):
+    num_positions = get_num_positions()
     log.info("Building position embeddings")
     position1_embedding = make_position_embedding(
-        target_task.num_positions,
+        num_positions,
         "position1_embedding"
     )(position1_input)
     position2_embedding = make_position_embedding(
-        target_task.num_positions,
+        num_positions,
         "position2_embedding"
     )(position2_input)
     word_embedding = make_word_embedding()(word_input)
@@ -74,17 +95,17 @@ def make_convolution_layers(embedding_merge_layer):
 
 def make_inputs():
     word_input = layers.Input(
-        (target_task.max_length,),
+        (config.max_len,),
         dtype="int32",
         name="word_input"
     )
     position1_input = layers.Input(
-        (target_task.max_length,),
+        (config.max_len,),
         dtype="int32",
         name="position1_input"
     )
     position2_input = layers.Input(
-        (target_task.max_length,),
+        (config.max_len,),
         dtype="int32",
         name="position2_input"
     )
@@ -116,44 +137,51 @@ def fit():
     best_validation_loss = float("inf")
     best_weights = None
     log.info(
-        "Training model with %i training samples, %i validation samples",
+        "Training model with %i training samples, "
+        "%i early stopping samples",
         len(target_task.train_relations),
-        len(target_task.validation_relations)
+        len(target_task.early_stopping_relations)
     )
     epochs_without_improvement = 0
-    for epoch in range(1, config.epochs):
-        batch_input, batch_labels = target_task.get_batch()
-        epoch_stats = target_task.pipeline.batch_fit(
+    early_stopping_set = target_task.early_stopping_set()
+    task_count = len(all_tasks)
+    log.info(log_header)
+    for epoch in range(1, config.epochs + 1):
+        task = all_tasks[epoch % task_count]
+        batch_input, batch_labels = task.get_batch()
+        epoch_stats = task.model.fit(
             batch_input,
             batch_labels,
-            validation_data=target_task.validation_set()
+            verbose=config.keras_verbosity,
+            validation_data=early_stopping_set if task.is_target else None
         )
         training_loss = epoch_stats.history["loss"][0]
-        validation_loss = epoch_stats.history["val_loss"][0]
-
-        if validation_loss < best_validation_loss:
+        validation_loss = (epoch_stats.history["val_loss"][0]
+                           if task.is_target else float("nan"))
+        if task.is_target and validation_loss < best_validation_loss:
             optimum = "*"
             best_validation_loss = validation_loss
             best_weights = target_task.model.get_weights()
             epochs_without_improvement = 0
         else:
             optimum = ""
-            epochs_without_improvement += 1
+            epochs_without_improvement += 1 if task.is_target else 0
         log.info(
-            "Epoch %i \t: Training loss: %f | Validation loss: %f %s",
+            log_line,
             epoch,
+            task.name,
             training_loss,
             validation_loss,
             optimum
         )
-        if training_loss < .01:
+        if task.is_target and training_loss < .01:
             log.info("Training F1 maximised. Stopping")
             break
         if epochs_without_improvement > config.patience:
             log.info("Patience exceeded. Stopping")
             break
     log.info(
-        "Finished training with best loss: %i",
+        "Finished training with best loss: %f",
         best_validation_loss
     )
     target_task.model.set_weights(best_weights)

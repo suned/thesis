@@ -1,12 +1,13 @@
 import os
 from _elementtree import ParseError
 from xml.etree import ElementTree
-
+import io
 
 import spacy
 
 from ..ground_truth import GroundTruth, BadTokenizationError
 from .. import log
+
 nlp = spacy.load("en")
 
 
@@ -14,17 +15,37 @@ class NoSentenceFondException(Exception):
     pass
 
 
+class NonBinaryRelationError(Exception):
+    pass
+
+
 def get_arguments(relation):
     all_args = []
-    mentions = relation.findall("./relation_mention")
+    mentions = get_mentions(relation)
     for mention in mentions:
-        arguments = mention.findall("./relation_mention_argument")
+        arguments = get_mention_args(mention)
+        if len(arguments) != 2:
+            raise NonBinaryRelationError()
         arg1, arg2 = arguments
         role = get_role(arg1)
         arg1 = find_start(arg1), find_end(arg1)
         arg2 = find_start(arg2), find_end(arg2)
         all_args.append((role, arg1, arg2))
     return all_args
+
+
+def get_mention_args(mention):
+    entity_args = []
+    arguments = mention.findall("./relation_mention_argument")
+    for argument in arguments:
+        if (get_role(argument) == "Arg-1"
+            or get_role(argument) == "Arg-2"):
+            entity_args.append(argument)
+    return entity_args
+
+
+def get_mentions(relation):
+    return relation.findall("./relation_mention")
 
 
 def find_end(arg):
@@ -42,10 +63,10 @@ def find_sentence(text, arg1, arg2):
     for sent in doc.sents:
         sent_start = sent.start_char
         sent_end = sent.end_char
-        if (arg1_start + 1 > sent_start and
-            arg1_end - 1 < sent_end and
-            arg2_start > sent_start and
-            arg2_end < sent_end):
+        if (arg1_start >= sent_start and
+                    arg1_end <= sent_end and
+                    arg2_start >= sent_start and
+                    arg2_end <= sent_end):
             arg1_in_sentence = (arg1_start - sent_start,
                                 arg1_end - sent_start + 1)
             arg2_in_sentence = (arg2_start - sent_start,
@@ -77,36 +98,44 @@ def get_relations(apf_file):
     all_relations = []
     root, apf = apf_file
     doc_id = get_doc_id(apf)
-    log.info("Parsing ACE file %s", doc_id)
     sgm_path = os.path.join(root, doc_id + ".sgm")
     try:
         text = get_text(sgm_path)
         relations = apf.findall(".//relation")
         for relation in relations:
+            relation_id = relation.attrib["ID"]
             relation_type = relation.attrib["TYPE"]
             arguments = get_arguments(relation)
             for role, arg1, arg2 in arguments:
                 try:
-                    sentence, arg1, arg2 = find_sentence(text, arg1, arg2)
+                    sentence, arg1, arg2 = find_sentence(text, arg1,
+                                                         arg2)
                     all_relations.append(
-                        make_relation(sentence, arg1, arg2, relation_type, role)
+                        make_relation(sentence, arg1, arg2,
+                                      relation_type, role)
                     )
                 except NoSentenceFondException:
-                    relation_id = relation.attrib["ID"]
                     log.error(
-                        "No sentence found in doc %s, relation %s",
+                        "No sentence found in ACE doc %s, relation %s",
                         doc_id,
                         relation_id
                     )
                 except BadTokenizationError:
-                    relation_id = relation.attrib["ID"]
                     log.error(
-                        "Bad tokenization detected in %s, relation %s",
+                        "Bad tokenization detected in ACE doc %s, relation %s",
                         doc_id,
                         relation_id
                     )
-    except ParseError:
-        log.error("Parse error in %s", doc_id)
+    except NonBinaryRelationError:
+        log.error(
+            "Non binary relation in ACE doce %s, relation %s",
+            doc_id,
+            relation_id
+        )
+    except ParseError as e:
+        import ipdb
+        ipdb.sset_trace()
+        log.error("Parse error in ACE doc %s", doc_id)
     return all_relations
 
 
@@ -119,10 +148,17 @@ def get_doc_id(apf):
 
 
 def get_text(sgm_path):
-    return "".join(ElementTree.parse(sgm_path).find(".").itertext())
+    with open(sgm_path) as f:
+        xml = f.read()
+        xml_escaped = xml.replace("&", "&amp;")
+        text = (""
+            .join(ElementTree.parse(io.StringIO(xml_escaped))
+            .find(".").itertext())
+            .replace("\n", " "))
+        return text.replace("&amp;", "&")
 
 
-def parse(path):
+def read_files(path):
     relations = []
     apf_files = read_apf_xml(path)
     for apf_file in apf_files:

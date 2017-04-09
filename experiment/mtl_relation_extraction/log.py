@@ -2,7 +2,22 @@ import colorlog
 
 from .io import arguments
 
-formatter = colorlog.ColoredFormatter(
+
+class MultiLineColorFormatter(colorlog.ColoredFormatter):
+    def format(self, record):
+        indent = " " * 32
+        message = colorlog.ColoredFormatter.format(self, record)
+        if message.count("\n") == 0:
+            return message
+        lines = message.split("\n")
+        all_but_first = lines[1:]
+        all_but_first = "\n".join(
+            indent + line for line in all_but_first
+        )
+        return lines[0] + "\n" + all_but_first
+
+
+formatter = MultiLineColorFormatter(
     "%(log_color)s[%(levelname)s]%(reset)s\t[%(asctime)s]\t%(message)s",
     reset=True,
     log_colors={

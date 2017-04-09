@@ -1,10 +1,7 @@
 import os
+os.environ["KERAS_BACKEND"] = "theano"
 
-from mtl_relation_extraction import model, config
-from mtl_relation_extraction.io import semeval_parser, arguments
-
-# Disable tensorflow warnings
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+from mtl_relation_extraction import model
 
 
 if __name__ == "__main__":

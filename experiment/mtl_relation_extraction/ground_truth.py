@@ -38,7 +38,8 @@ class GroundTruth:
         for i, token in enumerate(self.sentence):
             if token.idx == start_char:
                 start_index = i
-            if token.idx + len(token.text) == end_char:
+            if (token.idx + len(token.text) == end_char or
+                token.idx + len(token.text) - 1 == end_char):
                 end_index = i
                 break
         if start_index is None or end_index is None:
