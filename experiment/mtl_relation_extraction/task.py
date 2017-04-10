@@ -20,9 +20,9 @@ def split(relations, test_ratio):
     return relations[train_indices], relations[test_indices]
 
 
-def get_features(max_len, relations):
+def get_features(relations):
     return numpy.array(
-        [train_relation.feature_vector(max_len)
+        [train_relation.feature_vector()
          for train_relation in relations]
     )
 
@@ -33,12 +33,12 @@ def get_labels(relations):
     )
 
 
-def get_positions(max_len, train_relations):
+def get_positions(train_relations):
     position1 = []
     position2 = []
     for train_relation in train_relations:
         (position1_vector,
-         position2_vector) = train_relation.position_vectors(max_len)
+         position2_vector) = train_relation.position_vectors()
         position1.append(position1_vector)
         position2.append(position2_vector)
     return numpy.array(position1), numpy.array(position2)

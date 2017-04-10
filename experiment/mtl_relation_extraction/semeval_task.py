@@ -73,8 +73,6 @@ class SemEvalTask(Task):
         )
         relations = semeval_parser.read_file(train_path)
 
-        if config.dynamic_max_len:
-            config.max_len = max_sentence_length(relations)
         self.num_positions = longest_sentence(relations)
 
         train_relations, validation_relations = split(
@@ -91,31 +89,25 @@ class SemEvalTask(Task):
         self.early_stopping_relations = early_stopping_relations
 
         self.train_features = get_features(
-            config.max_len,
             train_relations
         )
         self.validation_features = get_features(
-            config.max_len,
             validation_relations
         )
         self.early_stopping_features = get_features(
-            config.max_len,
             early_stopping_relations
         )
 
         (self.train_position1_vectors,
          self.train_position2_vectors) = get_positions(
-            config.max_len,
             train_relations
         )
         (self.validation_position1_vectors,
          self.validation_position2_vectors) = get_positions(
-            config.max_len,
             validation_relations
         )
         (self.early_stopping_position1_vectors,
          self.early_stopping_position2_vectors) = get_positions(
-            config.max_len,
             early_stopping_relations
         )
 
@@ -132,13 +124,11 @@ class SemEvalTask(Task):
         )
         self.test_relations = semeval_parser.read_file(test_path)
         self.test_features = get_features(
-            config.max_len,
             self.test_relations
         )
         self.test_labels = get_labels(self.test_relations)
         (self.test_position1_vectors,
          self.test_position2_vectors) = get_positions(
-            config.max_len,
             self.test_relations
         )
 

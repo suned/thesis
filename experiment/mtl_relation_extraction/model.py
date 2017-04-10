@@ -3,8 +3,7 @@ import spacy
 from keras import layers, models
 from mtl_relation_extraction import log, hyperparameters, config
 from .tasks import load_tasks, target_task, all_tasks
-
-nlp = spacy.load("en")
+from . import tokenization
 
 log_header = """Epoch\t\tTask\t\tTraining Loss\t\tValidation Loss
 ======================================================================="""
@@ -13,7 +12,7 @@ log_line = """%i\t\t%s\t\t%f\t\t%f %s"""
 
 def make_word_embedding():
     log.info("Building word embedding layer")
-    embeddings = get_embeddings(nlp.vocab)
+    embeddings = get_embeddings(tokenization.nlp.vocab)
     return layers.Embedding(
         input_dim=embeddings.shape[0],
         output_dim=embeddings.shape[1],
@@ -122,11 +121,10 @@ def make_position_embedding(num_positions, name):
 
 
 def get_embeddings(vocab):
-    max_rank = max(lex.rank for lex in vocab if lex.has_vector)
-    vectors = numpy.ndarray(
-        (max_rank + 1, vocab.vectors_length),
-        dtype='float32'
-    )
+    vectors = numpy.random.rand(
+        tokenization.max_rank + 2,
+        vocab.vectors_length
+    ) / 100
     for lex in vocab:
         if lex.has_vector:
             vectors[lex.rank] = lex.vector

@@ -2,6 +2,7 @@ import numpy
 from keras.preprocessing import sequence
 
 from . import tokenization
+from . import config
 
 
 class BadTokenizationError(Exception):
@@ -12,6 +13,26 @@ def format_arguments(arguments):
     if arguments is None:
         return ""
     return "(" + arguments[0] + "," + arguments[1] + ")"
+
+
+def trim(vector):
+    excess = (len(vector) - config.max_len)
+    if excess % 2 == 0:
+        left = right = excess // 2
+    else:
+        left = (excess // 2) + 1
+        right = (excess // 2)
+    return vector[left:len(vector) - right]
+
+
+def pad(vector):
+    missing = (config.max_len - len(vector))
+    if missing % 2 == 0:
+        left = right = missing // 2
+    else:
+        left = (missing // 2) + 1
+        right = missing // 2
+    return numpy.pad(vector, pad_width=(left, right), mode="constant")
 
 
 class GroundTruth:
@@ -60,20 +81,26 @@ class GroundTruth:
         else:
             return self.e2, self.e1
 
-    def feature_vector(self, max_len):
-        vector = numpy.array([token.rank if token.has_vector else 0
-                             for token in self.sentence])
-        return sequence.pad_sequences([vector], maxlen=max_len)[0]
+    def feature_vector(self):
+        vector = numpy.array([token.rank if token.has_vector
+                              else tokenization.max_rank + 1
+                              for token in self.sentence])
+        if len(vector) < config.max_len:
+            return pad(vector)
+        return trim(vector)
 
-    def position_vectors(self, max_len):
+    def position_vectors(self):
         e1_position_vector = []
         e2_position_vector = []
-        pad = len(self.sentence) - max_len
-        for i in range(pad, len(self.sentence)):
+        for i in range(len(self.sentence)):
             e1_position_vector.append(abs(i - self.e1[0]))
             e2_position_vector.append(abs(i - self.e2[0]))
-        return (numpy.array(e1_position_vector),
-                numpy.array(e2_position_vector))
+        e1_position_vector = numpy.array(e1_position_vector)
+        e2_position_vector = numpy.array(e2_position_vector)
+        if len(self.sentence) < config.max_len:
+            return pad(e1_position_vector), pad(e2_position_vector)
+        else:
+            return trim(e1_position_vector), trim(e2_position_vector)
 
     def __str__(self):
         e1_start, e1_end = self.e1

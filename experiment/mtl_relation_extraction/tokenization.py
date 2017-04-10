@@ -10,3 +10,5 @@ nlp = spacy.load(
 
 def tokenize(s):
     return nlp.tokenizer(s)
+
+max_rank = max(lex.rank for lex in nlp.vocab if lex.has_vector)

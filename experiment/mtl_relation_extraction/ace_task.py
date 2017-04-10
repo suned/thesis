@@ -16,13 +16,11 @@ class ACETask(Task):
         ace_path = os.path.join(arguments.data_path, config.ace_path)
         self.train_relations = ace_parser.read_files(ace_path)
         self.train_features = get_features(
-            config.max_len,
             self.train_relations
         )
         self.train_labels = get_labels(self.train_relations)
         (self.train_position1_vectors,
          self.train_position2_vectors) = get_positions(
-            config.max_len,
             self.train_relations
         )
         self.init_encoder()
