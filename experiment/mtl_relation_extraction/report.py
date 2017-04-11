@@ -36,7 +36,6 @@ hyperparam_string = """
 """
 
 
-
 def save():
     log.info("Saving result")
     model = target_task.model
