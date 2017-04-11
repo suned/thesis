@@ -4,12 +4,12 @@ from keras import layers, models
 
 from .io import arguments
 from . import config
-from mtl_relation_extraction import log, hyperparameters
+from mtl_relation_extraction import log
 from . import tokenization
 from .tasks import load_tasks, target_task, experiment_tasks
 
 log_header = """Epoch\t\tTask\t\tTraining Loss\t\tEarly Stopping Loss
-======================================================================="""
+==========================================================================="""
 log_line = """%i\t\t%s\t\t%f\t\t%f %s"""
 
 
@@ -42,7 +42,6 @@ def compile_models():
         position1_input,
         position2_input
     ]
-    log.info("Compiling models")
 
     for task in experiment_tasks:
         output = task.get_output(
@@ -64,16 +63,12 @@ def get_num_positions():
 
 
 def make_shared_layers(position1_input, position2_input, word_input):
-    num_positions = get_num_positions()
     log.info("Building position embeddings")
-    position1_embedding = make_position_embedding(
-        num_positions,
-        "shared_position1_embedding"
-    )(position1_input)
-    position2_embedding = make_position_embedding(
-        num_positions,
-        "shared_position2_embedding"
-    )(position2_input)
+    position_embedding = make_position_embedding(
+        "shared_position_embedding"
+    )
+    position1_embedding = position_embedding(position1_input)
+    position2_embedding = position_embedding(position2_input)
     word_embedding = make_word_embedding()(word_input)
     embedding_merge_layer = layers.concatenate(
         [word_embedding, position1_embedding, position2_embedding]
@@ -84,10 +79,10 @@ def make_shared_layers(position1_input, position2_input, word_input):
 
 def make_convolution_layers(embedding_merge_layer):
     convolution_layers = []
-    for n_gram in hyperparameters.n_grams:
+    for n_gram in arguments.n_grams:
         convolution_layer = layers.Conv1D(
             kernel_size=n_gram,
-            filters=hyperparameters.filters,
+            filters=arguments.filters,
             activation="relu",
             name="shared_convolution_" + str(n_gram) + "_gram"
         )(embedding_merge_layer)
@@ -123,10 +118,10 @@ def make_inputs():
     return position1_input, position2_input, word_input
 
 
-def make_position_embedding(num_positions, name):
+def make_position_embedding(name):
     return layers.Embedding(
-        input_dim=num_positions,
-        output_dim=hyperparameters.position_embedding_dimension,
+        input_dim=2 * arguments.max_len,
+        output_dim=arguments.position_embedding_dimension,
         trainable=True,
         name=name
     )

@@ -41,6 +41,12 @@ def get_positions(train_relations):
     for train_relation in train_relations:
         (position1_vector,
          position2_vector) = train_relation.position_vectors()
+        if any(e >= 2*arguments.max_len for e in position1_vector):
+            import ipdb
+            ipdb.sset_trace()
+        if any(e >= 2*arguments.max_len for e in position2_vector):
+            import ipdb
+            ipdb.sset_trace()
         position1.append(position1_vector)
         position2.append(position2_vector)
     return numpy.array(position1), numpy.array(position2)

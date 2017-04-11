@@ -3,11 +3,11 @@ from .io import arguments
 
 
 def first_entity_index(relation):
-    return relation.e1[0]
+    return relation.first_entity()[0]
 
 
 def last_entity_index(relation):
-    return relation.e2[1]
+    return relation.last_entity[1]
 
 
 def entity_distance(e1, e2):

@@ -105,7 +105,19 @@ class GroundTruth:
                               for token in self.sentence])
         if len(vector) < arguments.max_len:
             return pad(vector)
-        return trim(vector, self.e1)
+        return trim(vector, self.first_entity())
+
+    def first_entity(self):
+        if self.e1[0] < self.e2[0]:
+            return self.e1
+        else:
+            return self.e2
+
+    def last_entity(self):
+        if self.e2[1] > self.e1[1]:
+            return self.e2
+        else:
+            return self.e1
 
     def position_vectors(self):
         e1_position_vector = []
@@ -118,8 +130,10 @@ class GroundTruth:
         if len(self.sentence) < arguments.max_len:
             return pad(e1_position_vector), pad(e2_position_vector)
         else:
-            return (trim_position(e1_position_vector, self.e1),
-                    trim_position(e2_position_vector, self.e1))
+            return (
+                trim_position(e1_position_vector, self.first_entity()),
+                trim_position(e2_position_vector, self.first_entity())
+            )
 
     def __str__(self):
         e1_start, e1_end = self.e1

@@ -27,12 +27,16 @@ report_string = """# {}
 """
 
 hyperparam_string = """
-| Parameter           | Value |
-|---------------------|-------|
-| max-len             | {:d}  |
-| trainable embedding | {}    |
-| batch size          | {}    |
-| patience            | {}    |
+| Parameter              | Value |
+|------------------------|-------|
+| max-len                | {:d}  |
+| trainable embedding    | {}    |
+| batch size             | {}    |
+| patience               | {}    |
+| dropout                | {}    |
+| filters                | {}    |
+| n_grams                | {}    |
+| position embedding dim | {}    |
 """
 
 
@@ -54,8 +58,11 @@ def save():
         arguments.max_len,
         not arguments.freeze_embeddings,
         arguments.batch_size,
-        arguments.patience
-
+        arguments.patience,
+        arguments.dropout,
+        arguments.filters,
+        arguments.n_grams,
+        arguments.position_embedding_dimension
     )
     if len(aux_tasks) > 0:
         headline += " + " + " + ".join(aux_tasks)
