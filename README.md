@@ -19,7 +19,9 @@ The latest built version can be found [here](https://github.com/suned/thesis/raw
 
 # Experiment
 ## Dependencies
- - [tensorflow](https://www.tensorflow.org/install/) or [theano](http://deeplearning.net/software/theano/install.html)
+ - [theano](http://deeplearning.net/software/theano/install.html)
+ 
+ The model arcitechture currently prevents the use of tensorflow.
 
 ## Run Instructions
 Install requirements:
@@ -27,8 +29,13 @@ Install requirements:
     > pip install -r experiment/requirements.txt
 
 If using a virtual environment (recommended), be sure to install in the same
-environment as `tensorflow` or `theano` is installed.
+environment as `theano` is installed.
 
 Download `spacy` models:
 
     > python -m spacy download en
+ 
+Run:
+
+    > cd experiment
+    > python -m run -h
