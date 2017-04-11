@@ -10,8 +10,7 @@ from .tasks import target_task
 from . import log
 
 
-report_string = """
-# {}
+report_string = """# {}
 ## Time\t: {}
 ### Auxiliary Tasks
 {}
@@ -26,6 +25,16 @@ report_string = """
 {}
 ```
 """
+
+hyperparam_string = """
+| Parameter           | Value |
+|---------------------|-------|
+| max-len             | {:d}  |
+| trainable embedding | {}    |
+| batch size          | {}    |
+| patience            | {}    |
+"""
+
 
 
 def save():
@@ -42,13 +51,20 @@ def save():
     report = classification_report(true_y, pred_y)
     date = datetime.now().strftime('%d-%m-%Y %H:%M:%S')
     headline = "SemEval"
+    hyper_params = hyperparam_string.format(
+        arguments.max_len,
+        not arguments.freeze_embeddings,
+        arguments.batch_size,
+        arguments.patience
+
+    )
     if len(aux_tasks) > 0:
         headline += " + " + " + ".join(aux_tasks)
     output = report_string.format(
         headline,
         date,
         tasks,
-        "",
+        hyper_params,
         summary,
         report
     )
