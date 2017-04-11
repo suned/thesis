@@ -105,7 +105,7 @@ def make_relation(sentence, arg1, arg2, relation_type, role):
         e1_offset=arg1,
         e2_offset=arg2,
         relation=relation_type,
-        arguments=arguments
+        relation_args=arguments
     )
 
 

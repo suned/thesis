@@ -1,9 +1,12 @@
 import numpy
 import spacy
 from keras import layers, models
-from mtl_relation_extraction import log, hyperparameters, config
-from .tasks import load_tasks, target_task, all_tasks
+
+from .io import arguments
+from . import config
+from mtl_relation_extraction import log, hyperparameters
 from . import tokenization
+from .tasks import load_tasks, target_task, experiment_tasks
 
 log_header = """Epoch\t\tTask\t\tTraining Loss\t\tValidation Loss
 ======================================================================="""
@@ -11,14 +14,18 @@ log_line = """%i\t\t%s\t\t%f\t\t%f %s"""
 
 
 def make_word_embedding():
-    log.info("Building word embedding layer")
+    log.info(
+        "Building %s word embedding layer",
+        "trainable" if not arguments.freeze_embeddings
+        else "un-trainable"
+    )
     embeddings = get_embeddings(tokenization.nlp.vocab)
     return layers.Embedding(
         input_dim=embeddings.shape[0],
         output_dim=embeddings.shape[1],
-        trainable=config.train_word_embeddings,
+        trainable=not arguments.freeze_embeddings,
         weights=[embeddings],
-        name="word_embedding"
+        name="shared_word_embedding"
     )
 
 
@@ -37,7 +44,7 @@ def compile_models():
     ]
     log.info("Compiling models")
 
-    for task in all_tasks:
+    for task in experiment_tasks:
         output = task.get_output(
             shared_layers=shared_layers
         )
@@ -53,7 +60,7 @@ def compile_models():
 
 
 def get_num_positions():
-    return max(task.num_positions for task in all_tasks)
+    return max(task.num_positions for task in experiment_tasks)
 
 
 def make_shared_layers(position1_input, position2_input, word_input):
@@ -61,11 +68,11 @@ def make_shared_layers(position1_input, position2_input, word_input):
     log.info("Building position embeddings")
     position1_embedding = make_position_embedding(
         num_positions,
-        "position1_embedding"
+        "shared_position1_embedding"
     )(position1_input)
     position2_embedding = make_position_embedding(
         num_positions,
-        "position2_embedding"
+        "shared_position2_embedding"
     )(position2_input)
     word_embedding = make_word_embedding()(word_input)
     embedding_merge_layer = layers.concatenate(
@@ -82,29 +89,34 @@ def make_convolution_layers(embedding_merge_layer):
             kernel_size=n_gram,
             filters=hyperparameters.filters,
             activation="relu",
-            name="convolution_" + str(n_gram)
+            name="shared_convolution_" + str(n_gram) + "_gram"
         )(embedding_merge_layer)
         pooling_layer = layers.GlobalMaxPooling1D(
-            name="pooling_" + str(n_gram),
+            name="pooling_" + str(n_gram) + "_gram",
         )(convolution_layer)
         convolution_layers.append(pooling_layer)
     convolution_merge_layer = layers.concatenate(convolution_layers)
+    if arguments.dropout:
+        log.info("Adding dropout layer")
+        convolution_merge_layer = layers.Dropout(
+            rate=.5
+        )(convolution_merge_layer)
     return convolution_merge_layer
 
 
 def make_inputs():
     word_input = layers.Input(
-        (config.max_len,),
+        (arguments.max_len,),
         dtype="int32",
         name="word_input"
     )
     position1_input = layers.Input(
-        (config.max_len,),
+        (arguments.max_len,),
         dtype="int32",
         name="position1_input"
     )
     position2_input = layers.Input(
-        (config.max_len,),
+        (arguments.max_len,),
         dtype="int32",
         name="position2_input"
     )
@@ -136,16 +148,17 @@ def fit():
     best_weights = None
     log.info(
         "Training model with %i training samples, "
-        "%i early stopping samples",
+        "%i early stopping samples, sentence length %i",
         len(target_task.train_relations),
-        len(target_task.early_stopping_relations)
+        len(target_task.early_stopping_relations),
+        arguments.max_len
     )
     epochs_without_improvement = 0
     early_stopping_set = target_task.early_stopping_set()
-    task_count = len(all_tasks)
+    task_count = len(experiment_tasks)
     log.info(log_header)
-    for epoch in range(1, config.epochs + 1):
-        task = all_tasks[epoch % task_count]
+    for epoch in range(1, arguments.epochs + 1):
+        task = experiment_tasks[epoch % task_count]
         batch_input, batch_labels = task.get_batch()
         epoch_stats = task.model.fit(
             batch_input,
@@ -175,7 +188,7 @@ def fit():
         if task.is_target and training_loss < .01:
             log.info("Training F1 maximised. Stopping")
             break
-        if epochs_without_improvement > config.patience:
+        if epochs_without_improvement > arguments.patience:
             log.info("Patience exceeded. Stopping")
             break
     log.info(

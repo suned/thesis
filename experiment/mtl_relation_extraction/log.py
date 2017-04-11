@@ -1,5 +1,4 @@
 import colorlog
-
 from .io import arguments
 
 

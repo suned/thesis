@@ -4,7 +4,9 @@ from keras.layers import Dense
 from keras.utils import to_categorical
 from sklearn import model_selection, preprocessing
 
-from mtl_relation_extraction import config, log
+from . import config
+from .io import arguments
+from mtl_relation_extraction import log
 from mtl_relation_extraction.preprocessing import longest_sentence
 
 
@@ -80,10 +82,11 @@ class Task:
 
     def get_batch(self):
         n = len(self.train_features)
+
         batch_indices = numpy.random.randint(
             0,
             high=n,
-            size=config.batch_size
+            size=arguments.batch_size
         )
         batch_features = self.train_features[batch_indices]
         batch_position1 = self.train_position1_vectors[batch_indices]

@@ -1,29 +1,24 @@
 from mtl_relation_extraction.ace_task import ACETask
 from mtl_relation_extraction.semeval_task import SemEvalTask
-from . import config
 from . import log
+from .io import arguments
+
 
 target_task = SemEvalTask()
 auxiliary_tasks = [
     ACETask()
 ]
-
+experiment_tasks = []
 all_tasks = auxiliary_tasks + [target_task]
 
 
 def load_tasks():
+    global experiment_tasks
     log.info("Loading %s task", target_task.name)
     target_task.load()
+    experiment_tasks.append(target_task)
     for auxiliary_task in auxiliary_tasks:
-        log.info("Loading %s task", auxiliary_task.name)
-        auxiliary_task.load()
-
-
-def get_batch():
-    input_batch = {}
-    output_batch = {}
-    for task in all_tasks:
-        task_input, task_output = task.get_batch()
-        input_batch.update(task_input)
-        output_batch.update(task_output)
-    return input_batch, output_batch
+        if auxiliary_task.name in arguments.auxiliary_tasks:
+            log.info("Loading %s task", auxiliary_task.name)
+            auxiliary_task.load()
+            experiment_tasks.append(auxiliary_task)

@@ -1,32 +1,39 @@
 import numpy
-from keras.preprocessing import sequence
 
+from .io import arguments
 from . import tokenization
-from . import config
 
 
 class BadTokenizationError(Exception):
     pass
 
 
-def format_arguments(arguments):
-    if arguments is None:
+def format_arguments(relation_args):
+    if relation_args is None:
         return ""
-    return "(" + arguments[0] + "," + arguments[1] + ")"
+    return "(" + relation_args[0] + "," + relation_args[1] + ")"
 
 
-def trim(vector):
-    excess = (len(vector) - config.max_len)
-    if excess % 2 == 0:
-        left = right = excess // 2
-    else:
-        left = (excess // 2) + 1
-        right = (excess // 2)
-    return vector[left:len(vector) - right]
+def at_beginning(left):
+    return left == 0
+
+
+def beyond_edge(right, vector):
+    return right > len(vector)
+
+
+def trim(vector, e1):
+    left = e1[0]
+    right = left + arguments.max_len
+    while (beyond_edge(right, vector)
+           and not at_beginning(left)):
+        left -= 1
+        right -= 1
+    return vector[left:right]
 
 
 def pad(vector):
-    missing = (config.max_len - len(vector))
+    missing = (arguments.max_len - len(vector))
     if missing % 2 == 0:
         left = right = missing // 2
     else:
@@ -43,14 +50,14 @@ class GroundTruth:
             e1_offset,
             e2_offset,
             relation,
-            arguments):
+            relation_args):
         self.sentence_id = sentence_id
         self.sentence = tokenization.tokenize(sentence)
         self.e1 = self._offset_to_index(e1_offset)
         self.e2 = self._offset_to_index(e2_offset)
         self.relation = (
             relation
-            + format_arguments(arguments)
+            + format_arguments(relation_args)
         )
 
     def _offset_to_index(self, e1_offset):
@@ -72,10 +79,10 @@ class GroundTruth:
                 break
         return start_index, end_index
 
-    def _ids_to_index(self, arguments):
-        if arguments is None:
+    def _ids_to_index(self, relation_args):
+        if relation_args is None:
             return None
-        first, _ = arguments
+        first, _ = relation_args
         if first == "e1":
             return self.e1, self.e2
         else:
@@ -85,9 +92,9 @@ class GroundTruth:
         vector = numpy.array([token.rank if token.has_vector
                               else tokenization.max_rank + 1
                               for token in self.sentence])
-        if len(vector) < config.max_len:
+        if len(vector) < arguments.max_len:
             return pad(vector)
-        return trim(vector)
+        return trim(vector, self.e1)
 
     def position_vectors(self):
         e1_position_vector = []
@@ -97,10 +104,11 @@ class GroundTruth:
             e2_position_vector.append(abs(i - self.e2[0]))
         e1_position_vector = numpy.array(e1_position_vector)
         e2_position_vector = numpy.array(e2_position_vector)
-        if len(self.sentence) < config.max_len:
+        if len(self.sentence) < arguments.max_len:
             return pad(e1_position_vector), pad(e2_position_vector)
         else:
-            return trim(e1_position_vector), trim(e2_position_vector)
+            return (trim(e1_position_vector, self.e1),
+                    trim(e2_position_vector, self.e1))
 
     def __str__(self):
         e1_start, e1_end = self.e1

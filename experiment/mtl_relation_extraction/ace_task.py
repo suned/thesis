@@ -1,6 +1,5 @@
 import os
-
-from mtl_relation_extraction import config
+from . import config
 from mtl_relation_extraction.io import arguments, ace_parser
 from mtl_relation_extraction.task import Task, get_features, get_labels, \
     get_positions
