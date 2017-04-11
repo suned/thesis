@@ -34,3 +34,8 @@ environment as `theano` is installed.
 Download `spacy` models:
 
     > python -m spacy download en
+ 
+Run:
+
+    > cd experiment
+    > python -m run -h
