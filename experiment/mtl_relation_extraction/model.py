@@ -8,7 +8,7 @@ from mtl_relation_extraction import log, hyperparameters
 from . import tokenization
 from .tasks import load_tasks, target_task, experiment_tasks
 
-log_header = """Epoch\t\tTask\t\tTraining Loss\t\tValidation Loss
+log_header = """Epoch\t\tTask\t\tTraining Loss\t\tEarly Stopping Loss
 ======================================================================="""
 log_line = """%i\t\t%s\t\t%f\t\t%f %s"""
 

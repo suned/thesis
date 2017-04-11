@@ -23,13 +23,18 @@ def beyond_edge(right, vector):
 
 
 def trim(vector, e1):
+    left, right = find_edges(e1, vector)
+    return vector[left:right]
+
+
+def find_edges(e1, vector):
     left = e1[0]
     right = left + arguments.max_len
     while (beyond_edge(right, vector)
            and not at_beginning(left)):
         left -= 1
         right -= 1
-    return vector[left:right]
+    return left, right
 
 
 def pad(vector):
@@ -40,6 +45,12 @@ def pad(vector):
         left = (missing // 2) + 1
         right = missing // 2
     return numpy.pad(vector, pad_width=(left, right), mode="constant")
+
+
+def trim_position(position_vector, e1):
+    left, right = find_edges(e1, position_vector)
+    shifted = numpy.roll(position_vector, -left)
+    return shifted[:arguments.max_len] + arguments.max_len
 
 
 class GroundTruth:
@@ -100,15 +111,15 @@ class GroundTruth:
         e1_position_vector = []
         e2_position_vector = []
         for i in range(len(self.sentence)):
-            e1_position_vector.append(abs(i - self.e1[0]))
-            e2_position_vector.append(abs(i - self.e2[0]))
+            e1_position_vector.append(i - self.e1[0])
+            e2_position_vector.append(i - self.e2[0])
         e1_position_vector = numpy.array(e1_position_vector)
         e2_position_vector = numpy.array(e2_position_vector)
         if len(self.sentence) < arguments.max_len:
             return pad(e1_position_vector), pad(e2_position_vector)
         else:
-            return (trim(e1_position_vector, self.e1),
-                    trim(e2_position_vector, self.e1))
+            return (trim_position(e1_position_vector, self.e1),
+                    trim_position(e2_position_vector, self.e1))
 
     def __str__(self):
         e1_start, e1_end = self.e1

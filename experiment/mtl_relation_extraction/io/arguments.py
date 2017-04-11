@@ -47,8 +47,8 @@ _parser.add_argument(
 _parser.add_argument(
     "--dynamic-max-len",
     help="Compute max-len based on longest distance between entities.",
-    type=bool,
-    default=True
+    action="store_true",
+    default=False
 )
 _parser.add_argument(
     "--freeze-embeddings",
@@ -67,7 +67,7 @@ _parser.add_argument(
     help="""Early stopping/train ratio. 
     Split is made after validation/train split""",
     type=float,
-    default=.2
+    default=.1
 
 )
 _parser.add_argument(
