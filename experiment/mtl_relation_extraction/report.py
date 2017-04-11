@@ -42,7 +42,7 @@ def save():
     report = classification_report(true_y, pred_y)
     date = datetime.now().strftime('%d-%m-%Y %H:%M:%S')
     headline = "SemEval"
-    if len(arguments.auxiliary_tasks) > 0:
+    if len(aux_tasks) > 0:
         headline += " + " + " + ".join(aux_tasks)
     output = report_string.format(
         headline,
