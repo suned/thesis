@@ -1,6 +1,8 @@
-import colorlog
-from .io import arguments
 import logging
+
+import colorlog
+
+from ..io import arguments
 
 
 class MultiLineColorFormatter(colorlog.ColoredFormatter):
@@ -24,6 +26,7 @@ formatter = MultiLineColorFormatter(
         'DEBUG': 'cyan',
         'INFO': 'cyan',
         'ERROR': 'red',
+        'WARNING': 'yellow'
     },
     secondary_log_colors={},
     style='%',
@@ -51,3 +54,7 @@ def debug(message, *args, **kwargs):
 
 def error(message, *args, **kwargs):
     logger.error(message, *args, **kwargs)
+
+
+def warning(message, *args, **kwargs):
+    logging.warning(message, *args, **kwargs)

@@ -1,10 +1,9 @@
 import numpy
-import spacy
 from keras import layers, models
 
-from .io import arguments
-from . import config
-from mtl_relation_extraction import log
+from .. import config
+from ..io import arguments
+from . import log
 from . import tokenization
 from .tasks import load_tasks, target_task, experiment_tasks
 

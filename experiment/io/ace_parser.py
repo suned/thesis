@@ -1,13 +1,13 @@
 import os
 from _elementtree import ParseError
 from xml.etree import ElementTree
-import io
-from nltk import sent_tokenize
 
 import spacy
+from nltk import sent_tokenize
 
-from ..ground_truth import GroundTruth, BadTokenizationError
-from .. import log
+import io
+from ..mtl_relation_extraction.ground_truth import GroundTruth, BadTokenizationError
+from ..mtl_relation_extraction import log
 
 nlp = spacy.load("en")
 

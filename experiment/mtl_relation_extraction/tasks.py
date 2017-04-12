@@ -1,8 +1,7 @@
-from mtl_relation_extraction.ace_task import ACETask
-from mtl_relation_extraction.semeval_task import SemEvalTask
+from ..io import arguments
+from .ace_task import ACETask
+from .semeval_task import SemEvalTask
 from . import log
-from .io import arguments
-
 
 target_task = SemEvalTask()
 auxiliary_tasks = [

@@ -3,8 +3,8 @@ import numpy
 from typing import (
     List
 )
-from .. import log
-from ..ground_truth import GroundTruth, BadTokenizationError
+from ..mtl_relation_extraction import log
+from ..mtl_relation_extraction.ground_truth import GroundTruth, BadTokenizationError
 
 
 def tokenize(s: str) -> List[lexer.Token]:

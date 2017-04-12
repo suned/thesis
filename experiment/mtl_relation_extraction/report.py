@@ -1,14 +1,14 @@
-import sys
-from io import StringIO
-from datetime import datetime
-from .io import arguments
-from . import config
-from sklearn.metrics import classification_report
 import os
+import sys
+from datetime import datetime
 
-from .tasks import target_task
+from sklearn.metrics import classification_report
+from io import StringIO
+
+from .. import config
+from ..io import arguments
 from . import log
-
+from .tasks import target_task
 
 report_string = """# {}
 ## Time\t: {}
@@ -20,7 +20,13 @@ report_string = """# {}
 ```
 {}
 ```
-### Report
+### Validation Set Report
+```
+{}
+```
+"""
+
+test_report = """### Test Report Report
 ```
 {}
 ```
@@ -28,7 +34,7 @@ report_string = """# {}
 
 hyperparam_string = """
 | Parameter              | Value |
-|------------------------|-------|
+|-----------------------:|-------|
 | max-len                | {:d}  |
 | trainable embedding    | {}    |
 | batch size             | {}    |
@@ -48,12 +54,9 @@ def save():
                  if task != "none"]
     tasks = "\t".join(aux_tasks)
     true_y = target_task.validation_labels
-    validation_input, _ = target_task.validation_set()
-    one_hot_y = model.predict(validation_input)
-    pred_y = target_task.decode(one_hot_y)
-    report = classification_report(true_y, pred_y)
+    report = target_task.validation_report()
     date = datetime.now().strftime('%d-%m-%Y %H:%M:%S')
-    headline = "SemEval"
+    headline = arguments.save
     hyper_params = hyperparam_string.format(
         arguments.max_len,
         not arguments.freeze_embeddings,
@@ -74,9 +77,15 @@ def save():
         summary,
         report
     )
+    if arguments.test_set:
+        report = target_task.test_report()
+        output += test_report.format(report)
+
+    root = os.path.join(config.out_path, arguments.save)
+    os.mkdir(root)
     report_path = os.path.join(
-        config.out_path,
-        date.replace(" ", "_") + ".md"
+        root,
+        "report.md"
     )
     with open(report_path, "w") as report_file:
         report_file.write(output)

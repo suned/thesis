@@ -3,9 +3,11 @@ import logging
 import os
 import sys
 
+from .. import config
 
-_args = None
 log_level = None
+save = None
+test_set = None
 auxiliary_tasks = None
 data_path = None
 max_len = None
@@ -23,12 +25,22 @@ position_embedding_dimension = None
 n_grams = None
 
 _log_levels = [
-    "DEBUG",
-    "INFO",
-    "WARNING",
-    "ERROR",
-    "CRITICAL"
+    logging.getLevelName(level)
+    for level in [
+        logging.DEBUG,
+        logging.WARN,
+        logging.INFO,
+        logging.ERROR,
+        logging.FATAL,
+    ]
 ]
+
+
+class LevelAction(argparse.Action):
+    def __call__(self, parser, namespace, level, option_string=None):
+        level = getattr(logging, level)
+        setattr(namespace, self.dest, level)
+
 
 _parser = argparse.ArgumentParser(
     description="""Deep Multi-Task Learning for Relation Extraction.
@@ -36,11 +48,12 @@ _parser = argparse.ArgumentParser(
 )
 
 _parser.add_argument(
-    "--loglevel",
+    "--log-level",
     type=str,
     help="Logging level.",
-    default="DEBUG",
-    choices=_log_levels
+    default=logging.INFO,
+    choices=_log_levels,
+    action=LevelAction
 )
 _parser.add_argument(
     "--data_path",
@@ -51,8 +64,8 @@ _parser.add_argument(
     """
 )
 _parser.add_argument(
-    "--aux-tasks",
-    help="List of auxliary tasks to use or none",
+    "--auxiliary-tasks",
+    help="List of auxiliary tasks to use or none",
     nargs="*",
     choices=["ACE", "none"],
     default=["ACE"]
@@ -120,9 +133,9 @@ _parser.add_argument(
 )
 _parser.add_argument(
     "--filters",
-    help="number of filters in n-gram convolutions",
+    help="number of filters in n-gram convolutions. (CNN only)",
     type=int,
-    default=200
+    default=150
 )
 _parser.add_argument(
     "--n-grams",
@@ -132,46 +145,44 @@ _parser.add_argument(
     default=[2, 3, 4, 5]
 )
 _parser.add_argument(
-    "--position-embedding-dim",
+    "--position-embedding-dimension",
     help="dimension of position embedding",
     type=int,
     default=50
 )
+_parser.add_argument(
+    "--save",
+    help="name of experiment results to save",
+    type=str,
+    default=None
+)
+_parser.add_argument(
+    "--test-set",
+    help="also output classification report on test set. "
+         "Depends on --save",
+    action="store_true"
+)
+
+
+class ExperimentExistsError(Exception):
+    pass
+
+
+def experiment_exists():
+        if save is not None:
+            experiment_path = os.path.join(
+                config.out_path,
+                save
+            )
+            return os.path.exists(experiment_path)
+        return False
 
 
 def parse():
-    global _args
-    global log_level
-    global auxiliary_tasks
-    global data_path
-    global max_len
-    global dynamic_max_len
-    global freeze_embeddings
-    global validation_ratio
-    global early_stopping_ratio
-    global batch_size
-    global dropout
-    global shared_layer_depth
-    global patience
-    global epochs
-    global filters
-    global position_embedding_dimension
-    global n_grams
+    arguments = sys.modules[__name__]
     _args = _parser.parse_args()
-
-    log_level = getattr(logging, _args.loglevel)
-    auxiliary_tasks = _args.aux_tasks
-    data_path = _args.data_path
-    max_len = _args.max_len
-    dynamic_max_len = _args.dynamic_max_len
-    freeze_embeddings = _args.freeze_embeddings
-    validation_ratio = _args.validation_ratio
-    early_stopping_ratio = _args.early_stopping_ratio
-    batch_size = _args.batch_size
-    dropout = _args.dropout
-    shared_layer_depth = _args.shared_layer_depth
-    patience = _args.patience
-    epochs = _args.epochs
-    filters = _args.filters
-    position_embedding_dimension = _args.position_embedding_dim
-    n_grams = _args.n_grams
+    for argument, value in vars(_args).items():
+        if getattr(arguments, argument) is None:
+            setattr(arguments, argument, value)
+    if experiment_exists():
+        raise ExperimentExistsError

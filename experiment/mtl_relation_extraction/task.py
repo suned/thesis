@@ -4,10 +4,10 @@ from keras.layers import Dense
 from keras.utils import to_categorical
 from sklearn import model_selection, preprocessing
 
-from . import config
-from .io import arguments
-from mtl_relation_extraction import log
-from mtl_relation_extraction.preprocessing import longest_sentence
+from .. import config
+from ..io import arguments
+from . import log
+from .preprocessing import longest_sentence
 
 
 def split(relations, test_ratio):
@@ -41,10 +41,10 @@ def get_positions(train_relations):
     for train_relation in train_relations:
         (position1_vector,
          position2_vector) = train_relation.position_vectors()
-        if any(e >= 2*arguments.max_len for e in position1_vector):
+        if any(e >= 2* arguments.max_len for e in position1_vector):
             import ipdb
             ipdb.sset_trace()
-        if any(e >= 2*arguments.max_len for e in position2_vector):
+        if any(e >= 2* arguments.max_len for e in position2_vector):
             import ipdb
             ipdb.sset_trace()
         position1.append(position1_vector)

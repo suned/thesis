@@ -1,8 +1,14 @@
 import os
-from . import config
-from mtl_relation_extraction.io import arguments, ace_parser
-from mtl_relation_extraction.task import Task, get_features, get_labels, \
+
+from ..io import arguments
+from .. import config
+from ..io import ace_parser
+from .task import (
+    Task,
+    get_features,
+    get_labels,
     get_positions
+)
 
 
 class ACETask(Task):

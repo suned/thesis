@@ -1,15 +1,20 @@
 import os
 
+from ..io import arguments
 from sklearn import metrics
 
-from . import config
-from .io import arguments
-from mtl_relation_extraction import log
-from mtl_relation_extraction.io import arguments, semeval_parser
-from mtl_relation_extraction.preprocessing import max_sentence_length, \
-    longest_sentence
-from mtl_relation_extraction.task import Task, make_input, get_features, \
-    get_positions, get_labels, split
+from .. import config
+from ..io import semeval_parser
+from . import log
+from .preprocessing import max_sentence_length, longest_sentence
+from .task import (
+    Task,
+    make_input,
+    get_features,
+    get_positions,
+    get_labels,
+    split
+)
 
 
 class SemEvalTask(Task):
@@ -152,3 +157,35 @@ class SemEvalTask(Task):
             label_prediction,
             average="macro"
         )
+
+    def validation_report(self):
+        validation_input, _ = self.validation_set()
+        one_hot_y = self.model.predict(validation_input)
+        pred_y = self.decode(one_hot_y)
+        report = metrics.classification_report(
+            self.validation_labels,
+            pred_y
+        )
+        return report
+
+    def test_report(self):
+        log.warning("Computing test set metrics")
+        test_input, _ = self.test_set()
+        one_hot_y = self.model.predict(test_input)
+        pred_y = self.decode(one_hot_y)
+        report = metrics.classification_report(
+            self.test_labels,
+            pred_y
+        )
+        return report
+
+    def test_set(self):
+        test_input = make_input(
+            self.test_features,
+            self.test_position1_vectors,
+            self.test_position2_vectors
+        )
+        test_labels = {
+            self.name + "_output": self.encode(self.test_labels)
+        }
+        return test_input, test_labels

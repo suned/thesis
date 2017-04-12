@@ -1,5 +1,5 @@
-from . import config
-from .io import arguments
+from ..import config
+from ..io import arguments
 
 
 def first_entity_index(relation):
@@ -7,7 +7,7 @@ def first_entity_index(relation):
 
 
 def last_entity_index(relation):
-    return relation.last_entity[1]
+    return relation.last_entity()[1]
 
 
 def entity_distance(e1, e2):

@@ -1,6 +1,6 @@
 import numpy
 
-from .io import arguments
+from ..io import arguments
 from . import tokenization
 
 
