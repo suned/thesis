@@ -1,6 +1,7 @@
 import argparse
 import os
 import csv
+from io import StringIO
 
 field_names = [
     "id",
@@ -16,7 +17,13 @@ field_names = [
 ]
 
 
-if __name__ == "__main__":
+def parse_line(line):
+    return next(
+        csv.DictReader(StringIO(line), fieldnames=field_names)
+    )
+
+
+def run():
     parser = argparse.ArgumentParser(
         "Download sentences for reverb dataset"
     )
@@ -37,4 +44,7 @@ if __name__ == "__main__":
     train_file = open(train_path)
     sentences_file = open(sentences_path, "w")
     for line in train_file:
-        reader = csv.DictReader()
+        row = parse_line(line)
+
+if __name__ == "__main__":
+    run()
