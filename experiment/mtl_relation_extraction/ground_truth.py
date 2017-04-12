@@ -53,6 +53,15 @@ def trim_position(position_vector, e1):
     return shifted[:arguments.max_len] + arguments.max_len
 
 
+def entity_distance(i, entity):
+    if entity[0] <= i < entity[1]:
+        return 0
+    if i < entity[0]:
+        return i - entity[0]
+    if i >= entity[1]:
+        return i - entity[1] + 1
+
+
 class GroundTruth:
     def __init__(
             self,
@@ -88,7 +97,7 @@ class GroundTruth:
                                 token.text) - 1 == end_char):
                 end_index = i
                 break
-        return start_index, end_index
+        return start_index, end_index + 1
 
     def _ids_to_index(self, relation_args):
         if relation_args is None:
@@ -123,8 +132,8 @@ class GroundTruth:
         e1_position_vector = []
         e2_position_vector = []
         for i in range(len(self.sentence)):
-            e1_position_vector.append(i - self.e1[0])
-            e2_position_vector.append(i - self.e2[0])
+            e1_position_vector.append(entity_distance(i, self.e1))
+            e2_position_vector.append(entity_distance(i, self.e2))
         e1_position_vector = numpy.array(e1_position_vector)
         e2_position_vector = numpy.array(e2_position_vector)
         if len(self.sentence) < arguments.max_len:

@@ -207,8 +207,8 @@ class TestGroundTruth(unittest.TestCase):
 
     def test_no_negatives(self):
         arguments.max_len = 11
-        self.odd_relation.e1 = (0, 0)
-        self.odd_relation.e2 = (10, 10)
+        self.odd_relation.e1 = (0, 1)
+        self.odd_relation.e2 = (10, 11)
         e1_positions, e2_positions = (self
             .odd_relation
             .position_vectors())
@@ -230,11 +230,30 @@ class TestGroundTruth(unittest.TestCase):
     def test_overlapping_entities(self):
         arguments.max_len = 7
         self.odd_relation.e1 = (0, 9)
-        self.odd_relation.e2 = (4, 4)
+        self.odd_relation.e2 = (4, 5)
         (e1_position,
          e2_position) = self.odd_relation.position_vectors()
-        expected_e1 = array([0, 1, 2, 3, 4, 5, 6]) + 7
+        expected_e1 = array([0, 0, 0, 0, 0, 0, 0]) + 7
         expected_e2 = array([-4, -3, -2, -1, 0, 1, 2]) + 7
+        self.check_length(e1_position)
+        self.check_length(e2_position)
+        testing.assert_equal(
+            e1_position,
+            expected_e1
+        )
+        testing.assert_equal(
+            e2_position,
+            expected_e2
+        )
+
+    def test_long_entities(self):
+        arguments.max_len = 7
+        self.odd_relation.e1 = (1, 3)
+        self.odd_relation.e2 = (4, 6)
+        (e1_position,
+         e2_position) = self.odd_relation.position_vectors()
+        expected_e1 = array([0, 0, 1, 2, 3, 4, 5]) + 7
+        expected_e2 = array([-3, -2, -1, 0, 0, 1, 2]) + 7
         self.check_length(e1_position)
         self.check_length(e2_position)
         testing.assert_equal(

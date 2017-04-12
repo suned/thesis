@@ -1,5 +1,6 @@
 import colorlog
 from .io import arguments
+import logging
 
 
 class MultiLineColorFormatter(colorlog.ColoredFormatter):
@@ -32,7 +33,11 @@ formatter = MultiLineColorFormatter(
 handler = colorlog.StreamHandler()
 handler.setFormatter(formatter)
 logger = colorlog.getLogger()
-logger.setLevel(arguments.log_level)
+logger.setLevel(
+    arguments.log_level
+    if arguments.log_level is not None
+    else logging.DEBUG
+)
 logger.addHandler(handler)
 
 
