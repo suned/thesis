@@ -34,7 +34,7 @@ test_report = """### Test Report Report
 
 hyperparam_string = """
 | Parameter              | Value |
-|-----------------------:|-------|
+|-----------------------:|:------|
 | max-len                | {:d}  |
 | trainable embedding    | {}    |
 | batch size             | {}    |
@@ -53,7 +53,6 @@ def save():
     aux_tasks = [task for task in arguments.auxiliary_tasks
                  if task != "none"]
     tasks = "\t".join(aux_tasks)
-    true_y = target_task.validation_labels
     report = target_task.validation_report()
     date = datetime.now().strftime('%d-%m-%Y %H:%M:%S')
     headline = arguments.save
@@ -67,8 +66,6 @@ def save():
         arguments.n_grams,
         arguments.position_embedding_dimension
     )
-    if len(aux_tasks) > 0:
-        headline += " + " + " + ".join(aux_tasks)
     output = report_string.format(
         headline,
         date,

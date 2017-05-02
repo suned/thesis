@@ -18,11 +18,16 @@ early_stopping_ratio = None
 batch_size = None
 dropout = None
 shared_layer_depth = None
+hidden_layer_dimension = None
 patience = None
 epochs = None
 filters = None
 position_embedding_dimension = None
 n_grams = None
+task_layer_depth = None
+entity_markers = None
+fit_sequential = None
+model = None
 
 _log_levels = [
     logging.getLevelName(level)
@@ -103,7 +108,7 @@ _parser.add_argument(
 _parser.add_argument(
     "--batch-size",
     help="SGD batch size",
-    type=float,
+    type=int,
     default=64
 )
 _parser.add_argument(
@@ -142,7 +147,7 @@ _parser.add_argument(
     help="width of convolutions",
     type=int,
     nargs="*",
-    default=[2, 3, 4, 5]
+    default=[1, 2, 3, 4, 5]
 )
 _parser.add_argument(
     "--position-embedding-dimension",
@@ -161,6 +166,35 @@ _parser.add_argument(
     help="also output classification report on test set. "
          "Depends on --save",
     action="store_true"
+)
+_parser.add_argument(
+    "--hidden-layer-dimension",
+    help="dimensionality of dense hidden layers",
+    type=int,
+    default=500
+)
+_parser.add_argument(
+    "--task-layer-depth",
+    help="depth of task specific layers",
+    type=int,
+    default=0
+)
+_parser.add_argument(
+    "--entity-markers",
+    help="use binary entity features instead of position embeddings",
+    action="store_true"
+)
+_parser.add_argument(
+    "--fit-sequential",
+    help="fit auxiliary tasks first, then target",
+    action="store_true"
+)
+_parser.add_argument(
+    "--model",
+    help="model type",
+    type=str,
+    default="cnn",
+    choices=["cnn", "rnn"]
 )
 
 

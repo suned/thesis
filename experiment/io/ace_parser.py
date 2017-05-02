@@ -2,6 +2,7 @@ import os
 from _elementtree import ParseError
 from xml.etree import ElementTree
 
+import numpy
 import spacy
 from nltk import sent_tokenize
 
@@ -188,7 +189,7 @@ def read_files(path):
     apf_files = read_apf_xml(path)
     for apf_file in apf_files:
         relations.extend(get_relations(apf_file))
-    return relations
+    return numpy.array(relations)
 
 
 def read_apf_xml(path):

@@ -5,10 +5,8 @@ from .. import config
 from ..io import ace_parser
 from .task import (
     Task,
-    get_features,
     get_labels,
-    get_positions
-)
+    split)
 
 
 class ACETask(Task):
@@ -19,14 +17,16 @@ class ACETask(Task):
 
     def load(self):
         ace_path = os.path.join(arguments.data_path, config.ace_path)
-        self.train_relations = ace_parser.read_files(ace_path)
-        self.train_features = get_features(
-            self.train_relations
-        )
+        train_relations = ace_parser.read_files(ace_path)
+        if arguments.fit_sequential:
+            train_relations, early_stopping_relations = split(
+                train_relations,
+                arguments.early_stopping_ratio
+            )
+            self.early_stopping_relations = early_stopping_relations
+            self.early_stopping_labels = get_labels(
+                early_stopping_relations
+            )
+        self.train_relations = train_relations
         self.train_labels = get_labels(self.train_relations)
-        (self.train_position1_vectors,
-         self.train_position2_vectors) = get_positions(
-            self.train_relations
-        )
         self.init_encoder()
-        self.init_num_positions()

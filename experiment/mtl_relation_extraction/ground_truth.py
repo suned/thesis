@@ -1,7 +1,7 @@
 import numpy
 
 from ..io import arguments
-from . import tokenization
+from . import nlp
 
 
 class BadTokenizationError(Exception):
@@ -47,12 +47,6 @@ def pad(vector):
     return numpy.pad(vector, pad_width=(left, right), mode="constant")
 
 
-def trim_position(position_vector, e1):
-    left, right = find_edges(e1, position_vector)
-    shifted = numpy.roll(position_vector, -left)
-    return shifted[:arguments.max_len] + arguments.max_len
-
-
 def entity_distance(i, entity):
     if entity[0] <= i < entity[1]:
         return 0
@@ -72,7 +66,7 @@ class GroundTruth:
             relation,
             relation_args):
         self.sentence_id = sentence_id
-        self.sentence = tokenization.tokenize(sentence)
+        self.sentence = nlp.tokenize(sentence)
         self.e1 = self._offset_to_index(e1_offset)
         self.e2 = self._offset_to_index(e2_offset)
         self.relation = (
@@ -85,7 +79,7 @@ class GroundTruth:
         start_index, end_index = self._find_token(start_char, end_char)
         if start_index is None or end_index is None:
             raise BadTokenizationError()
-        return start_index, end_index
+        return start_index, end_index + 1
 
     def _find_token(self, start_char, end_char):
         start_index = end_index = None
@@ -97,7 +91,7 @@ class GroundTruth:
                                 token.text) - 1 == end_char):
                 end_index = i
                 break
-        return start_index, end_index + 1
+        return start_index, end_index
 
     def _ids_to_index(self, relation_args):
         if relation_args is None:
@@ -110,7 +104,7 @@ class GroundTruth:
 
     def feature_vector(self):
         vector = numpy.array([token.rank if token.has_vector
-                              else tokenization.max_rank + 1
+                              else nlp.vocab.length + 1
                               for token in self.sentence])
         if len(vector) < arguments.max_len:
             return pad(vector)
@@ -140,9 +134,34 @@ class GroundTruth:
             return pad(e1_position_vector), pad(e2_position_vector)
         else:
             return (
-                trim_position(e1_position_vector, self.first_entity()),
-                trim_position(e2_position_vector, self.first_entity())
+                trim(
+                    e1_position_vector,
+                    self.first_entity()
+                ) + arguments.max_len,
+                trim(
+                    e2_position_vector,
+                    self.first_entity()
+                ) + arguments.max_len
             )
+
+    def at_entity(self, i):
+        return (
+            entity_distance(i, self.e1) == 0
+            or entity_distance(i, self.e2) == 0
+        )
+
+    def entity_markers(self):
+        entity_markers = []
+        for i in range(len(self.sentence)):
+            if self.at_entity(i):
+                entity_markers.append(1)
+            else:
+                entity_markers.append(0)
+        entity_markers = numpy.array(entity_markers)
+        if len(self.sentence) < arguments.max_len:
+            return pad(entity_markers)
+        else:
+            return trim(entity_markers, self.first_entity())
 
     def __str__(self):
         e1_start, e1_end = self.e1

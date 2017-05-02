@@ -1,4 +1,7 @@
-from ..import config
+import os
+import unicodedata
+
+from .. import config
 from ..io import arguments
 
 
@@ -30,3 +33,19 @@ def max_sentence_length(relations):
 
 def longest_sentence(relations):
     return max(len(relation.sentence) for relation in relations)
+
+
+def clean_glove_vectors(vector_path, length=300):
+    path, extension = os.path.splitext(vector_path)
+    clean_path = path + ".clean" + extension
+    line_count = 0
+    with open(vector_path) as vector_file, \
+         open(clean_path, "w") as clean_file:
+        for vector_string in vector_file:
+            if line_count == 77292:
+                continue
+            decoded = unicodedata.normalize("NFKC", vector_string)
+            splat = decoded.split(" ")
+            if len(splat) == length + 1:
+                clean_file.write(decoded)
+            line_count += 1
