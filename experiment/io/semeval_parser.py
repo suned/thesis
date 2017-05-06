@@ -4,7 +4,7 @@ from typing import (
     List
 )
 from ..mtl_relation_extraction import log
-from ..mtl_relation_extraction.ground_truth import GroundTruth, BadTokenizationError
+from ..mtl_relation_extraction.ground_truth import Relation, BadTokenizationError
 
 
 def tokenize(s: str) -> List[lexer.Token]:
@@ -89,7 +89,7 @@ def sentence_to_offset(sent):
     return (e1_start, e1_end), (e2_start, e2_end)
 
 
-def parse(s: str) -> List[GroundTruth]:
+def parse(s: str) -> List[Relation]:
     def tokval(x):
         return x.value
 
@@ -104,7 +104,7 @@ def parse(s: str) -> List[GroundTruth]:
         sent_string = make_sentence_string(sent)
         e1_offset, e2_offset = sentence_to_offset(sent)
         try:
-            return GroundTruth(
+            return Relation(
                 sent_id,
                 sent_string,
                 e1_offset,
@@ -188,7 +188,7 @@ def parse(s: str) -> List[GroundTruth]:
     )
 
 
-def read_file(path: str) -> List[GroundTruth]:
+def read_file(path: str) -> List[Relation]:
     with open(path) as f:
         s = f.read()
     return parse(s)

@@ -1,11 +1,15 @@
+import numpy
+
 from ..io import arguments, kbp37_parser
 from .. import config
-from .task import Task, get_labels
+from .task import get_labels
+from mtl_relation_extraction.cnn import CNN
+from . import preprocessing
 
 import os
 
 
-class KBP37Task(Task):
+class KBP37Task(CNN):
     def load(self):
         train_path = os.path.join(
             arguments.data_path,
@@ -21,7 +25,11 @@ class KBP37Task(Task):
         )
         train_relations = kbp37_parser.read_file(train_path)
         test_relations = kbp37_parser.read_file(test_path)
-        self.train_relations = train_relations + test_relations
+        self.train_relations = numpy.append(
+            train_relations,
+            test_relations
+        )
+        self.input_length = preprocessing.max_distance(train_relations)
         self.early_stopping_relations = kbp37_parser.read_file(dev_path)
         self.early_stopping_labels = get_labels(
             self.early_stopping_relations
@@ -32,5 +40,7 @@ class KBP37Task(Task):
         self.init_encoder()
 
     def __init__(self):
-        super().__init__()
-        self.name = "KBP37"
+        super().__init__(
+            name="KBP37",
+            is_target=False
+        )

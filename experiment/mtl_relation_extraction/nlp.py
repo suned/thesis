@@ -2,6 +2,7 @@ import numpy
 import spacy
 from . import log
 from ..io import word_vector_parser
+from .. import config
 
 _nlp = spacy.load(
     "en_core_web_md",
@@ -11,6 +12,13 @@ _nlp = spacy.load(
 )
 
 vocab = _nlp.vocab
+glove_vectors = None
+
+
+def load_glove_vectors():
+    global glove_vectors
+    log.info("Loading glove vectors")
+    glove_vectors = word_vector_parser.from_pickle()
 
 
 def tokenize(s):
@@ -27,13 +35,13 @@ def add_all(train_relations):
     log.info("Vocabulary length after: %i", _nlp.vocab.length)
 
 
-def add_test_vocabulary(glove_vectors, task):
-    glove_or_nothing(glove_vectors, task.validation_relations)
-    glove_or_nothing(glove_vectors, task.early_stopping_relations)
-    glove_or_nothing(glove_vectors, task.test_relations)
+def add_test_vocabulary(task):
+    glove_or_nothing(task.validation_relations)
+    glove_or_nothing(task.early_stopping_relations)
+    glove_or_nothing(task.test_relations)
 
 
-def glove_or_nothing(glove_vectors, relations):
+def glove_or_nothing(relations):
     for relation in relations:
         for token in relation.sentence:
             if token.string not in _nlp.vocab:
@@ -45,18 +53,17 @@ def glove_or_nothing(glove_vectors, relations):
 
 
 def add_vocabularies(tasks, vector_length=300):
-    log.info("Loading glove vectors")
-    glove_vectors = word_vector_parser.from_pickle()
     for task in tasks:
         log.info("Adding vocabulary from task: %s", task.name)
         log.info("Vocabulary length before: %i", _nlp.vocab.length)
-        add_train_vocabulary(glove_vectors, task, vector_length)
+        add_train_vocabulary(task, vector_length)
         if task.is_target:
-            add_test_vocabulary(glove_vectors, task)
+            add_test_vocabulary(task)
         log.info("Vocabulary after: %i", _nlp.vocab.length)
 
 
-def add_train_vocabulary(glove_vectors, task, vector_length):
+def add_train_vocabulary(task, vector_length):
+    _ = vocab[config.pad_token]
     for relation in task.train_relations:
         for token in relation.sentence:
             if token.string not in _nlp.vocab:

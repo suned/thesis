@@ -14,10 +14,9 @@ def interleaved():
     best_weights = None
     log.info(
         "Training interleaved with %i training samples, "
-        "%i early stopping samples, sentence length %i",
+        "%i early stopping samples",
         len(target_task.train_relations),
         len(target_task.early_stopping_relations),
-        arguments.max_len
     )
     epochs_without_improvement = 0
     early_stopping_set = target_task.early_stopping_set()
@@ -79,12 +78,12 @@ def sequential():
 
 
 def fit_early_stopping(task):
-    epochs_without_improvement = 0
     best_early_stopping_loss = float("inf")
     best_weights = None
     log.info("Training on task: %s", task.name)
     log.info(log_header)
     early_stopping_set = task.early_stopping_set()
+    epochs_without_improvement = 0
     for epoch in range(1, arguments.epochs + 1):
         training_input, training_labels = task.get_batch()
         epoch_stats = task.model.fit(
@@ -124,5 +123,4 @@ def fit_early_stopping(task):
         best_early_stopping_loss
     )
     task.model.set_weights(best_weights)
-
 

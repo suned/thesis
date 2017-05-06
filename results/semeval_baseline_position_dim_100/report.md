@@ -1,5 +1,5 @@
-# semeval_baseline
-## Time	: 03-05-2017 11:08:12
+# semeval_baseline_position_dim_100
+## Time	: 03-05-2017 11:24:03
 ### Auxiliary Tasks
 
 ### Hyper-Parameters
@@ -13,7 +13,7 @@
 | dropout                | False    |
 | filters                | 150    |
 | n_grams                | [1, 2, 3, 4, 5]    |
-| position embedding dim | 50    |
+| position embedding dim | 100    |
 
 ### SemEval Model Summary
 ```
@@ -28,19 +28,19 @@ position2_input (InputLayer)     (None, 32)            0
 ____________________________________________________________________________________________________
 shared_word_embedding (Embedding (None, 32, 300)       402089100                                    
 ____________________________________________________________________________________________________
-shared_position_embedding (Embed (None, 32, 50)        3200                                         
+shared_position_embedding (Embed (None, 32, 100)       6400                                         
 ____________________________________________________________________________________________________
-embedding_merge (Concatenate)    (None, 32, 400)       0                                            
+embedding_merge (Concatenate)    (None, 32, 500)       0                                            
 ____________________________________________________________________________________________________
-shared_convolution_1_gram (Conv1 (None, 32, 150)       60150                                        
+shared_convolution_1_gram (Conv1 (None, 32, 150)       75150                                        
 ____________________________________________________________________________________________________
-shared_convolution_2_gram (Conv1 (None, 31, 150)       120150                                       
+shared_convolution_2_gram (Conv1 (None, 31, 150)       150150                                       
 ____________________________________________________________________________________________________
-shared_convolution_3_gram (Conv1 (None, 30, 150)       180150                                       
+shared_convolution_3_gram (Conv1 (None, 30, 150)       225150                                       
 ____________________________________________________________________________________________________
-shared_convolution_4_gram (Conv1 (None, 29, 150)       240150                                       
+shared_convolution_4_gram (Conv1 (None, 29, 150)       300150                                       
 ____________________________________________________________________________________________________
-shared_convolution_5_gram (Conv1 (None, 28, 150)       300150                                       
+shared_convolution_5_gram (Conv1 (None, 28, 150)       375150                                       
 ____________________________________________________________________________________________________
 pooling_1_gram (GlobalMaxPooling (None, 150)           0                                            
 ____________________________________________________________________________________________________
@@ -56,8 +56,8 @@ convolution_merge (Concatenate)  (None, 750)           0
 ____________________________________________________________________________________________________
 SemEval_output (Dense)           (None, 19)            14269                                        
 ====================================================================================================
-Total params: 403,007,319.0
-Trainable params: 918,219.0
+Total params: 403,235,519.0
+Trainable params: 1,146,419.0
 Non-trainable params: 402,089,100.0
 ____________________________________________________________________________________________________
 
@@ -66,25 +66,25 @@ ________________________________________________________________________________
 ```
                            precision    recall  f1-score   support
 
-      Cause-Effect(e1,e2)       0.89      0.72      0.80        65
-      Cause-Effect(e2,e1)       0.88      0.78      0.83       133
-   Component-Whole(e1,e2)       0.80      0.72      0.76        94
-   Component-Whole(e2,e1)       0.61      0.64      0.63        92
- Content-Container(e1,e2)       0.79      0.91      0.85        70
- Content-Container(e2,e1)       0.93      0.80      0.86        35
-Entity-Destination(e1,e2)       0.78      0.86      0.81       161
-     Entity-Origin(e1,e2)       0.70      0.75      0.73       110
-     Entity-Origin(e2,e1)       0.94      0.77      0.85        39
- Instrument-Agency(e1,e2)       1.00      0.38      0.55        24
- Instrument-Agency(e2,e1)       0.69      0.79      0.74        85
- Member-Collection(e1,e2)       0.53      0.57      0.55        14
- Member-Collection(e2,e1)       0.85      0.91      0.88       129
-     Message-Topic(e1,e2)       0.80      0.84      0.82       107
-     Message-Topic(e2,e1)       0.53      0.53      0.53        19
-                    Other       0.48      0.49      0.48       285
-  Product-Producer(e1,e2)       0.69      0.52      0.59        60
-  Product-Producer(e2,e1)       0.67      0.69      0.68        77
+      Cause-Effect(e1,e2)       0.82      0.75      0.78        65
+      Cause-Effect(e2,e1)       0.88      0.83      0.85       133
+   Component-Whole(e1,e2)       0.78      0.71      0.74        94
+   Component-Whole(e2,e1)       0.60      0.63      0.62        92
+ Content-Container(e1,e2)       0.81      0.90      0.85        70
+ Content-Container(e2,e1)       0.94      0.83      0.88        35
+Entity-Destination(e1,e2)       0.78      0.87      0.82       161
+     Entity-Origin(e1,e2)       0.71      0.79      0.75       110
+     Entity-Origin(e2,e1)       0.97      0.74      0.84        39
+ Instrument-Agency(e1,e2)       1.00      0.33      0.50        24
+ Instrument-Agency(e2,e1)       0.70      0.81      0.75        85
+ Member-Collection(e1,e2)       0.57      0.57      0.57        14
+ Member-Collection(e2,e1)       0.85      0.90      0.88       129
+     Message-Topic(e1,e2)       0.82      0.85      0.83       107
+     Message-Topic(e2,e1)       0.52      0.58      0.55        19
+                    Other       0.49      0.49      0.49       285
+  Product-Producer(e1,e2)       0.75      0.55      0.63        60
+  Product-Producer(e2,e1)       0.66      0.66      0.66        77
 
-              avg / total       0.72      0.72      0.72      1599
+              avg / total       0.73      0.72      0.72      1599
 
 ```

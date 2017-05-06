@@ -1,109 +1,68 @@
 from keras import layers, models
 
-
-from . import log
-from .embedding import make_word_embedding, make_position_embedding
-from .input_layers import make_inputs
-from .tasks import experiment_tasks
 from .. import config
 from ..io import arguments
+from . import inputs, embeddings, convolutions
+from .relation_task import RelationTask
 
 
-def compile_models():
-    log.info("Compiling cnn models")
-    (word_input,
-     position1_input,
-     position2_input,
-     entity_marker_input) = make_inputs()
-    shared_layers = make_shared_layers(
-        word_input,
-        position1_input,
-        position2_input,
-        entity_marker_input
-    )
-    inputs = [
-        word_input,
-        position1_input,
-        position2_input
-    ] if not arguments.entity_markers else [
-        word_input,
-        entity_marker_input
-    ]
+class CNN(RelationTask):
+    def load(self):
+        raise NotImplementedError
 
-    for task in experiment_tasks:
-        output = task.get_output(
-            shared_layers=shared_layers
+    def compile_model(self):
+        word_input = inputs.make_word_input(
+            input_length=self.input_length
         )
+        position1_input, position2_input = (inputs
+            .make_position_inputs(input_length=self.input_length)
+        )
+        word_embedding = embeddings.shared_word_embedding(word_input)
+        position1_embedding = embeddings.shared_position_embedding(
+            position1_input
+        )
+        position2_embedding = embeddings.shared_position_embedding(
+            position2_input
+        )
+        embeddings_concatenation = layers.concatenate(
+            [word_embedding, position1_embedding, position2_embedding],
+            name="embeddings"
+        )
+        pooling_layers = []
+        if arguments.share_filters:
+            convolution_layers = convolutions.shared_convolutions
+        else:
+            convolution_layers = convolutions.make_convolution_layers()
+
+        for convolution in convolution_layers:
+            convolution_layer = convolution(
+                embeddings_concatenation
+            )
+            pooling_layer = layers.GlobalMaxPool1D()(
+                convolution_layer
+            )
+            pooling_layers.append(pooling_layer)
+        pooling_layers_concatenation = layers.concatenate(
+                pooling_layers
+        )
+        if arguments.dropout:
+            drop_out = layers.Dropout(rate=.5)(
+                pooling_layers_concatenation
+            )
+            output = self.get_output()(drop_out)
+        else:
+            output = self.get_output()(pooling_layers_concatenation)
+        input_layers = [
+            word_input,
+            position1_input,
+            position2_input
+        ]
         model = models.Model(
-            inputs=inputs,
+            inputs=input_layers,
             outputs=output
         )
         model.compile(
             optimizer=config.optimizer,
             loss="categorical_crossentropy"
         )
-        task.model = model
-
-
-def get_num_positions():
-    return max(task.num_positions for task in experiment_tasks)
-
-
-def make_shared_layers(word_input,
-                       position1_input,
-                       position2_input,
-                       entity_marker_input):
-    log.info("Building position embeddings")
-    position_embedding = make_position_embedding(
-        "shared_position_embedding"
-    )
-    position1_embedding = position_embedding(position1_input)
-    position2_embedding = position_embedding(position2_input)
-    word_embedding = make_word_embedding()(word_input)
-    embedding_merge_layer = layers.concatenate(
-        [word_embedding, position1_embedding, position2_embedding],
-        name="embedding_merge"
-    ) if not arguments.entity_markers else word_embedding
-    log.info("Building convolution layers")
-    convolution_layers = make_convolution_layers(embedding_merge_layer)
-    if arguments.entity_markers:
-        log.info("Using entity markers instead of position embeddings")
-        return layers.concatenate(
-            [convolution_layers, entity_marker_input],
-            name="entity_marker_merge"
-        )
-    else:
-        return convolution_layers
-
-
-def make_convolution_layers(embedding_merge_layer):
-    convolution_layers = []
-    for n_gram in arguments.n_grams:
-        convolution_layer = layers.Conv1D(
-            kernel_size=n_gram,
-            filters=arguments.filters,
-            activation="relu",
-            name="shared_convolution_" + str(n_gram) + "_gram"
-        )(embedding_merge_layer)
-        pooling_layer = layers.GlobalMaxPooling1D(
-            name="pooling_" + str(n_gram) + "_gram",
-        )(convolution_layer)
-        convolution_layers.append(pooling_layer)
-    convolution_merge_layer = layers.concatenate(
-        convolution_layers,
-        name="convolution_merge"
-    )
-    if arguments.dropout:
-        log.info("Adding dropout layer")
-        convolution_merge_layer = layers.Dropout(
-            rate=.5
-        )(convolution_merge_layer)
-    for dense_count in range(1, arguments.shared_layer_depth + 1):
-        convolution_merge_layer = layers.Dense(
-            units=arguments.hidden_layer_dimension,
-            activation="relu",
-            name="shared_dense_" + str(dense_count)
-        )(convolution_merge_layer)
-    return convolution_merge_layer
-
-
+        self.model = model

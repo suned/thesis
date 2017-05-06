@@ -4,18 +4,22 @@ from numpy import testing, zeros, array
 
 from ..io import arguments
 from ..mtl_relation_extraction.ground_truth import (
-    GroundTruth
+    Relation,
+    nlp
 )
+from .. import config
 
 
 class TestGroundTruth(unittest.TestCase):
 
     def setUp(self):
+        config.max_distance = 10
+        arguments.model = "cnn"
         odd_sentence = ("This is a sentence "
                         "with an odd number of tokens.")
         even_sentence = ("This is not a sentence with "
                          "an odd number of tokens.")
-        self.odd_relation = GroundTruth(
+        self.odd_relation = Relation(
             sentence_id="odd",
             relation="test",
             sentence=odd_sentence,
@@ -23,7 +27,7 @@ class TestGroundTruth(unittest.TestCase):
             e2_offset=(27, 30),
             relation_args=("e1", "e2")
         )
-        self.even_relation = GroundTruth(
+        self.even_relation = Relation(
             sentence_id="even",
             relation="test",
             sentence=even_sentence,
@@ -54,11 +58,11 @@ class TestGroundTruth(unittest.TestCase):
             len(self.odd_relation.sentence)
         )
         expected_odd_position1_vector = array(
-            [-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7]
-        ) + 11
+            [-3, -2, -1, 1, 2, 3, 4, 5, 6, 7, 8]
+        ) + config.max_distance
         expected_odd_position2_vector = array(
-            [-6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4]
-        ) + 11
+            [-6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5]
+        ) + config.max_distance
         testing.assert_equal(
             expected_odd_position1_vector,
             self.odd_full_position1_vector
@@ -72,11 +76,11 @@ class TestGroundTruth(unittest.TestCase):
             len(self.even_relation.sentence)
         )
         expected_even_position1_vector = array(
-            [-4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7]
-        ) + 12
+            [-4, -3, -2, -1, 1, 2, 3, 4, 5, 6, 7, 8]
+        ) + config.max_distance
         expected_even_position2_vector = array(
-            [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4]
-        ) + 12
+            [-7, -6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5]
+        ) + config.max_distance
         testing.assert_equal(
             expected_even_position1_vector,
             self.even_full_position1_vector
@@ -128,8 +132,8 @@ class TestGroundTruth(unittest.TestCase):
             .position_vectors())
         self.check_length(e1_positions)
         self.check_length(e2_positions)
-        expected_e1 = array([0, 1, 2, 3, 4, 5, 6]) + 7
-        expected_e2 = array([-3, -2, -1, 0, 1, 2, 3]) + 7
+        expected_e1 = array([1, 2, 3, 4, 5, 6, 7]) + config.max_distance
+        expected_e2 = array([-3, -2, -1, 1, 2, 3, 4]) + config.max_distance
         testing.assert_equal(
             e1_positions,
             expected_e1
@@ -152,8 +156,8 @@ class TestGroundTruth(unittest.TestCase):
             .position_vectors())
         self.check_length(e1_positions)
         self.check_length(e2_positions)
-        expected_e1 = array([0, 1, 2, 3, 4, 5, 6, 7]) + 8
-        expected_e2 = array([-3, -2, -1, 0, 1, 2, 3, 4]) + 8
+        expected_e1 = array([1, 2, 3, 4, 5, 6, 7, 8]) + config.max_distance
+        expected_e2 = array([-3, -2, -1, 1, 2, 3, 4, 5]) + config.max_distance
         testing.assert_equal(
             e1_positions,
             expected_e1
@@ -174,8 +178,8 @@ class TestGroundTruth(unittest.TestCase):
             .position_vectors())
         self.check_length(e1_positions)
         self.check_length(e2_positions)
-        expected_e1 = array([-1, 0, 1, 2, 3, 4, 5, 6, 7]) + 9
-        expected_e2 = array([-4, -3, -2, -1, 0, 1, 2, 3, 4]) + 9
+        expected_e1 = array([-1, 1, 2, 3, 4, 5, 6, 7, 8]) + config.max_distance
+        expected_e2 = array([-4, -3, -2, -1, 1, 2, 3, 4, 5]) + config.max_distance
         testing.assert_equal(
             e1_positions,
             expected_e1
@@ -197,8 +201,8 @@ class TestGroundTruth(unittest.TestCase):
             .even_relation.position_vectors())
         self.check_length(e1_positions)
         self.check_length(e2_positions)
-        expected_e1 = array([-2, -1, 0, 1, 2, 3, 4, 5, 6, 7]) + 10
-        expected_e2 = array([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4]) + 10
+        expected_e1 = array([-2, -1, 1, 2, 3, 4, 5, 6, 7, 8]) + config.max_distance
+        expected_e2 = array([-5, -4, -3, -2, -1, 1, 2, 3, 4, 5]) + config.max_distance
         testing.assert_equal(
             e1_positions,
             expected_e1
@@ -216,6 +220,21 @@ class TestGroundTruth(unittest.TestCase):
             1,
             1
         )
+        expected_e1 = array(
+            [0, -3, -2, -1, 1, 2, 3, 4, 5, 6, 7, 8, 0]
+        ) + config.max_distance
+        expected_e2 = array(
+            [0, -6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 0]
+        ) + config.max_distance
+        e1, e2 = self.odd_relation.position_vectors()
+        testing.assert_equal(
+            e1,
+            expected_e1
+        )
+        testing.assert_equal(
+            e2,
+            expected_e2
+        )
 
     def test_pad_odd_sentence_even_max_len(self):
         arguments.max_len = 14
@@ -224,6 +243,20 @@ class TestGroundTruth(unittest.TestCase):
             self.odd_full_feature_vector,
             2,
             1
+        )
+        expected_e1 = array(
+            [0, 0, -3, -2, -1, 1, 2, 3, 4, 5, 6, 7, 8, 0]
+        ) + config.max_distance
+        expected_e2 = array(
+            [0, 0, -6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 0]
+        ) + config.max_distance
+        e1, e2 = self.odd_relation.position_vectors()
+        testing.assert_equal(
+            e1,
+            expected_e1
+        )
+        testing.assert_equal(
+            e2, expected_e2
         )
 
     def test_pad_even_sentence_odd_max_len(self):
@@ -234,6 +267,21 @@ class TestGroundTruth(unittest.TestCase):
             3,
             2
         )
+        expected_e1 = array(
+            [0, 0, 0, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6, 7, 8, 0, 0]
+        ) + config.max_distance
+        expected_e2 = array(
+            [0, 0, 0, -7, -6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 0, 0]
+        ) + config.max_distance
+        e1, e2 = self.even_relation.position_vectors()
+        testing.assert_equal(
+            e1,
+            expected_e1
+        )
+        testing.assert_equal(
+            e2,
+            expected_e2
+        )
 
     def test_pad_even_sentence_even_max_len(self):
         arguments.max_len = 14
@@ -242,6 +290,21 @@ class TestGroundTruth(unittest.TestCase):
             self.even_full_feature_vector,
             1,
             1
+        )
+        expected_e1 = array(
+            [0, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6, 7, 8, 0]
+        ) + config.max_distance
+        expected_e2 = array(
+            [0, -7, -6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 0]
+        ) + config.max_distance
+        e1, e2 = self.even_relation.position_vectors()
+        testing.assert_equal(
+            e1,
+            expected_e1
+        )
+        testing.assert_equal(
+            e2,
+            expected_e2
         )
 
     def test_no_negatives(self):
@@ -253,10 +316,10 @@ class TestGroundTruth(unittest.TestCase):
             .position_vectors())
         self.check_length(e1_positions)
         self.check_length(e2_positions)
-        expected_e1 = array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]) + 11
+        expected_e1 = array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]) + config.max_distance
         expected_e2 = array(
-            [-10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0]
-        ) + 11
+            [-10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 1]
+        ) + config.max_distance
         testing.assert_equal(
             e1_positions,
             expected_e1
@@ -272,8 +335,8 @@ class TestGroundTruth(unittest.TestCase):
         self.odd_relation.e2 = (4, 5)
         (e1_position,
          e2_position) = self.odd_relation.position_vectors()
-        expected_e1 = array([0, 0, 0, 0, 0, 0, 0]) + 7
-        expected_e2 = array([-4, -3, -2, -1, 0, 1, 2]) + 7
+        expected_e1 = array([1, 1, 1, 1, 1, 1, 1]) + config.max_distance
+        expected_e2 = array([-4, -3, -2, -1, 1, 2, 3]) + config.max_distance
         self.check_length(e1_position)
         self.check_length(e2_position)
         testing.assert_equal(
@@ -291,8 +354,8 @@ class TestGroundTruth(unittest.TestCase):
         self.odd_relation.e2 = (4, 6)
         (e1_position,
          e2_position) = self.odd_relation.position_vectors()
-        expected_e1 = array([0, 0, 1, 2, 3, 4, 5]) + 7
-        expected_e2 = array([-3, -2, -1, 0, 0, 1, 2]) + 7
+        expected_e1 = array([1, 1, 2, 3, 4, 5, 6]) + config.max_distance
+        expected_e2 = array([-3, -2, -1, 1, 1, 2, 3]) + config.max_distance
         self.check_length(e1_position)
         self.check_length(e2_position)
         testing.assert_equal(
@@ -320,8 +383,8 @@ class TestGroundTruth(unittest.TestCase):
                                       .position_vectors())
         self.check_length(e1_positions)
         self.check_length(e2_positions)
-        expected_e1 = array([-3, -2, -1, 0, 1, 2, 3]) + 7
-        expected_e2 = array([0, 1, 2, 3, 4, 5, 6]) + 7
+        expected_e1 = array([-3, -2, -1, 1, 2, 3, 4]) + config.max_distance
+        expected_e2 = array([1, 2, 3, 4, 5, 6, 7]) + config.max_distance
         testing.assert_equal(
             e1_positions,
             expected_e1
@@ -330,4 +393,71 @@ class TestGroundTruth(unittest.TestCase):
             e2_positions,
             expected_e2
         )
+
+    def test_long_sentence(self):
+        arguments.max_len = 31
+        s = ("In 1998 Go-Ahead Group replaced Northwest and Delta as "
+            "GHI's owner.FundingUniverse The Go-Ahead Group Plc : "
+            "Company History In 2000 Go-ahead merged GHI with its "
+            "other UK aircraft ground handling operations Midland "
+            "Airport Services British Midland Handling Services and "
+            "Reed Aviation under the Aviance UK brand ..")
+        test_relation = Relation(
+            sentence_id="test",
+            relation="test",
+            sentence=s,
+            e1_offset=(8, 22),
+            e2_offset=(167, 169),
+            relation_args=("e1", "e2")
+        )
+        features = test_relation.feature_vector()
+        self.check_length(features)
+        expected_e1 = array(
+            [1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
+             15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28]
+        ) + config.max_distance
+        expected_e2 = array(
+            [-33, -32, -31, -30, -29, -28, -27, -26, -25, -24, -23, -22,
+             -21, -20, -19, -18, -17, -16, -15, -14, -13, -12, -11, -10,
+             -9, -8, -7, -6, -5, -4, -3]
+        ) + config.max_distance
+        e1, e2 = test_relation.position_vectors()
+        testing.assert_equal(
+            e1,
+            expected_e1
+        )
+        testing.assert_equal(
+            e2,
+            expected_e2
+        )
+
+    def test_rnn_features(self):
+        entity_start_rank = nlp.vocab.length + 2
+        entity_end_rank = nlp.vocab.length + 3
+        arguments.model = "rnn"
+        arguments.max_len = 15
+        features = self.odd_relation.feature_vector()
+        expected_features = [
+            118,
+            11,
+            6,
+            entity_start_rank,
+            1905,
+            entity_end_rank,
+            26,
+            60,
+            entity_start_rank,
+            1879,
+            entity_end_rank,
+            482,
+            8,
+            10540,
+            1
+        ]
+        testing.assert_equal(
+            features,
+            expected_features
+        )
+
+
 

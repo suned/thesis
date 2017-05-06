@@ -10,24 +10,19 @@ save = None
 test_set = None
 auxiliary_tasks = None
 data_path = None
-max_len = None
 dynamic_max_len = None
-freeze_embeddings = None
 validation_ratio = None
 early_stopping_ratio = None
 batch_size = None
 dropout = None
-shared_layer_depth = None
 hidden_layer_dimension = None
 patience = None
 epochs = None
 filters = None
 position_embedding_dimension = None
 n_grams = None
-task_layer_depth = None
-entity_markers = None
 fit_sequential = None
-model = None
+share_filters = None
 
 _log_levels = [
     logging.getLevelName(level)
@@ -72,28 +67,12 @@ _parser.add_argument(
     "--auxiliary-tasks",
     help="List of auxiliary tasks to use or none",
     nargs="*",
-    choices=["ACE", "none"],
+    choices=["ACE", "KBP37", "Conll2000POS", "none"],
     default=["ACE"]
 )
 _parser.add_argument(
-    "--max-len",
-    help="Cut sentences with a length that exceeds max-len. (CNN only)",
-    type=int,
-    default=15
-)
-_parser.add_argument(
-    "--dynamic-max-len",
-    help="Compute max-len based on longest distance between entities.",
-    action="store_true",
-)
-_parser.add_argument(
-    "--freeze-embeddings",
-    help="Do not backpropagate into word embeddings",
-    action="store_true"
-)
-_parser.add_argument(
     "--validation_ratio",
-    help="Validation/train set ration",
+    help="Validation/train set ratio",
     type=float,
     default=.2
 )
@@ -103,7 +82,6 @@ _parser.add_argument(
     Split is made after validation/train split""",
     type=float,
     default=.1
-
 )
 _parser.add_argument(
     "--batch-size",
@@ -116,12 +94,6 @@ _parser.add_argument(
     help="Add dropout layer before final layer",
     default=False,
     action="store_true"
-)
-_parser.add_argument(
-    "--shared-layer-depth",
-    help="Depth of shared dense layers",
-    type=int,
-    default=0
 )
 _parser.add_argument(
     "--epochs",
@@ -174,27 +146,14 @@ _parser.add_argument(
     default=500
 )
 _parser.add_argument(
-    "--task-layer-depth",
-    help="depth of task specific layers",
-    type=int,
-    default=0
-)
-_parser.add_argument(
-    "--entity-markers",
-    help="use binary entity features instead of position embeddings",
-    action="store_true"
-)
-_parser.add_argument(
     "--fit-sequential",
     help="fit auxiliary tasks first, then target",
     action="store_true"
 )
 _parser.add_argument(
-    "--model",
-    help="model type",
-    type=str,
-    default="cnn",
-    choices=["cnn", "rnn"]
+    "--share_filters",
+    help="share convolution filters between sentence models",
+    action="store_true"
 )
 
 

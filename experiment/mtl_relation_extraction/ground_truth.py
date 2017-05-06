@@ -1,6 +1,5 @@
 import numpy
 
-from ..io import arguments
 from . import nlp
 
 
@@ -14,49 +13,16 @@ def format_arguments(relation_args):
     return "(" + relation_args[0] + "," + relation_args[1] + ")"
 
 
-def at_beginning(left):
-    return left == 0
-
-
-def beyond_edge(right, vector):
-    return right > len(vector)
-
-
-def trim(vector, e1):
-    left, right = find_edges(e1, vector)
-    return vector[left:right]
-
-
-def find_edges(e1, vector):
-    left = e1[0]
-    right = left + arguments.max_len
-    while (beyond_edge(right, vector)
-           and not at_beginning(left)):
-        left -= 1
-        right -= 1
-    return left, right
-
-
-def pad(vector):
-    missing = (arguments.max_len - len(vector))
-    if missing % 2 == 0:
-        left = right = missing // 2
-    else:
-        left = (missing // 2) + 1
-        right = missing // 2
-    return numpy.pad(vector, pad_width=(left, right), mode="constant")
-
-
 def entity_distance(i, entity):
     if entity[0] <= i < entity[1]:
-        return 0
+        return 1
     if i < entity[0]:
         return i - entity[0]
     if i >= entity[1]:
-        return i - entity[1] + 1
+        return i - entity[1] + 2
 
 
-class GroundTruth:
+class Relation:
     def __init__(
             self,
             sentence_id,
@@ -103,12 +69,9 @@ class GroundTruth:
             return self.e2, self.e1
 
     def feature_vector(self):
-        vector = numpy.array([token.rank if token.has_vector
+        return numpy.array([token.rank if token.has_vector
                               else nlp.vocab.length + 1
                               for token in self.sentence])
-        if len(vector) < arguments.max_len:
-            return pad(vector)
-        return trim(vector, self.first_entity())
 
     def first_entity(self):
         if self.e1[0] < self.e2[0]:
@@ -130,19 +93,7 @@ class GroundTruth:
             e2_position_vector.append(entity_distance(i, self.e2))
         e1_position_vector = numpy.array(e1_position_vector)
         e2_position_vector = numpy.array(e2_position_vector)
-        if len(self.sentence) < arguments.max_len:
-            return pad(e1_position_vector), pad(e2_position_vector)
-        else:
-            return (
-                trim(
-                    e1_position_vector,
-                    self.first_entity()
-                ) + arguments.max_len,
-                trim(
-                    e2_position_vector,
-                    self.first_entity()
-                ) + arguments.max_len
-            )
+        return e1_position_vector, e2_position_vector
 
     def at_entity(self, i):
         return (
@@ -150,33 +101,21 @@ class GroundTruth:
             or entity_distance(i, self.e2) == 0
         )
 
-    def entity_markers(self):
-        entity_markers = []
-        for i in range(len(self.sentence)):
-            if self.at_entity(i):
-                entity_markers.append(1)
-            else:
-                entity_markers.append(0)
-        entity_markers = numpy.array(entity_markers)
-        if len(self.sentence) < arguments.max_len:
-            return pad(entity_markers)
+
+class Sequence:
+    def __init__(self, sentence, tags):
+        if type(sentence) == str:
+            self.sentence = nlp.tokenize(sentence)
         else:
-            return trim(entity_markers, self.first_entity())
+            self.sentence = sentence
+        if len(self.sentence) != len(tags):
+            raise BadTokenizationError()
+        if type(tags) == list:
+            self.tags = numpy.array(tags)
+        else:
+            self.tags = tags
 
-    def __str__(self):
-        e1_start, e1_end = self.e1
-        e2_start, e2_end = self.e2
-        e1 = self.sentence[e1_start:e1_end + 1]
-        e2 = self.sentence[e2_start:e2_end + 1]
-        e1 = "<e1>" + str(e1) + "</e1> "
-        e2 = "<e2>" + str(e2) + "</e2>"
-        before_e1 = self.sentence[:e1_start].string
-        between_es = self.sentence[e1_end + 1:e2_start].string
-        after_e2 = self.sentence[e2_end + 1:]
-        if not after_e2[0].is_punct:
-            e2 += " "
-        sentence = before_e1 + e1 + between_es + e2 + after_e2.string
-        return self.relation + " : " + sentence
-
-    def __repr__(self):
-        return self.__str__()
+    def feature_vector(self):
+        return numpy.array([nlp.vocab[str(token)].rank if token in nlp.vocab
+                              else nlp.vocab.length + 1
+                              for token in self.sentence])

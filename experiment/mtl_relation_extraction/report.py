@@ -2,7 +2,6 @@ import os
 import sys
 from datetime import datetime
 
-from sklearn.metrics import classification_report
 from io import StringIO
 
 from .. import config
@@ -35,8 +34,6 @@ test_report = """### Test Report Report
 hyperparam_string = """
 | Parameter              | Value |
 |-----------------------:|:------|
-| max-len                | {:d}  |
-| trainable embedding    | {}    |
 | batch size             | {}    |
 | patience               | {}    |
 | dropout                | {}    |
@@ -57,8 +54,6 @@ def save():
     date = datetime.now().strftime('%d-%m-%Y %H:%M:%S')
     headline = arguments.save
     hyper_params = hyperparam_string.format(
-        arguments.max_len,
-        not arguments.freeze_embeddings,
         arguments.batch_size,
         arguments.patience,
         arguments.dropout,

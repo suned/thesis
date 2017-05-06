@@ -6,30 +6,26 @@ from sklearn import metrics
 from .. import config
 from ..io import semeval_parser
 from . import log
-from .preprocessing import max_sentence_length, longest_sentence
+from . import preprocessing
 from .task import (
-    Task,
     get_labels,
-    split,
+    split
 )
+from mtl_relation_extraction.cnn import CNN
 
 
-class SemEvalTask(Task):
+class SemEvalTask(CNN):
     def __init__(self):
-        super().__init__()
-        self.name = "SemEval"
-        self.is_target = True
-        self.model = None
+        super().__init__(
+            name="SemEval",
+            is_target=True
+        )
 
         self.test_relations = None
         self.validation_relations = None
-        self.early_stopping_relations = None
 
         self.test_labels = None
         self.validation_labels = None
-        self.early_stopping_labels = None
-
-        self.max_len = None
 
     def load(self):
         self.load_training_set()
@@ -58,14 +54,8 @@ class SemEvalTask(Task):
             arguments.early_stopping_ratio
         )
 
-        if arguments.dynamic_max_len:
-            arguments.max_len = max_sentence_length(train_relations)
-            log.info(
-                "Dynamically updated max sentence length to %i",
-                arguments.max_len
-            )
-
         self.train_relations = train_relations
+        self.input_length = preprocessing.max_distance(train_relations)
         self.validation_relations = validation_relations
         self.early_stopping_relations = early_stopping_relations
 

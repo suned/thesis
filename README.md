@@ -31,9 +31,10 @@ Install requirements:
 If using a virtual environment (recommended), be sure to install in the same
 environment as `theano` is installed.
 
-Download `spacy` models:
+Download `spacy` models and `nltk` data:
 
     > python -m spacy download en
+    > python -m nltk.downloader all
 
 Run:
 

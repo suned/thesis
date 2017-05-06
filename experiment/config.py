@@ -10,8 +10,9 @@ random_state = 1
 keras_verbosity = 0
 optimizer = "adam"
 word_vector_path = "GloVe/glove.840B.300d.pkl"
-kbp37_train = "kbp37/train.txt"
+kbp37_train = "kbp37/train.clean.txt"
 kbp37_test = "kbp37/test.txt"
 kbp37_dev = "kbp37/dev.txt"
+pad_rank = 0
 
 numpy.random.seed(random_state)

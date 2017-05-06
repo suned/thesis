@@ -7,7 +7,7 @@ import spacy
 from nltk import sent_tokenize
 
 import io
-from ..mtl_relation_extraction.ground_truth import GroundTruth, BadTokenizationError
+from ..mtl_relation_extraction.ground_truth import Relation, BadTokenizationError
 from ..mtl_relation_extraction import log
 
 nlp = spacy.load("en")
@@ -100,7 +100,7 @@ def make_relation(sentence, arg1, arg2, relation_type, role):
         arguments = ("e1", "e2")
     else:
         arguments = ("e2", "e1")
-    return GroundTruth(
+    return Relation(
         sentence_id=None,
         sentence=sentence,
         e1_offset=arg1,
