@@ -5,8 +5,6 @@ from .kbp37_task import KBP37Task
 from .conll2000_pos_task import Conll2000PosTask
 from . import log
 from . import nlp
-from . import preprocessing
-from .. import config
 
 target_task = SemEvalTask()
 longest_sentence = None
@@ -30,8 +28,6 @@ def load_tasks():
             log.info("Loading %s task", auxiliary_task.name)
             auxiliary_task.load()
             experiment_tasks.append(auxiliary_task)
-    longest_sentence = max(
-        len(relation.sentence) for task in experiment_tasks
-        for relation in task.train_relations
-    )
+    longest_sentence = max(task.longest_sentence()
+                           for task in experiment_tasks)
     nlp.add_vocabularies(experiment_tasks)

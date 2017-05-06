@@ -7,11 +7,15 @@ from .task import (
     get_labels,
     split
 )
-from mtl_relation_extraction.cnn import CNN
+from .cnn import CNN
 from . import preprocessing
+from .relation_task import get_vocabulary
 
 
 class ACE(CNN):
+    def get_validation_vocabulary(self):
+        return get_vocabulary(self.early_stopping_relations)
+
     def __init__(self):
         super().__init__(name="ACE", is_target=False)
 

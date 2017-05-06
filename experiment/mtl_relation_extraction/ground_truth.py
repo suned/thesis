@@ -110,12 +110,15 @@ class Sequence:
             self.sentence = sentence
         if len(self.sentence) != len(tags):
             raise BadTokenizationError()
-        if type(tags) == list:
-            self.tags = numpy.array(tags)
-        else:
-            self.tags = tags
+        self.tags = tags
+
+    def get_words(self):
+        if type(self.sentence) == list:
+            return self.sentence
+        return [token.string for token in self.sentence]
 
     def feature_vector(self):
-        return numpy.array([nlp.vocab[str(token)].rank if token in nlp.vocab
-                              else nlp.vocab.length + 1
-                              for token in self.sentence])
+        return numpy.array([nlp.vocab[str(token)].rank
+                            if token in nlp.vocab
+                            else nlp.vocab.length + 1
+                            for token in self.sentence])

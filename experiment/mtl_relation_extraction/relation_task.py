@@ -1,14 +1,32 @@
 import numpy
 from keras.layers import Dense
 from keras.utils import to_categorical
+from keras.preprocessing import sequence
 from sklearn.preprocessing import LabelEncoder
 
 from ..io import arguments
 from .task import Task, beyond_edge, \
     at_beginning, make_input
+from . import nlp
+
+
+def get_vocabulary(relations):
+    return set([token.string for relation in relations
+                for token in relation.sentence])
 
 
 class RelationTask(Task):
+
+    def longest_sentence(self):
+        return max(len(relation.sentence)
+                   for relation in self.train_relations)
+
+    def get_validation_vocabulary(self):
+        raise NotImplementedError()
+
+    def get_train_vocabulary(self):
+        return get_vocabulary(self.train_relations)
+
     def __init__(self, is_target, name):
         super().__init__(name, is_target)
         self.train_relations = None
@@ -35,7 +53,8 @@ class RelationTask(Task):
         return numpy.pad(
             vector,
             pad_width=(left, right),
-            mode="constant"
+            mode="constant",
+            constant_values=nlp.pad_rank
         )
 
     def find_edges(self, e1, vector):

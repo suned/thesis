@@ -1,6 +1,6 @@
 from keras import layers, models
 
-from . import inputs
+from . import inputs, nlp
 from . import embeddings
 from .sequence_task import SequenceTask
 from ..io import arguments
@@ -13,13 +13,13 @@ class RNN(SequenceTask):
 
     def compile_model(self):
         word_input = inputs.make_word_input(
-            input_length=self.longest_sentence
+            input_length=self.longest_sentence()
         )
         mask = layers.Masking(
-            mask_value=config.pad_rank,
+            mask_value=nlp.pad_rank,
             dtype=int
         )(word_input)
-        word_embedding = embeddings.shared_position_embedding(
+        word_embedding = embeddings.shared_word_embedding(
             mask
         )
         bi_lstm = layers.Bidirectional(

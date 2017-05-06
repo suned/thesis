@@ -3,13 +3,17 @@ import numpy
 from ..io import arguments, kbp37_parser
 from .. import config
 from .task import get_labels
-from mtl_relation_extraction.cnn import CNN
+from .cnn import CNN
 from . import preprocessing
+from .relation_task import get_vocabulary
 
 import os
 
 
 class KBP37Task(CNN):
+    def get_validation_vocabulary(self):
+        return get_vocabulary(self.early_stopping_relations)
+
     def load(self):
         train_path = os.path.join(
             arguments.data_path,

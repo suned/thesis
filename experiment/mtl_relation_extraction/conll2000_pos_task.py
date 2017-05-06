@@ -19,4 +19,3 @@ class Conll2000PosTask(RNN):
         self.train_sequences = train_sequences
         self.early_stopping_sequences = early_stopping_sequences
         self.init_encoder()
-        self.init_longest_sentence()

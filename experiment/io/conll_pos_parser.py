@@ -1,3 +1,5 @@
+import numpy
+
 from ..mtl_relation_extraction.ground_truth import Sequence
 
 
@@ -20,7 +22,7 @@ def conll2000():
             tags
         )
         sequences.append(sequence)
-    return sequences
+    return numpy.array(sequences)
 
 
 

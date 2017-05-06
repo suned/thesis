@@ -61,6 +61,15 @@ class Task:
     def init_encoder(self):
         raise NotImplementedError()
 
+    def get_train_vocabulary(self):
+        raise NotImplementedError()
+
+    def get_validation_vocabulary(self):
+        raise NotImplementedError()
+
+    def longest_sentence(self):
+        raise NotImplementedError()
+
 
 def at_beginning(left):
     return left == 0

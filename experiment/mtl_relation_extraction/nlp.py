@@ -1,8 +1,8 @@
 import numpy
 import spacy
+
 from . import log
 from ..io import word_vector_parser
-from .. import config
 
 _nlp = spacy.load(
     "en_core_web_md",
@@ -11,7 +11,9 @@ _nlp = spacy.load(
     entity=False
 )
 
+pad_token = "#pad#"
 vocab = _nlp.vocab
+pad_rank = 0
 glove_vectors = None
 
 
@@ -35,21 +37,14 @@ def add_all(train_relations):
     log.info("Vocabulary length after: %i", _nlp.vocab.length)
 
 
-def add_test_vocabulary(task):
-    glove_or_nothing(task.validation_relations)
-    glove_or_nothing(task.early_stopping_relations)
-    glove_or_nothing(task.test_relations)
-
-
-def glove_or_nothing(relations):
-    for relation in relations:
-        for token in relation.sentence:
-            if token.string not in _nlp.vocab:
-                lex = _nlp.vocab[token.string]
-                if token.string in glove_vectors:
-                    lex.vector = glove_vectors[token.string]
-                else:
-                    assert not lex.has_vector
+def add_validation_vocabulary(task):
+    for word in task.get_validation_vocabulary():
+        if word not in _nlp.vocab:
+            lex = _nlp.vocab[word]
+            if word in glove_vectors:
+                lex.vector = glove_vectors[word]
+            else:
+                assert not lex.has_vector
 
 
 def add_vocabularies(tasks, vector_length=300):
@@ -57,18 +52,15 @@ def add_vocabularies(tasks, vector_length=300):
         log.info("Adding vocabulary from task: %s", task.name)
         log.info("Vocabulary length before: %i", _nlp.vocab.length)
         add_train_vocabulary(task, vector_length)
-        if task.is_target:
-            add_test_vocabulary(task)
+        add_validation_vocabulary(task)
         log.info("Vocabulary after: %i", _nlp.vocab.length)
 
 
 def add_train_vocabulary(task, vector_length):
-    _ = vocab[config.pad_token]
-    for relation in task.train_relations:
-        for token in relation.sentence:
-            if token.string not in _nlp.vocab:
-                lex = _nlp.vocab[token.string]
-                vector = (glove_vectors[token.string]
-                          if token.string in glove_vectors
-                          else numpy.random.rand(vector_length))
-                lex.vector = vector
+    for word in task.get_train_vocabulary():
+        if word not in _nlp.vocab:
+            lex = _nlp.vocab[word]
+            vector = (glove_vectors[word]
+                      if word in glove_vectors
+                      else numpy.random.rand(vector_length))
+            lex.vector = vector

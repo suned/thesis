@@ -1,5 +1,7 @@
 import os
 
+import numpy
+
 from ..io import arguments
 from sklearn import metrics
 
@@ -11,10 +13,23 @@ from .task import (
     get_labels,
     split
 )
-from mtl_relation_extraction.cnn import CNN
+from .cnn import CNN
+from .relation_task import get_vocabulary
 
 
 class SemEvalTask(CNN):
+    def get_validation_vocabulary(self):
+        early_stopping_vocab = get_vocabulary(
+            self.early_stopping_relations
+        )
+        validation_vocab = get_vocabulary(self.validation_relations)
+        test_vocab = get_vocabulary(self.test_relations)
+        return early_stopping_vocab.union(
+            validation_vocab
+        ).union(
+            test_vocab
+        )
+
     def __init__(self):
         super().__init__(
             name="SemEval",
