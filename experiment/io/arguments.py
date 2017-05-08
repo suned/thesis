@@ -23,6 +23,7 @@ position_embedding_dimension = None
 n_grams = None
 fit_sequential = None
 share_filters = None
+word_embedding_dimension = None
 
 _log_levels = [
     logging.getLevelName(level)
@@ -82,6 +83,12 @@ _parser.add_argument(
     Split is made after validation/train split""",
     type=float,
     default=.1
+)
+_parser.add_argument(
+    "--word-embedding-dimension",
+    help="dimension of the shared word embedding",
+    type=int,
+    default=300
 )
 _parser.add_argument(
     "--batch-size",

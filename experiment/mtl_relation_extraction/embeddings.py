@@ -9,7 +9,7 @@ def make_word_embedding():
     log.info(
         "Building word embedding layer"
     )
-    embeddings = get_embeddings(nlp.vocab)
+    embeddings = get_embeddings()
     return layers.Embedding(
         input_dim=embeddings.shape[0],
         output_dim=embeddings.shape[1],
@@ -19,19 +19,18 @@ def make_word_embedding():
     )
 
 
-def get_embeddings(vocab):
+def get_embeddings():
     vectors = numpy.random.rand(
         # indices:
         # padding: 0
         # out of vocab: nlp.vocab.length + 1
         # entity start: nlp.vocab.length + 2
         # entity end: nlp.vocab.length + 3
-        nlp.vocab.length + 2,
-        vocab.vectors_length
+        nlp.vocabulary.length,
+        arguments.word_embedding_dimension
     ) / 100
-    for lex in vocab:
-        if lex.has_vector:
-            vectors[lex.rank] = lex.vector
+    for lex in nlp.vocabulary:
+        vectors[lex.rank] = lex.vector
     log.info("Word embedding shape: %s", vectors.shape)
     return vectors
 

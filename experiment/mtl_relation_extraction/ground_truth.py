@@ -69,9 +69,8 @@ class Relation:
             return self.e2, self.e1
 
     def feature_vector(self):
-        return numpy.array([token.rank if token.has_vector
-                              else nlp.vocab.length + 1
-                              for token in self.sentence])
+        return numpy.array([nlp.vocabulary[token.string]
+                            for token in self.sentence])
 
     def first_entity(self):
         if self.e1[0] < self.e2[0]:
@@ -118,7 +117,5 @@ class Sequence:
         return [token.string for token in self.sentence]
 
     def feature_vector(self):
-        return numpy.array([nlp.vocab[str(token)].rank
-                            if token in nlp.vocab
-                            else nlp.vocab.length + 1
+        return numpy.array([nlp.vocabulary[str(token)]
                             for token in self.sentence])

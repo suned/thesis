@@ -10,8 +10,6 @@ import io
 from ..mtl_relation_extraction.ground_truth import Relation, BadTokenizationError
 from ..mtl_relation_extraction import log
 
-nlp = spacy.load("en")
-
 
 class NoSentenceFondException(Exception):
     pass

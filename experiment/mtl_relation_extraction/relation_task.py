@@ -74,6 +74,9 @@ class RelationTask(Task):
         vectors = []
         for relation in relations:
             vector = relation.feature_vector()
+            if numpy.any(vector > nlp.vocabulary.length):
+                import ipdb
+                ipdb.sset_trace()
             if len(vector) <= self.input_length:
                 vector = self.pad(vector)
             else:

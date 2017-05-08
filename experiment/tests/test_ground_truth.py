@@ -432,8 +432,8 @@ class TestGroundTruth(unittest.TestCase):
         )
 
     def test_rnn_features(self):
-        entity_start_rank = nlp.vocab.length + 2
-        entity_end_rank = nlp.vocab.length + 3
+        entity_start_rank = nlp.vocabulary.length + 2
+        entity_end_rank = nlp.vocabulary.length + 3
         arguments.model = "rnn"
         arguments.max_len = 15
         features = self.odd_relation.feature_vector()

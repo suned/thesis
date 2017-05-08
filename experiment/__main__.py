@@ -1,5 +1,6 @@
 import os
 from .io import arguments
+import gc
 
 os.environ["KERAS_BACKEND"] = "theano"
 
@@ -13,9 +14,13 @@ def run():
         from .mtl_relation_extraction import (
             models,
             report,
-            embeddings
+            embeddings,
+            log
         )
         embeddings.make_shared_embeddings()
+        nlp.glove_vectors = None
+        log.info("Garbage collecting")
+        gc.collect()
         models.compile()
         models.train()
         if arguments.save is not None:

@@ -4,9 +4,9 @@ from . import log
 from .tasks import target_task, experiment_tasks
 
 
-log_header = """Epoch\t\tTask\t\tTraining Loss\t\tEarly Stopping Loss
+log_header = """Epoch\tTask\t\t\tTraining Loss\t\tEarly Stopping Loss
 ==========================================================================="""
-log_line = """%i\t\t%s\t\t%f\t\t%f %s"""
+log_line = """%i\t%s\t\t\t%f\t\t%f %s"""
 
 
 def interleaved():
@@ -92,7 +92,7 @@ def fit_early_stopping(task):
             epochs=1,
             verbose=config.keras_verbosity,
             validation_data=early_stopping_set,
-            batch_size=arguments.batch_size
+            initial_epoch=epoch
         )
         training_loss = epoch_stats.history["loss"][0]
         early_stopping_loss = epoch_stats.history["val_loss"][0]
