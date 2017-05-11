@@ -92,7 +92,6 @@ def fit_early_stopping(task):
             epochs=1,
             verbose=config.keras_verbosity,
             validation_data=early_stopping_set,
-            initial_epoch=epoch
         )
         training_loss = epoch_stats.history["loss"][0]
         early_stopping_loss = epoch_stats.history["val_loss"][0]
