@@ -1,13 +1,12 @@
-from ..io import arguments
-from .ace_task import ACE
-from .semeval_task import SemEvalTask
-from .kbp37_task import KBP37Task
-from .conll2000_pos_task import Conll2000PosTask
 from . import log
 from . import nlp
+from .ace_task import ACE
+from .conll2000_pos_task import Conll2000PosTask
+from .kbp37_task import KBP37Task
+from .semeval_task import SemEvalTask
+from ..io import arguments
 
 target_task = SemEvalTask()
-longest_sentence = None
 auxiliary_tasks = [
     ACE(),
     KBP37Task(),
@@ -19,15 +18,14 @@ all_tasks = auxiliary_tasks + [target_task]
 
 def load_tasks():
     global experiment_tasks
-    global longest_sentence
     log.info("Loading %s task", target_task.name)
     target_task.load()
     experiment_tasks.append(target_task)
     for auxiliary_task in auxiliary_tasks:
+        log.info("Loading %s task", auxiliary_task.name)
+        auxiliary_task.load()
         if auxiliary_task.name in arguments.auxiliary_tasks:
-            log.info("Loading %s task", auxiliary_task.name)
-            auxiliary_task.load()
             experiment_tasks.append(auxiliary_task)
-    longest_sentence = max(task.longest_sentence()
-                           for task in experiment_tasks)
-    nlp.add_vocabularies(experiment_tasks)
+    nlp.longest_sentence = max(task.longest_sentence()
+                               for task in experiment_tasks)
+    nlp.add_vocabularies(all_tasks)

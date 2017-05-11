@@ -69,7 +69,7 @@ class Relation:
             return self.e2, self.e1
 
     def feature_vector(self):
-        return numpy.array([nlp.vocabulary[token.string]
+        return numpy.array([nlp.vocabulary[str(token)]
                             for token in self.sentence])
 
     def first_entity(self):

@@ -14,7 +14,9 @@ from .relation_task import get_vocabulary
 
 class ACE(CNN):
     def get_validation_vocabulary(self):
-        return get_vocabulary(self.early_stopping_relations)
+        return (get_vocabulary(self.early_stopping_relations)
+                if self.early_stopping_relations is not None
+                else set())
 
     def __init__(self):
         super().__init__(name="ACE", is_target=False)

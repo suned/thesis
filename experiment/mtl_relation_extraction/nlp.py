@@ -39,10 +39,13 @@ def add_all(train_relations):
 
 
 def add_validation_vocabulary(task):
+    count = 0
     for word in task.get_validation_vocabulary():
         if word in glove_vectors:
             vector = glove_vectors[word]
             vocabulary.add(word, vector)
+            count += 1
+    log.info("Added %i glove vectors", count)
 
 
 def add_vocabularies(tasks):
@@ -55,11 +58,22 @@ def add_vocabularies(tasks):
 
 
 def add_train_vocabulary(task):
+    glove_vector_count = 0
     for word in task.get_train_vocabulary():
         vector = (
-            glove_vectors[word]if word in glove_vectors
+            glove_vectors[word] if word in glove_vectors
             else numpy.random.rand(
                 arguments.word_embedding_dimension
             )
         )
+        if word in glove_vectors:
+            glove_vector_count += 1
         vocabulary.add(word, vector)
+    log.info(
+        "Added %i glove vectors, %i random vectors",
+        glove_vector_count,
+        len(task.get_validation_vocabulary()) - glove_vector_count
+    )
+
+
+longest_sentence = None

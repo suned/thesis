@@ -108,7 +108,8 @@ class RelationTask(Task):
                 )
             position1.append(position1_vector)
             position2.append(position2_vector)
-        return numpy.array(position1), numpy.array(position2)
+        return (numpy.array(position1) + nlp.longest_sentence,
+                numpy.array(position2) + nlp.longest_sentence)
 
     def format_set(self, labels, relations):
         features = self.get_features(relations)

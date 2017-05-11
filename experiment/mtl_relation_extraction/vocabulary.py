@@ -1,6 +1,7 @@
 import numpy
 
 from ..io import arguments
+from . import log
 
 out_of_vocabulary = "#none#"
 
@@ -15,7 +16,7 @@ class Token:
 class Vocabulary:
     def __init__(self):
         self.words = {}
-        self.length = 1
+        self.length = 0
         self.add(
             out_of_vocabulary,
             numpy.random.rand(arguments.word_embedding_dimension)
@@ -23,8 +24,8 @@ class Vocabulary:
 
     def add(self, word, vector):
         if word not in self.words:
-            self.words[word] = Token(word, self.length, vector)
             self.length += 1
+            self.words[word] = Token(word, self.length, vector)
 
     def __getitem__(self, word):
         if word in self.words:
@@ -37,3 +38,16 @@ class Vocabulary:
 
     def __iter__(self):
         return iter(self.words.values())
+
+    def get_embeddings(self):
+        vectors = numpy.random.rand(
+            # indices:
+            # padding: 0
+            # out of vocab: 1
+            self.length + 1,
+            arguments.word_embedding_dimension
+        ) / 100
+        for lex in self:
+            vectors[lex.rank] = lex.vector
+        log.info("Word embedding shape: %s", vectors.shape)
+        return vectors
