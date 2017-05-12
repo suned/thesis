@@ -25,7 +25,9 @@ class SequenceTask(Task):
                    for sequence in self.train_sequences)
 
     def get_validation_vocabulary(self):
-        return get_vocabulary(self.early_stopping_sequences)
+        return (get_vocabulary(self.early_stopping_sequences)
+                if arguments.fit_sequential
+                else set())
 
     def get_train_vocabulary(self):
         return get_vocabulary(self.train_sequences)

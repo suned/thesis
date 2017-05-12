@@ -4,9 +4,14 @@ from . import log
 from .tasks import target_task, experiment_tasks
 
 
-log_header = """Epoch\tTask\t\t\tTraining Loss\t\tEarly Stopping Loss
-==========================================================================="""
-log_line = """%i\t%s\t\t\t%f\t\t%f %s"""
+log_header = """{0:<10} {1:<20} {2:<15} {3:<15}""".format(
+    "Epoch",
+    "Task",
+    "Training Loss",
+    "Early Stopping Loss"
+)
+log_header += "\n" + "=" * len(log_header)
+log_line = """{0:<10d} {1:<20} {2:<15.4f} {3:<1.4f} {4}"""
 
 
 def interleaved():
@@ -19,7 +24,8 @@ def interleaved():
         len(target_task.early_stopping_relations),
     )
     epochs_without_improvement = 0
-    early_stopping_set = target_task.early_stopping_set()
+    (early_stopping_input,
+     early_stopping_labels) = target_task.early_stopping_set()
     task_count = len(experiment_tasks)
     log.info(log_header)
     for epoch in range(1, arguments.epochs + 1):
@@ -29,32 +35,33 @@ def interleaved():
             batch_input,
             batch_labels,
             epochs=1,
-            verbose=config.keras_verbosity,
-            validation_data=(early_stopping_set
-                             if task.is_target
-                             else None)
+            verbose=config.keras_verbosity
         )
         training_loss = epoch_stats.history["loss"][0]
-        validation_loss = (epoch_stats.history["val_loss"][0]
-                           if task.is_target else float("nan"))
-        if task.is_target and validation_loss < best_validation_loss:
+        validation_loss = target_task.model.evaluate(
+            early_stopping_input,
+            early_stopping_labels,
+            verbose=config.keras_verbosity
+        )
+        if validation_loss < best_validation_loss:
             optimum = "*"
             best_validation_loss = validation_loss
             best_weights = target_task.model.get_weights()
             epochs_without_improvement = 0
         else:
             optimum = ""
-            epochs_without_improvement += 1 if task.is_target else 0
+            epochs_without_improvement += 1
         log.info(
-            log_line,
-            epoch,
-            task.name,
-            training_loss,
-            validation_loss,
-            optimum
+            log_line.format(
+                epoch,
+                task.name,
+                training_loss,
+                validation_loss,
+                optimum
+            )
         )
         if task.is_target and training_loss < .01:
-            log.info("Training F1 maximised. Stopping")
+            log.info("Training loss maximised. Stopping")
             break
         if epochs_without_improvement > arguments.patience:
             log.info("Patience exceeded. Stopping")
@@ -104,12 +111,13 @@ def fit_early_stopping(task):
             optimum = ""
             epochs_without_improvement += 1
         log.info(
-            log_line,
-            epoch,
-            task.name,
-            training_loss,
-            early_stopping_loss,
-            optimum
+            log_line.format(
+                epoch,
+                task.name,
+                training_loss,
+                early_stopping_loss,
+                optimum
+            )
         )
         if training_loss < .01:
             log.info("Training F1 maximised. Stopping")

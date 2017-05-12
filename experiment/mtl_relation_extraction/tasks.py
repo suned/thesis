@@ -5,6 +5,7 @@ from .conll2000_pos_task import Conll2000PosTask
 from .kbp37_task import KBP37Task
 from .semeval_task import SemEvalTask
 from .conll2000_chunk_task import Conll2000ChunkTask
+from .gmb_ner_task import GMBNERTask
 from ..io import arguments
 
 target_task = SemEvalTask()
@@ -12,7 +13,8 @@ auxiliary_tasks = [
     ACE(),
     KBP37Task(),
     Conll2000PosTask(),
-    Conll2000ChunkTask()
+    Conll2000ChunkTask(),
+    GMBNERTask()
 ]
 experiment_tasks = []
 all_tasks = auxiliary_tasks + [target_task]

@@ -68,7 +68,13 @@ _parser.add_argument(
     "--auxiliary-tasks",
     help="List of auxiliary tasks to use or none",
     nargs="*",
-    choices=["ACE", "KBP37", "Conll2000POS", "none", "Conll2000Chunk"],
+    choices=[
+        "ACE",
+        "KBP37",
+        "Conll2000POS",
+        "none",
+        "Conll2000Chunk",
+        "GMB-NER"],
     default=["ACE"]
 )
 _parser.add_argument(

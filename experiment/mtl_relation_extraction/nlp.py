@@ -16,6 +16,7 @@ pad_token = "#pad#"
 vocabulary = Vocabulary()
 pad_rank = 0
 glove_vectors = None
+longest_sentence = None
 
 
 def load_glove_vectors():
@@ -26,16 +27,6 @@ def load_glove_vectors():
 
 def tokenize(s):
     return _nlp.tokenizer(s)
-
-
-def add_all(train_relations):
-    log.info("Adding relation words to vocabulary")
-
-    for relation in train_relations:
-        for token in relation.sentence:
-            if token.string not in _nlp.vocab:
-                _ = _nlp.vocab[token.string]
-    log.info("Vocabulary length after: %i", _nlp.vocab.length)
 
 
 def add_validation_vocabulary(task):
@@ -72,8 +63,5 @@ def add_train_vocabulary(task):
     log.info(
         "Added %i glove vectors, %i random vectors",
         glove_vector_count,
-        len(task.get_validation_vocabulary()) - glove_vector_count
+        glove_vector_count - len(task.get_validation_vocabulary())
     )
-
-
-longest_sentence = None

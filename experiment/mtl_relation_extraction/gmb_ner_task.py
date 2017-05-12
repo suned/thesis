@@ -1,17 +1,18 @@
+import os
+
 from .rnn import RNN
-from ..io import conll2000_parser, arguments
+from ..io import arguments, gmb_parser
+from .. import config
 from .task import split
 
 
-class Conll2000PosTask(RNN):
+class GMBNERTask(RNN):
     def __init__(self):
-        super().__init__(
-            name="Conll2000POS",
-            is_target=False
-        )
+        super().__init__(name="GMB-NER", is_target=False)
 
     def load(self):
-        train_sequences = conll2000_parser.conll2000pos()
+        corpus_root = os.path.join(arguments.data_path, config.gmb_root)
+        train_sequences = gmb_parser.gmb_named_entities(corpus_root)
         if arguments.fit_sequential:
             train_sequences, early_stopping_sequences = split(
                 train_sequences,
@@ -20,3 +21,4 @@ class Conll2000PosTask(RNN):
             self.early_stopping_sequences = early_stopping_sequences
         self.train_sequences = train_sequences
         self.init_encoder()
+
