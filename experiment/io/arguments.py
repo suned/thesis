@@ -119,7 +119,7 @@ _parser.add_argument(
     help="Max number of epochs without improvement "
          "on early stopping set",
     type=int,
-    default=20
+    default=100
 )
 _parser.add_argument(
     "--filters",
