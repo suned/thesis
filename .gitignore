@@ -10,6 +10,7 @@ lit/
 target/
 GloVe/
 data/
+connect.sh
 
 !sune_debel_master_thesis.pdf
 
