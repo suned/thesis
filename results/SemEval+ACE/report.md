@@ -1,5 +1,5 @@
-# semeval_ace_no_filter_sharing
-## Time	: 04-05-2017 17:37:23
+# SemEval+ACE
+## Time	: 15-05-2017 11:34:02
 ### Auxiliary Tasks
 ACE
 ### Hyper-Parameters
@@ -7,7 +7,7 @@ ACE
 | Parameter              | Value |
 |-----------------------:|:------|
 | batch size             | 64    |
-| patience               | 20    |
+| patience               | 100    |
 | dropout                | False    |
 | filters                | 150    |
 | n_grams                | [1, 2, 3, 4, 5]    |
@@ -24,7 +24,7 @@ position1_input (InputLayer)     (None, 31)            0
 ____________________________________________________________________________________________________
 position2_input (InputLayer)     (None, 31)            0                                            
 ____________________________________________________________________________________________________
-shared_word_embedding (Embedding multiple              410134500                                    
+shared_word_embedding (Embedding multiple              34108500                                     
 ____________________________________________________________________________________________________
 shared_position_embedding (Embed multiple              23900                                        
 ____________________________________________________________________________________________________
@@ -54,8 +54,8 @@ concatenate_1 (Concatenate)      (None, 750)           0
 ____________________________________________________________________________________________________
 SemEval_output (Dense)           (None, 19)            14269                                        
 ====================================================================================================
-Total params: 411,073,419.0
-Trainable params: 411,073,419.0
+Total params: 35,047,419.0
+Trainable params: 35,047,419.0
 Non-trainable params: 0.0
 ____________________________________________________________________________________________________
 
@@ -64,25 +64,25 @@ ________________________________________________________________________________
 ```
                            precision    recall  f1-score   support
 
-      Cause-Effect(e1,e2)       0.88      0.78      0.83        65
-      Cause-Effect(e2,e1)       0.86      0.85      0.86       133
-   Component-Whole(e1,e2)       0.80      0.72      0.76        94
-   Component-Whole(e2,e1)       0.62      0.60      0.61        92
- Content-Container(e1,e2)       0.85      0.81      0.83        70
- Content-Container(e2,e1)       0.88      0.86      0.87        35
-Entity-Destination(e1,e2)       0.74      0.90      0.81       161
-     Entity-Origin(e1,e2)       0.73      0.77      0.75       110
-     Entity-Origin(e2,e1)       0.97      0.79      0.87        39
- Instrument-Agency(e1,e2)       1.00      0.46      0.63        24
- Instrument-Agency(e2,e1)       0.73      0.80      0.76        85
- Member-Collection(e1,e2)       0.75      0.64      0.69        14
- Member-Collection(e2,e1)       0.85      0.91      0.88       129
-     Message-Topic(e1,e2)       0.85      0.82      0.83       107
-     Message-Topic(e2,e1)       0.62      0.42      0.50        19
-                    Other       0.52      0.50      0.51       285
-  Product-Producer(e1,e2)       0.69      0.73      0.71        60
-  Product-Producer(e2,e1)       0.65      0.68      0.66        77
+      Cause-Effect(e1,e2)       0.90      0.72      0.80        65
+      Cause-Effect(e2,e1)       0.79      0.87      0.83       133
+   Component-Whole(e1,e2)       0.71      0.73      0.72        94
+   Component-Whole(e2,e1)       0.56      0.68      0.62        92
+ Content-Container(e1,e2)       0.80      0.86      0.83        70
+ Content-Container(e2,e1)       0.88      0.83      0.85        35
+Entity-Destination(e1,e2)       0.75      0.91      0.82       161
+     Entity-Origin(e1,e2)       0.74      0.75      0.75       110
+     Entity-Origin(e2,e1)       0.93      0.72      0.81        39
+ Instrument-Agency(e1,e2)       0.91      0.42      0.57        24
+ Instrument-Agency(e2,e1)       0.72      0.73      0.73        85
+ Member-Collection(e1,e2)       0.80      0.57      0.67        14
+ Member-Collection(e2,e1)       0.83      0.90      0.87       129
+     Message-Topic(e1,e2)       0.83      0.84      0.83       107
+     Message-Topic(e2,e1)       0.44      0.58      0.50        19
+                    Other       0.50      0.40      0.44       285
+  Product-Producer(e1,e2)       0.72      0.55      0.62        60
+  Product-Producer(e2,e1)       0.61      0.74      0.67        77
 
-              avg / total       0.74      0.73      0.73      1599
+              avg / total       0.71      0.71      0.71      1599
 
 ```

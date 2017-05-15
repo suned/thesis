@@ -13,12 +13,6 @@ class GMBNERTask(RNN):
     def load(self):
         corpus_root = os.path.join(arguments.data_path, config.gmb_root)
         train_sequences = gmb_parser.gmb_named_entities(corpus_root)
-        if arguments.fit_sequential:
-            train_sequences, early_stopping_sequences = split(
-                train_sequences,
-                test_ratio=arguments.early_stopping_ratio
-            )
-            self.early_stopping_sequences = early_stopping_sequences
-        self.train_sequences = train_sequences
+        self.sequences = train_sequences
         self.init_encoder()
 

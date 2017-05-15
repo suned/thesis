@@ -1,13 +1,13 @@
-# semeval_conll2000pos
-## Time	: 07-05-2017 22:57:38
+# test
+## Time	: 15-05-2017 18:26:03
 ### Auxiliary Tasks
-Conll2000POS
+ACE
 ### Hyper-Parameters
 
 | Parameter              | Value |
 |-----------------------:|:------|
 | batch size             | 64    |
-| patience               | 100    |
+| patience               | 1    |
 | dropout                | False    |
 | filters                | 150    |
 | n_grams                | [1, 2, 3, 4, 5]    |
@@ -18,27 +18,27 @@ Conll2000POS
 ____________________________________________________________________________________________________
 Layer (type)                     Output Shape          Param #     Connected to                     
 ====================================================================================================
-word_input (InputLayer)          (None, 31)            0                                            
+word_input (InputLayer)          (None, 38)            0                                            
 ____________________________________________________________________________________________________
-position1_input (InputLayer)     (None, 31)            0                                            
+position1_input (InputLayer)     (None, 38)            0                                            
 ____________________________________________________________________________________________________
-position2_input (InputLayer)     (None, 31)            0                                            
+position2_input (InputLayer)     (None, 38)            0                                            
 ____________________________________________________________________________________________________
-shared_word_embedding (Embedding multiple              408866700                                    
+shared_word_embedding (Embedding multiple              35915400                                     
 ____________________________________________________________________________________________________
-shared_position_embedding (Embed (None, 31, 50)        9700                                         
+shared_position_embedding (Embed multiple              23900                                        
 ____________________________________________________________________________________________________
-embeddings (Concatenate)         (None, 31, 400)       0                                            
+embeddings (Concatenate)         (None, 38, 400)       0                                            
 ____________________________________________________________________________________________________
-convolution_1_gram (Conv1D)      (None, 31, 150)       60150                                        
+convolution_1_gram (Conv1D)      (None, 38, 150)       60150                                        
 ____________________________________________________________________________________________________
-convolution_2_gram (Conv1D)      (None, 30, 150)       120150                                       
+convolution_2_gram (Conv1D)      (None, 37, 150)       120150                                       
 ____________________________________________________________________________________________________
-convolution_3_gram (Conv1D)      (None, 29, 150)       180150                                       
+convolution_3_gram (Conv1D)      (None, 36, 150)       180150                                       
 ____________________________________________________________________________________________________
-convolution_4_gram (Conv1D)      (None, 28, 150)       240150                                       
+convolution_4_gram (Conv1D)      (None, 35, 150)       240150                                       
 ____________________________________________________________________________________________________
-convolution_5_gram (Conv1D)      (None, 27, 150)       300150                                       
+convolution_5_gram (Conv1D)      (None, 34, 150)       300150                                       
 ____________________________________________________________________________________________________
 global_max_pooling1d_1 (GlobalMa (None, 150)           0                                            
 ____________________________________________________________________________________________________
@@ -54,35 +54,17 @@ concatenate_1 (Concatenate)      (None, 750)           0
 ____________________________________________________________________________________________________
 SemEval_output (Dense)           (None, 19)            14269                                        
 ====================================================================================================
-Total params: 409,791,419.0
-Trainable params: 409,791,419.0
+Total params: 36,854,319.0
+Trainable params: 36,854,319.0
 Non-trainable params: 0.0
 ____________________________________________________________________________________________________
 
 ```
-### Validation Set Report
-```
-                           precision    recall  f1-score   support
+### Validation Metrics
 
-      Cause-Effect(e1,e2)       0.84      0.78      0.81        65
-      Cause-Effect(e2,e1)       0.85      0.84      0.85       133
-   Component-Whole(e1,e2)       0.82      0.72      0.77        94
-   Component-Whole(e2,e1)       0.66      0.62      0.64        92
- Content-Container(e1,e2)       0.79      0.94      0.86        70
- Content-Container(e2,e1)       0.91      0.83      0.87        35
-Entity-Destination(e1,e2)       0.84      0.86      0.85       161
-     Entity-Origin(e1,e2)       0.71      0.85      0.78       110
-     Entity-Origin(e2,e1)       1.00      0.77      0.87        39
- Instrument-Agency(e1,e2)       0.94      0.67      0.78        24
- Instrument-Agency(e2,e1)       0.70      0.81      0.75        85
- Member-Collection(e1,e2)       0.80      0.57      0.67        14
- Member-Collection(e2,e1)       0.85      0.91      0.88       129
-     Message-Topic(e1,e2)       0.84      0.83      0.84       107
-     Message-Topic(e2,e1)       0.52      0.58      0.55        19
-                    Other       0.52      0.50      0.51       285
-  Product-Producer(e1,e2)       0.79      0.57      0.66        60
-  Product-Producer(e2,e1)       0.66      0.73      0.69        77
+| Metric    | Mean      | Std       |
+|----------:|-----------|-----------|
+| Macro-F1  | 0.2622 | 0.2751 |
+| Precision | 0.2990 | 0.2862 |
+| Recall    | 0.2759 | 0.2552 |
 
-              avg / total       0.75      0.74      0.74      1599
-
-```

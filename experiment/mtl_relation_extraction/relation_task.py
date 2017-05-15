@@ -1,7 +1,6 @@
 import numpy
 from keras.layers import Dense
 from keras.utils import to_categorical
-from keras.preprocessing import sequence
 from sklearn.preprocessing import LabelEncoder
 
 from ..io import arguments
@@ -10,29 +9,20 @@ from .task import Task, beyond_edge, \
 from . import nlp
 
 
-def get_vocabulary(relations):
-    return set([token.string for relation in relations
-                for token in relation.sentence])
-
-
 class RelationTask(Task):
 
     def longest_sentence(self):
         return max(len(relation.sentence)
-                   for relation in self.train_relations)
+                   for relation in self.relations)
 
-    def get_validation_vocabulary(self):
-        raise NotImplementedError()
-
-    def get_train_vocabulary(self):
-        return get_vocabulary(self.train_relations)
+    def get_vocabulary(self):
+        return set([token.string for relation in self.relations
+                for token in relation.sentence])
 
     def __init__(self, is_target, name):
         super().__init__(name, is_target)
-        self.train_relations = None
-        self.early_stopping_relations = None
-        self.train_labels = None
-        self.early_stopping_labels = None
+        self.relations = None
+        self.labels = None
         self.input_length = None
 
     def load(self):
@@ -40,7 +30,7 @@ class RelationTask(Task):
 
     def init_encoder(self):
         self.encoder = LabelEncoder()
-        self.encoder.fit(self.train_labels)
+        self.encoder.fit(self.labels)
         self.num_classes = len(self.encoder.classes_)
 
     def pad(self, vector):
@@ -126,32 +116,20 @@ class RelationTask(Task):
 
     def training_set(self):
         return self.format_set(
-            self.train_labels,
-            self.train_relations
-        )
-
-    def early_stopping_set(self):
-        if self.early_stopping_relations is None:
-            raise ValueError(
-                "Early stopping relations not initialised in task %s" %
-                self.name
-
-            )
-        return self.format_set(
-            self.early_stopping_labels,
-            self.early_stopping_relations
+            self.labels,
+            self.relations
         )
 
     def get_batch(self, size=arguments.batch_size):
-        n = len(self.train_relations)
+        n = len(self.relations)
 
         batch_indices = numpy.random.randint(
             0,
             high=n,
             size=size
         )
-        batch_relations = self.train_relations[batch_indices]
-        batch_labels = self.train_labels[batch_indices]
+        batch_relations = self.relations[batch_indices]
+        batch_labels = self.labels[batch_indices]
         return self.format_set(batch_labels, batch_relations)
 
     def encode(self, labels):

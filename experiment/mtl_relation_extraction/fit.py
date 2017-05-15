@@ -2,6 +2,7 @@ from .. import config
 from ..io import arguments
 from . import log
 from .tasks import target_task, experiment_tasks
+from sklearn.model_selection import KFold
 
 
 log_header = """{0:<10} {1:<20} {2:<15} {3:<15}""".format(
@@ -13,8 +14,44 @@ log_header = """{0:<10} {1:<20} {2:<15} {3:<15}""".format(
 log_header += "\n" + "=" * len(log_header)
 log_line = """{0:<10d} {1:<20} {2:<15.4f} {3:<1.4f} {4}"""
 
+metrics = {
+    "precision": [],
+    "recall": [],
+    "f1": []
+}
+
+
+def init_weights():
+    log.info("Initialising weights")
+    for task in experiment_tasks:
+        task.init_weights()
+
 
 def interleaved():
+    for iteration in range(1, arguments.iterations + 1):
+        log.info(
+            "Starting iteration %i of %i",
+            iteration,
+            arguments.iterations
+        )
+        iterator = KFold(n_splits=arguments.k_folds)
+        k = 1
+        for train_indices, test_indices in iterator.split(
+                target_task.relations
+        ):
+            log.info("Starting fold %i of %i", k, arguments.k_folds)
+            target_task.split(train_indices, test_indices)
+            early_stopping()
+            k += 1
+            init_weights()
+
+
+def append(validation_metrics):
+    for metric, value in validation_metrics.items():
+        metrics[metric].append(value)
+
+
+def early_stopping():
     best_validation_loss = float("inf")
     best_weights = None
     log.info(
@@ -71,63 +108,6 @@ def interleaved():
         best_validation_loss
     )
     target_task.model.set_weights(best_weights)
-    log.info("Validation F1: %f", target_task.validation_f1())
-
-
-def sequential():
-    auxiliary_tasks = [task for task in experiment_tasks
-                       if not task.is_target]
-    log.info("Training sequentially")
-    for task in auxiliary_tasks:
-        fit_early_stopping(task)
-    fit_early_stopping(target_task)
-    log.info("Validation F1: %f", target_task.validation_f1())
-
-
-def fit_early_stopping(task):
-    best_early_stopping_loss = float("inf")
-    best_weights = None
-    log.info("Training on task: %s", task.name)
-    log.info(log_header)
-    early_stopping_set = task.early_stopping_set()
-    epochs_without_improvement = 0
-    for epoch in range(1, arguments.epochs + 1):
-        training_input, training_labels = task.get_batch()
-        epoch_stats = task.model.fit(
-            training_input,
-            training_labels,
-            epochs=1,
-            verbose=config.keras_verbosity,
-            validation_data=early_stopping_set,
-        )
-        training_loss = epoch_stats.history["loss"][0]
-        early_stopping_loss = epoch_stats.history["val_loss"][0]
-        if early_stopping_loss < best_early_stopping_loss:
-            optimum = "*"
-            best_early_stopping_loss = early_stopping_loss
-            best_weights = task.model.get_weights()
-            epochs_without_improvement = 0
-        else:
-            optimum = ""
-            epochs_without_improvement += 1
-        log.info(
-            log_line.format(
-                epoch,
-                task.name,
-                training_loss,
-                early_stopping_loss,
-                optimum
-            )
-        )
-        if training_loss < .01:
-            log.info("Training F1 maximised. Stopping")
-            break
-        if epochs_without_improvement > arguments.patience:
-            log.info("Patience exceeded. Stopping")
-            break
-    log.info(
-        "Finished training with best loss: %f",
-        best_early_stopping_loss
-    )
-    task.model.set_weights(best_weights)
-
+    validation_metrics = target_task.validation_metrics()
+    append(validation_metrics)
+    log.info("Validation F1: %f", validation_metrics["f1"])

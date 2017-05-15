@@ -1,6 +1,5 @@
-from ..io import conll2000_parser, arguments
+from ..io import conll2000_parser
 from .rnn import RNN
-from .task import split
 
 
 class Conll2000ChunkTask(RNN):
@@ -9,11 +8,5 @@ class Conll2000ChunkTask(RNN):
 
     def load(self):
         train_sequences = conll2000_parser.conll2000chunk()
-        if arguments.fit_sequential:
-            train_sequences, early_stopping_sequences = split(
-                train_sequences,
-                test_ratio=arguments.early_stopping_ratio
-            )
-            self.early_stopping_sequences = early_stopping_sequences
-        self.train_sequences = train_sequences
+        self.sequences = train_sequences
         self.init_encoder()

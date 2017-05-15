@@ -13,8 +13,5 @@ def compile():
 
 
 def train():
-    if arguments.fit_sequential:
-        fit.sequential()
-    else:
-        fit.interleaved()
+    fit.interleaved()
 

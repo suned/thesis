@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+rm -r results/*
+
 python -m experiment \
   --save SemEval \
   --auxiliary-tasks none

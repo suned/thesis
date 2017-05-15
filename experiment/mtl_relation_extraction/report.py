@@ -1,12 +1,13 @@
 import os
 import sys
 from datetime import datetime
+import pandas
 
 from io import StringIO
 
 from .. import config
 from ..io import arguments
-from . import log
+from . import log, fit
 from .tasks import target_task
 
 report_string = """# {}
@@ -19,16 +20,16 @@ report_string = """# {}
 ```
 {}
 ```
-### Validation Set Report
-```
+### Validation Metrics
 {}
-```
 """
 
-test_report = """### Test Report Report
-```
-{}
-```
+metrics_string = """
+| Metric    | Mean      | Std       |
+|----------:|:----------|:----------|
+| Macro-F1  | {0:<0.4f} | {1:<0.4f} |
+| Precision | {2:<0.4f} | {3:<0.4f} |
+| Recall    | {4:<0.4f} | {5:<0.4f} |
 """
 
 hyperparam_string = """
@@ -50,7 +51,17 @@ def save():
     aux_tasks = [task for task in arguments.auxiliary_tasks
                  if task != "none"]
     tasks = "\t".join(aux_tasks)
-    report = target_task.validation_report()
+    metrics = pandas.DataFrame(fit.metrics)
+    mean = metrics.mean()
+    std = metrics.std()
+    metrics_out = metrics_string.format(
+        mean["f1"],
+        std["f1"],
+        mean["precision"],
+        std["precision"],
+        mean["recall"],
+        std["recall"]
+    )
     date = datetime.now().strftime('%d-%m-%Y %H:%M:%S')
     headline = arguments.save
     hyper_params = hyperparam_string.format(
@@ -67,11 +78,8 @@ def save():
         tasks,
         hyper_params,
         summary,
-        report
+        metrics_out
     )
-    if arguments.test_set:
-        report = target_task.test_report()
-        output += test_report.format(report)
 
     root = os.path.join(config.out_path, arguments.save)
     os.mkdir(root)
@@ -81,6 +89,8 @@ def save():
     )
     with open(report_path, "w") as report_file:
         report_file.write(output)
+    metrics_path = os.path.join(root, "metrics.csv")
+    metrics.to_csv(metrics_path, index=False)
 
 
 def get_summary(model):

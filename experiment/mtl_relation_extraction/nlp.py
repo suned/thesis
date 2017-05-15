@@ -50,7 +50,7 @@ def add_vocabularies(tasks):
 
 def add_train_vocabulary(task):
     glove_vector_count = 0
-    for word in task.get_train_vocabulary():
+    for word in task.get_vocabulary():
         vector = (
             glove_vectors[word] if word in glove_vectors
             else numpy.random.rand(

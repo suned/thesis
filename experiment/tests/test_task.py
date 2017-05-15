@@ -48,7 +48,7 @@ class TestTask(unittest.TestCase):
             self.odd_relation,
             self.even_relation
         ]
-        self.task.train_relations = [
+        self.task.relations = [
             self.odd_relation,
             self.even_relation
         ]

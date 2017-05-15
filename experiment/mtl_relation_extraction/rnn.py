@@ -39,6 +39,6 @@ class RNN(SequenceTask):
         )
         model.compile(
             optimizer=config.optimizer,
-            loss="categorical_crossentropy"
+            loss=self.loss
         )
         self.model = model

@@ -1,15 +1,14 @@
 import numpy
 from sklearn import model_selection
 
-from .. import config
 from ..io import arguments
+from .. import config
 from . import inputs
 
 
 def split(data, test_ratio):
     iterator = model_selection.ShuffleSplit(
-            n_splits=1,
-            random_state=config.random_state,
+            n_splits=2,
             test_size=test_ratio
     )
     train_indices, test_indices = next(
@@ -35,13 +34,14 @@ def make_input(features,
 
 
 class Task:
-    def __init__(self, name, is_target):
+    def __init__(self, name, is_target, loss="categorical_crossentropy"):
         self.is_target = is_target
         self.name = name
         self.encoder = None
         self.num_classes = None
         self.model = None
         self.output_name = name + "_output"
+        self.loss = loss
 
     def __repr__(self):
         return self.name
@@ -49,23 +49,23 @@ class Task:
     def load(self):
         raise NotImplementedError()
 
+    def init_weights(self):
+        self.compile_model()
+
     def get_batch(self, size=arguments.batch_size):
         raise NotImplementedError()
 
     def compile_model(self):
         raise NotImplementedError()
 
-    def early_stopping_set(self):
-        raise NotImplementedError()
-
     def init_encoder(self):
         raise NotImplementedError()
 
-    def get_train_vocabulary(self):
+    def get_vocabulary(self):
         raise NotImplementedError()
 
     def get_validation_vocabulary(self):
-        raise NotImplementedError()
+        return set()
 
     def longest_sentence(self):
         raise NotImplementedError()

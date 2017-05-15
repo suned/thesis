@@ -12,29 +12,24 @@ def get_features(sequences):
     return [sequence.feature_vector() for sequence in sequences]
 
 
-def get_vocabulary(sequences):
-    return set(
-        [word for sequence in sequences for word in sequence.sentence]
-    )
-
-
 class SequenceTask(Task):
 
     def longest_sentence(self):
         return max(len(sequence.sentence)
-                   for sequence in self.train_sequences)
+                   for sequence in self.sequences)
 
     def get_validation_vocabulary(self):
-        return (get_vocabulary(self.early_stopping_sequences)
-                if arguments.fit_sequential
-                else set())
+        return set()
 
-    def get_train_vocabulary(self):
-        return get_vocabulary(self.train_sequences)
+    def get_vocabulary(self):
+        return set(
+            [word for sequence in self.sequences for word
+             in sequence.sentence]
+        )
 
     def init_encoder(self):
         classes = numpy.unique(
-            [tag for sequence in self.train_sequences
+            [tag for sequence in self.sequences
              for tag in sequence.tags] + [nlp.pad_token]
         )
         self.encoder = LabelEncoder()
@@ -43,23 +38,19 @@ class SequenceTask(Task):
         assert encoded_pad == nlp.pad_rank
         self.num_classes = len(self.encoder.classes_)
 
-    def early_stopping_set(self):
-        return self.format_set(self.early_stopping_sequences)
-
     def __init__(self, name, is_target):
         super().__init__(name, is_target)
-        self.train_sequences = None
-        self.early_stopping_sequences = None
+        self.sequences = None
 
     def get_batch(self, size=arguments.batch_size):
-        n = len(self.train_sequences)
+        n = len(self.sequences)
 
         batch_indices = numpy.random.randint(
             0,
             high=n,
             size=size
         )
-        batch_sequences = self.train_sequences[batch_indices]
+        batch_sequences = self.sequences[batch_indices]
         return self.format_set(batch_sequences)
 
     def compile_model(self):

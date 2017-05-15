@@ -21,9 +21,10 @@ epochs = None
 filters = None
 position_embedding_dimension = None
 n_grams = None
-fit_sequential = None
 share_filters = None
 word_embedding_dimension = None
+k_folds = None
+iterations = None
 
 _log_levels = [
     logging.getLevelName(level)
@@ -57,7 +58,7 @@ _parser.add_argument(
     action=LevelAction
 )
 _parser.add_argument(
-    "--data_path",
+    "--data-path",
     type=str,
     default=os.environ["MTL_DATA"],
     help="""Path to relation data folder. Expected to contain files and
@@ -78,7 +79,7 @@ _parser.add_argument(
     default=["ACE"]
 )
 _parser.add_argument(
-    "--validation_ratio",
+    "--validation-ratio",
     help="Validation/train set ratio",
     type=float,
     default=.2
@@ -159,14 +160,21 @@ _parser.add_argument(
     default=500
 )
 _parser.add_argument(
-    "--fit-sequential",
-    help="fit auxiliary tasks first, then target",
+    "--share-filters",
+    help="share convolution filters between sentence models",
     action="store_true"
 )
 _parser.add_argument(
-    "--share_filters",
-    help="share convolution filters between sentence models",
-    action="store_true"
+    "--k-folds",
+    help="number of folds in cross validation",
+    type=int,
+    default=5
+)
+_parser.add_argument(
+    "--iterations",
+    help="number of iterations to perform cross-validation",
+    type=int,
+    default=100
 )
 
 
