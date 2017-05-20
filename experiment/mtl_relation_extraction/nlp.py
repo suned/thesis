@@ -63,5 +63,5 @@ def add_train_vocabulary(task):
     log.info(
         "Added %i glove vectors, %i random vectors",
         glove_vector_count,
-        glove_vector_count - len(task.get_validation_vocabulary())
+        len(task.get_vocabulary()) - glove_vector_count
     )

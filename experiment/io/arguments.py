@@ -120,7 +120,7 @@ _parser.add_argument(
     help="Max number of epochs without improvement "
          "on early stopping set",
     type=int,
-    default=100
+    default=200
 )
 _parser.add_argument(
     "--filters",
@@ -174,7 +174,7 @@ _parser.add_argument(
     "--iterations",
     help="number of iterations to perform cross-validation",
     type=int,
-    default=100
+    default=20
 )
 
 
@@ -183,13 +183,14 @@ class ExperimentExistsError(Exception):
 
 
 def experiment_exists():
-        if save is not None:
-            experiment_path = os.path.join(
-                config.out_path,
-                save
-            )
-            return os.path.exists(experiment_path)
-        return False
+    return False
+    # if save is not None:
+    #     experiment_path = os.path.join(
+    #         config.out_path,
+    #         save
+    #     )
+    #     return os.path.exists(experiment_path)
+    # return False
 
 
 def parse():

@@ -1,8 +1,8 @@
 import os
+os.environ["KERAS_BACKEND"] = "theano"
+
 from .io import arguments
 import gc
-
-os.environ["KERAS_BACKEND"] = "theano"
 
 
 def run():

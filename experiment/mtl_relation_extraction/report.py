@@ -90,7 +90,8 @@ def save():
     with open(report_path, "w") as report_file:
         report_file.write(output)
     metrics_path = os.path.join(root, "metrics.csv")
-    metrics.to_csv(metrics_path, index=False)
+    with open(metrics_path, "a") as metrics_file:
+        metrics.to_csv(metrics_file, index=False)
 
 
 def get_summary(model):

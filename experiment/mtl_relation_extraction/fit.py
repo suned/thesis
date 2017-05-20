@@ -1,9 +1,14 @@
+import gc
+
+import math
+import random
+
 from .. import config
 from ..io import arguments
-from . import log
+from . import log, embeddings
 from .tasks import target_task, experiment_tasks
 from sklearn.model_selection import KFold
-
+from pygpu.gpuarray import GpuArrayException
 
 log_header = """{0:<10} {1:<20} {2:<15} {3:<15}""".format(
     "Epoch",
@@ -23,6 +28,7 @@ metrics = {
 
 def init_weights():
     log.info("Initialising weights")
+    embeddings.make_shared_embeddings()
     for task in experiment_tasks:
         task.init_weights()
 
@@ -44,6 +50,7 @@ def interleaved():
             early_stopping()
             k += 1
             init_weights()
+            gc.collect()
 
 
 def append(validation_metrics):
@@ -52,7 +59,7 @@ def append(validation_metrics):
 
 
 def early_stopping():
-    best_validation_loss = float("inf")
+    best_early_stopping_loss = float("inf")
     best_weights = None
     log.info(
         "Training interleaved with %i training samples, "
@@ -63,26 +70,44 @@ def early_stopping():
     epochs_without_improvement = 0
     (early_stopping_input,
      early_stopping_labels) = target_task.early_stopping_set()
-    task_count = len(experiment_tasks)
     log.info(log_header)
-    for epoch in range(1, arguments.epochs + 1):
-        task = experiment_tasks[epoch % task_count]
+    epoch = 1
+    while epoch <= arguments.epochs:
+        task = random.choice(experiment_tasks)
         batch_input, batch_labels = task.get_batch()
-        epoch_stats = task.model.fit(
-            batch_input,
-            batch_labels,
-            epochs=1,
-            verbose=config.keras_verbosity
-        )
-        training_loss = epoch_stats.history["loss"][0]
-        validation_loss = target_task.model.evaluate(
-            early_stopping_input,
-            early_stopping_labels,
-            verbose=config.keras_verbosity
-        )
-        if validation_loss < best_validation_loss:
+        try:
+            epoch_stats = task.model.fit(
+                batch_input,
+                batch_labels,
+                epochs=1,
+                verbose=config.keras_verbosity
+            )
+            training_loss = epoch_stats.history["loss"][0]
+            early_stopping_loss = target_task.model.evaluate(
+                early_stopping_input,
+                early_stopping_labels,
+                verbose=config.keras_verbosity
+            )
+        except RuntimeError as e:
+            log.error(str(e))
+            continue
+        except GpuArrayException as e:
+            if "(cublas)" in str(e):
+                log.error(str(e))
+                continue
+            else:
+                raise e
+        if math.isnan(training_loss) or math.isnan(early_stopping_loss):
+            log.error("Illegal loss detected, restarting fold")
+            init_weights()
+            epoch = 1
+            epochs_without_improvement = 0
+            best_early_stopping_loss = float("inf")
+            log.info(log_header)
+            continue
+        if early_stopping_loss < best_early_stopping_loss:
             optimum = "*"
-            best_validation_loss = validation_loss
+            best_early_stopping_loss = early_stopping_loss
             best_weights = target_task.model.get_weights()
             epochs_without_improvement = 0
         else:
@@ -93,19 +118,20 @@ def early_stopping():
                 epoch,
                 task.name,
                 training_loss,
-                validation_loss,
+                early_stopping_loss,
                 optimum
             )
         )
-        if task.is_target and training_loss < .01:
+        if task.is_target and training_loss < .001:
             log.info("Training loss maximised. Stopping")
             break
         if epochs_without_improvement > arguments.patience:
             log.info("Patience exceeded. Stopping")
             break
+        epoch += 1
     log.info(
         "Finished training with best loss: %f",
-        best_validation_loss
+        best_early_stopping_loss
     )
     target_task.model.set_weights(best_weights)
     validation_metrics = target_task.validation_metrics()

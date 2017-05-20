@@ -25,7 +25,6 @@ class RNN(SequenceTask):
         bi_lstm = layers.Bidirectional(
             layers.LSTM(
                 units=arguments.hidden_layer_dimension,
-                activation="relu",
                 return_sequences=True
             )
         )(word_embedding)

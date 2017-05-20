@@ -2,7 +2,6 @@ import numpy
 from sklearn import model_selection
 
 from ..io import arguments
-from .. import config
 from . import inputs
 
 
