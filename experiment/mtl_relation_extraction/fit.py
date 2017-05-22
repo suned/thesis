@@ -8,6 +8,9 @@ from ..io import arguments
 from . import log, embeddings
 from .tasks import target_task, experiment_tasks
 from sklearn.model_selection import KFold
+from keras import backend
+import os
+import pandas
 from pygpu.gpuarray import GpuArrayException
 
 log_header = """{0:<10} {1:<20} {2:<15} {3:<15}""".format(
@@ -19,11 +22,16 @@ log_header = """{0:<10} {1:<20} {2:<15} {3:<15}""".format(
 log_header += "\n" + "=" * len(log_header)
 log_line = """{0:<10d} {1:<20} {2:<15.4f} {3:<1.4f} {4}"""
 
-metrics = {
-    "precision": [],
-    "recall": [],
-    "f1": []
-}
+
+def init_metrics():
+    return {
+        "precision": [],
+        "recall": [],
+        "f1": []
+    }
+
+
+metrics = init_metrics()
 
 
 def init_weights():
@@ -33,7 +41,28 @@ def init_weights():
         task.init_weights()
 
 
+def save_metrics():
+    if arguments.save:
+        root = os.path.join(config.out_path, arguments.save)
+        os.makedirs(root, exist_ok=True)
+        metrics_path = os.path.join(root, "metrics.csv")
+        metrics_frame = pandas.DataFrame(metrics)
+        if os.path.exists(metrics_path):
+            metrics_frame.to_csv(
+                metrics_path,
+                index=False,
+                mode="a",
+                header=False
+            )
+        else:
+            metrics_frame.to_csv(
+                metrics_path,
+                index=False
+            )
+
+
 def interleaved():
+    global metrics
     for iteration in range(1, arguments.iterations + 1):
         log.info(
             "Starting iteration %i of %i",
@@ -47,10 +76,16 @@ def interleaved():
         ):
             log.info("Starting fold %i of %i", k, arguments.k_folds)
             target_task.split(train_indices, test_indices)
-            early_stopping()
-            k += 1
-            init_weights()
-            gc.collect()
+            try:
+                early_stopping()
+                k += 1
+                init_weights()
+                save_metrics()
+                metrics = init_metrics()
+            except RuntimeError as e:
+                log.error(str(e))
+            except GpuArrayException as e:
+                log.error(str(e))
 
 
 def append(validation_metrics):
@@ -75,33 +110,23 @@ def early_stopping():
     while epoch <= arguments.epochs:
         task = random.choice(experiment_tasks)
         batch_input, batch_labels = task.get_batch()
-        try:
-            epoch_stats = task.model.fit(
-                batch_input,
-                batch_labels,
-                epochs=1,
-                verbose=config.keras_verbosity
-            )
-            training_loss = epoch_stats.history["loss"][0]
-            early_stopping_loss = target_task.model.evaluate(
-                early_stopping_input,
-                early_stopping_labels,
-                verbose=config.keras_verbosity
-            )
-        except RuntimeError as e:
-            log.error(str(e))
-            continue
-        except GpuArrayException as e:
-            if "(cublas)" in str(e):
-                log.error(str(e))
-                continue
-            else:
-                raise e
+        epoch_stats = task.model.fit(
+            batch_input,
+            batch_labels,
+            epochs=1,
+            verbose=config.keras_verbosity
+        )
+        training_loss = epoch_stats.history["loss"][0]
+        early_stopping_loss = target_task.model.evaluate(
+            early_stopping_input,
+            early_stopping_labels,
+            verbose=config.keras_verbosity
+        )
         if math.isnan(training_loss) or math.isnan(early_stopping_loss):
             log.error("Illegal loss detected, restarting fold")
             init_weights()
             epoch = 1
-            epochs_without_improvement = 0
+            QQ = 0
             best_early_stopping_loss = float("inf")
             log.info(log_header)
             continue

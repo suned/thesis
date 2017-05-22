@@ -20,8 +20,6 @@ report_string = """# {}
 ```
 {}
 ```
-### Validation Metrics
-{}
 """
 
 metrics_string = """
@@ -51,17 +49,6 @@ def save():
     aux_tasks = [task for task in arguments.auxiliary_tasks
                  if task != "none"]
     tasks = "\t".join(aux_tasks)
-    metrics = pandas.DataFrame(fit.metrics)
-    mean = metrics.mean()
-    std = metrics.std()
-    metrics_out = metrics_string.format(
-        mean["f1"],
-        std["f1"],
-        mean["precision"],
-        std["precision"],
-        mean["recall"],
-        std["recall"]
-    )
     date = datetime.now().strftime('%d-%m-%Y %H:%M:%S')
     headline = arguments.save
     hyper_params = hyperparam_string.format(
@@ -77,8 +64,7 @@ def save():
         date,
         tasks,
         hyper_params,
-        summary,
-        metrics_out
+        summary
     )
 
     root = os.path.join(config.out_path, arguments.save)
@@ -89,9 +75,6 @@ def save():
     )
     with open(report_path, "w") as report_file:
         report_file.write(output)
-    metrics_path = os.path.join(root, "metrics.csv")
-    with open(metrics_path, "a") as metrics_file:
-        metrics.to_csv(metrics_file, index=False)
 
 
 def get_summary(model):
