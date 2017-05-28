@@ -1,9 +1,9 @@
 from .rnn import RNN
-from ..io import conll2000_parser, arguments
-from .task import split
+from .sequence_cnn import SequenceCNN
+from ..io import conll2000_parser
 
 
-class Conll2000PosTask(RNN):
+class Conll2000PosTask(SequenceCNN):
     def __init__(self):
         super().__init__(
             name="Conll2000POS",

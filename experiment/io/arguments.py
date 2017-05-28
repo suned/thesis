@@ -25,6 +25,7 @@ share_filters = None
 word_embedding_dimension = None
 k_folds = None
 iterations = None
+window_size = None
 
 _log_levels = [
     logging.getLevelName(level)
@@ -175,6 +176,12 @@ _parser.add_argument(
     help="number of iterations to perform cross-validation",
     type=int,
     default=20
+)
+_parser.add_argument(
+    "--window-size",
+    help="window size for sequence CNN models",
+    type=int,
+    default=7
 )
 
 

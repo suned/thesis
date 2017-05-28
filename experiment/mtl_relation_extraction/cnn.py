@@ -24,19 +24,35 @@ class CNN(RelationTask):
         position2_embedding = embeddings.shared_position_embedding(
             position2_input
         )
-        embeddings_concatenation = layers.concatenate(
-            [word_embedding, position1_embedding, position2_embedding],
-            name="embeddings"
-        )
         pooling_layers = []
         if arguments.share_filters:
-            convolution_layers = convolutions.shared_convolutions
+            word_convolutions = convolutions.shared_word_convolutions
+            position_convolutions = (convolutions
+                .shared_position_convolutions
+            )
         else:
-            convolution_layers = convolutions.make_convolution_layers()
+            (word_convolutions, position_convolutions) = (convolutions
+                .make_convolution_layers(prefix=self.name + "_")
+            )
 
-        for convolution in convolution_layers:
+        for convolution in word_convolutions:
             convolution_layer = convolution(
-                embeddings_concatenation
+                word_embedding
+            )
+            pooling_layer = layers.GlobalMaxPool1D()(
+                convolution_layer
+            )
+            pooling_layers.append(pooling_layer)
+        for convolution in position_convolutions:
+            convolution_layer = convolution(
+                position1_embedding
+            )
+            pooling_layer = layers.GlobalMaxPool1D()(
+                convolution_layer
+            )
+            pooling_layers.append(pooling_layer)
+            convolution_layer = convolution(
+                position2_embedding
             )
             pooling_layer = layers.GlobalMaxPool1D()(
                 convolution_layer

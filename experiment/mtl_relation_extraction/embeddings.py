@@ -2,7 +2,7 @@ import numpy
 from keras import layers
 
 from ..io import arguments
-from . import log, nlp, tasks
+from . import log, nlp
 
 
 def make_word_embedding():

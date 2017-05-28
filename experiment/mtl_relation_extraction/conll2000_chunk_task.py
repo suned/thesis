@@ -1,8 +1,8 @@
 from ..io import conll2000_parser
-from .rnn import RNN
+from .sequence_cnn import SequenceCNN
 
 
-class Conll2000ChunkTask(RNN):
+class Conll2000ChunkTask(SequenceCNN):
     def __init__(self):
         super().__init__(name="Conll2000Chunk", is_target=False)
 

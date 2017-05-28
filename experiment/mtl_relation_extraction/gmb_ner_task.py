@@ -1,12 +1,12 @@
 import os
 
-from .rnn import RNN
+from .sequence_cnn import SequenceCNN
 from ..io import arguments, gmb_parser
 from .. import config
 from .task import split
 
 
-class GMBNERTask(RNN):
+class GMBNERTask(SequenceCNN):
     def __init__(self):
         super().__init__(name="GMB-NER", is_target=False)
 
