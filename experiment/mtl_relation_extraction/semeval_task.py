@@ -59,18 +59,6 @@ class SemEvalTask(CNN):
             early_stopping_relations
         )
 
-    def get_batch(self, size=arguments.batch_size):
-        n = len(self.train_relations)
-
-        batch_indices = numpy.random.randint(
-            0,
-            high=n,
-            size=size
-        )
-        batch_relations = self.train_relations[batch_indices]
-        batch_labels = self.train_labels[batch_indices]
-        return self.format_set(batch_labels, batch_relations)
-
     def load(self):
         train_path = os.path.join(
             arguments.data_path,

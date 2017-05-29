@@ -9,4 +9,5 @@ class Conll2000ChunkTask(SequenceCNN):
     def load(self):
         train_sequences = conll2000_parser.conll2000chunk()
         self.sequences = train_sequences
+        self.train_sequences = train_sequences
         self.init_encoder()

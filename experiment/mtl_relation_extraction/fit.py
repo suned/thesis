@@ -5,7 +5,7 @@ import random
 
 from .. import config
 from ..io import arguments
-from . import log, embeddings
+from . import log, embeddings, convolutions
 from .tasks import target_task, experiment_tasks
 from sklearn.model_selection import KFold
 from keras import backend
@@ -25,9 +25,11 @@ log_line = """{0:<10d} {1:<20} {2:<15.4f} {3:<1.4f} {4}"""
 
 def init_metrics():
     return {
-        "precision": [],
-        "recall": [],
-        "f1": []
+            "precision": [],
+            "recall": [],
+            "f1": [],
+            "targetFraction": [],
+            "auxFraction": []
     }
 
 
@@ -37,6 +39,7 @@ metrics = init_metrics()
 def init_weights():
     log.info("Initialising weights")
     embeddings.make_shared_embeddings()
+    convolutions.make_shared_convolutions()
     for task in experiment_tasks:
         task.init_weights()
 
@@ -62,30 +65,49 @@ def save_metrics():
 
 
 def interleaved():
+    import ipdb
+    ipdb.sset_trace()
     global metrics
-    for iteration in range(1, arguments.iterations + 1):
-        log.info(
-            "Starting iteration %i of %i",
-            iteration,
-            arguments.iterations
-        )
-        iterator = KFold(n_splits=arguments.k_folds)
-        k = 1
-        for train_indices, test_indices in iterator.split(
-                target_task.relations
-        ):
-            log.info("Starting fold %i of %i", k, arguments.k_folds)
-            target_task.split(train_indices, test_indices)
-            try:
-                early_stopping()
-                k += 1
-                init_weights()
-                save_metrics()
-                metrics = init_metrics()
-            except RuntimeError as e:
-                log.error(str(e))
-            except GpuArrayException as e:
-                log.error(str(e))
+    if arguments.learning_surface:
+        fractions = [0, .2, .4, .6, .8, 1.0]
+    else:
+        fractions = [1.0]
+    for auxiliary_fraction in fractions:
+        for task in experiment_tasks:
+            if not task.is_target:
+                task.reduce_train_data(auxiliary_fraction)
+        for target_fraction in fractions:
+            for iteration in range(1, arguments.iterations + 1):
+                log.info(
+                    "Starting iteration %i of %i",
+                    iteration,
+                    arguments.iterations
+                )
+                iterator = KFold(n_splits=arguments.k_folds)
+                k = 1
+                for train_indices, test_indices in iterator.split(
+                        target_task.relations
+                ):
+                    log.info(
+                        "Starting fold %i of %i",
+                        k,
+                        arguments.k_folds
+                    )
+                    target_task.split(train_indices, test_indices)
+                    target_task.reduce_train_data(target_fraction)
+                    try:
+                        early_stopping(
+                            target_fraction,
+                            auxiliary_fraction
+                        )
+                        k += 1
+                        init_weights()
+                        save_metrics()
+                        metrics = init_metrics()
+                    except RuntimeError as e:
+                        log.error(str(e))
+                    except GpuArrayException as e:
+                        log.error(str(e))
 
 
 def append(validation_metrics):
@@ -93,7 +115,9 @@ def append(validation_metrics):
         metrics[metric].append(value)
 
 
-def early_stopping():
+def early_stopping(target_fraction, auxiliary_fraction):
+    import ipdb
+    ipdb.sset_trace()
     best_early_stopping_loss = float("inf")
     best_weights = None
     log.info(
@@ -116,7 +140,9 @@ def early_stopping():
             epochs=1,
             verbose=config.keras_verbosity
         )
-        training_loss = epoch_stats.history["loss"][0]
+        training_loss = (epoch_stats.history["loss"][0]
+                         if "loss" in epoch_stats.history
+                         else float("inf"))
         early_stopping_loss = target_task.model.evaluate(
             early_stopping_input,
             early_stopping_labels,
@@ -126,7 +152,6 @@ def early_stopping():
             log.error("Illegal loss detected, restarting fold")
             init_weights()
             epoch = 1
-            QQ = 0
             best_early_stopping_loss = float("inf")
             log.info(log_header)
             continue
@@ -160,5 +185,7 @@ def early_stopping():
     )
     target_task.model.set_weights(best_weights)
     validation_metrics = target_task.validation_metrics()
+    validation_metrics["targetFraction"] = target_fraction
+    validation_metrics["auxFraction"] = auxiliary_fraction
     append(validation_metrics)
     log.info("Validation F1: %f", validation_metrics["f1"])

@@ -34,6 +34,10 @@ class SequenceCNN(SequenceTask):
         self.num_classes = len(self.encoder.classes_)
 
     def format_set(self, sequences):
+        if not sequences:
+            windows = numpy.array([]).reshape((0, self.window_size))
+            labels = numpy.array([]).reshape((0, self.num_classes))
+            return self.make_in_out_pair(labels, windows)
         windows = []
         tags = []
         half_window_size = self.window_size // 2
@@ -69,6 +73,9 @@ class SequenceCNN(SequenceTask):
             encoded_tags,
             num_classes=self.num_classes
         )
+        return self.make_in_out_pair(one_hot_tags, windows)
+
+    def make_in_out_pair(self, one_hot_tags, windows):
         input = {
             inputs.word_input: windows
         }
@@ -87,9 +94,9 @@ class SequenceCNN(SequenceTask):
 
         pooling_layers = []
         if arguments.share_filters:
-            convolution_layers = convolutions.shared_word_convolutions
+            convolution_layers = convolutions.shared_convolutions
         else:
-            convolution_layers, _ = convolutions.make_convolution_layers(
+            convolution_layers = convolutions.make_convolution_layers(
                 prefix=self.name + "_"
             )
         for convolution in convolution_layers:

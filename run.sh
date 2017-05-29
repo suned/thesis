@@ -2,25 +2,20 @@
 
 python -m experiment \
   --save SemEval \
-  --auxiliary-tasks none \
-  --share-filters
+  --auxiliary-tasks none
 
 python -m experiment \
   --save SemEval+ACE \
-  --auxiliary-tasks ACE \
-  --share-filters
+  --auxiliary-tasks ACE
 
 python -m experiment \
   --save SemEval+Conll2000POS \
-  --auxiliary-tasks Conll2000POS \
-  --share-filters
+  --auxiliary-tasks Conll2000POS
 
 python -m experiment \
   --save SemEval+Conll2000Chunk \
-  --auxiliary-tasks Conll2000Chunk \
-  --share-filters
+  --auxiliary-tasks Conll2000Chunk
 
 python -m experiment \
   --save SemEval+GMB-NER \
-  --auxiliary-tasks GMB-NER \
-  --share-filters
+  --auxiliary-tasks GMB-NER

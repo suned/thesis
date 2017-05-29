@@ -23,5 +23,7 @@ class ACE(CNN):
         train_relations = ace_parser.read_files(ace_path)
         self.input_length = preprocessing.max_distance(train_relations)
         self.relations = train_relations
+        self.train_relations = self.relations
         self.labels = get_labels(self.relations)
+        self.train_labels = self.labels
         self.init_encoder()

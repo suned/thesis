@@ -7,10 +7,8 @@ from .. import config
 
 log_level = None
 save = None
-test_set = None
 auxiliary_tasks = None
 data_path = None
-dynamic_max_len = None
 validation_ratio = None
 early_stopping_ratio = None
 batch_size = None
@@ -26,6 +24,8 @@ word_embedding_dimension = None
 k_folds = None
 iterations = None
 window_size = None
+learning_surface = None
+
 
 _log_levels = [
     logging.getLevelName(level)
@@ -149,12 +149,6 @@ _parser.add_argument(
     default=None
 )
 _parser.add_argument(
-    "--test-set",
-    help="also output classification report on test set. "
-         "Depends on --save",
-    action="store_true"
-)
-_parser.add_argument(
     "--hidden-layer-dimension",
     help="dimensionality of dense hidden layers",
     type=int,
@@ -182,6 +176,11 @@ _parser.add_argument(
     help="window size for sequence CNN models",
     type=int,
     default=7
+)
+_parser.add_argument(
+    "--learning-surface",
+    help="save learning surface data",
+    action="store_true"
 )
 
 

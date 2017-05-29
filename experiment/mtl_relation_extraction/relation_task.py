@@ -11,6 +11,17 @@ from . import nlp
 
 class RelationTask(Task):
 
+    def reduce_train_data(self, fraction):
+        n = len(self.relations)
+        reduced_n = int(n / fraction) if fraction != 0. else 0
+        indices = numpy.random.randint(
+            0,
+            high=n,
+            size=reduced_n
+        )
+        self.train_relations = self.relations[indices]
+        self.train_labels = self.labels[indices]
+
     def longest_sentence(self):
         return max(len(relation.sentence)
                    for relation in self.relations)
@@ -23,6 +34,8 @@ class RelationTask(Task):
         super().__init__(name, is_target)
         self.relations = None
         self.labels = None
+        self.train_relations = None
+        self.train_labels = None
         self.input_length = None
 
     def load(self):
@@ -64,9 +77,6 @@ class RelationTask(Task):
         vectors = []
         for relation in relations:
             vector = relation.feature_vector()
-            if numpy.any(vector > nlp.vocabulary.length):
-                import ipdb
-                ipdb.sset_trace()
             if len(vector) <= self.input_length:
                 vector = self.pad(vector)
             else:
@@ -104,6 +114,10 @@ class RelationTask(Task):
     def format_set(self, labels, relations):
         features = self.get_features(relations)
         position1, position2 = self.get_positions(relations)
+        if len(features) == 0:
+            features = features.reshape((0, self.input_length))
+            position1 = position1.reshape((0, self.input_length))
+            position2 = position2.reshape((0, self.input_length))
         input_data = make_input(
             features,
             position1,
@@ -116,20 +130,22 @@ class RelationTask(Task):
 
     def training_set(self):
         return self.format_set(
-            self.labels,
-            self.relations
+            self.train_labels,
+            self.train_relations
         )
 
     def get_batch(self, size=arguments.batch_size):
-        n = len(self.relations)
-
+        n = len(self.train_relations)
+        if n == 0:
+            empty = numpy.array([])
+            return self.format_set(empty.astype(str), empty)
         batch_indices = numpy.random.randint(
             0,
             high=n,
             size=size
         )
-        batch_relations = self.relations[batch_indices]
-        batch_labels = self.labels[batch_indices]
+        batch_relations = self.train_relations[batch_indices]
+        batch_labels = self.train_labels[batch_indices]
         return self.format_set(batch_labels, batch_relations)
 
     def encode(self, labels):

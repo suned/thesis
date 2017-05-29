@@ -15,7 +15,8 @@ class CNN(RelationTask):
             input_length=self.input_length
         )
         position1_input, position2_input = (inputs
-            .make_position_inputs(input_length=self.input_length)
+            .make_position_inputs(
+                input_length=self.input_length)
         )
         word_embedding = embeddings.shared_word_embedding(word_input)
         position1_embedding = embeddings.shared_position_embedding(
@@ -24,42 +25,28 @@ class CNN(RelationTask):
         position2_embedding = embeddings.shared_position_embedding(
             position2_input
         )
+        embeddings_concatenation = layers.concatenate(
+            [word_embedding, position1_embedding, position2_embedding],
+            name="embeddings"
+        )
         pooling_layers = []
         if arguments.share_filters:
-            word_convolutions = convolutions.shared_word_convolutions
-            position_convolutions = (convolutions
-                .shared_position_convolutions
-            )
+            convolution_layers = convolutions.shared_convolutions
         else:
-            (word_convolutions, position_convolutions) = (convolutions
-                .make_convolution_layers(prefix=self.name + "_")
+            convolution_layers = convolutions.make_convolution_layers(
+                prefix=self.name + "_"
             )
 
-        for convolution in word_convolutions:
+        for convolution in convolution_layers:
             convolution_layer = convolution(
-                word_embedding
-            )
-            pooling_layer = layers.GlobalMaxPool1D()(
-                convolution_layer
-            )
-            pooling_layers.append(pooling_layer)
-        for convolution in position_convolutions:
-            convolution_layer = convolution(
-                position1_embedding
-            )
-            pooling_layer = layers.GlobalMaxPool1D()(
-                convolution_layer
-            )
-            pooling_layers.append(pooling_layer)
-            convolution_layer = convolution(
-                position2_embedding
+                embeddings_concatenation
             )
             pooling_layer = layers.GlobalMaxPool1D()(
                 convolution_layer
             )
             pooling_layers.append(pooling_layer)
         pooling_layers_concatenation = layers.concatenate(
-                pooling_layers
+            pooling_layers
         )
         if arguments.dropout:
             drop_out = layers.Dropout(rate=.5)(

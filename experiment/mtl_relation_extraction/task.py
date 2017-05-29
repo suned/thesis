@@ -48,6 +48,9 @@ class Task:
     def load(self):
         raise NotImplementedError()
 
+    def reduce_train_data(self, fraction):
+        raise NotImplementedError()
+
     def init_weights(self):
         self.compile_model()
 

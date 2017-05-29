@@ -27,6 +27,17 @@ class SequenceTask(Task):
              in sequence.sentence]
         )
 
+    def reduce_train_data(self, fraction):
+        n = len(self.sequences)
+        size = int(n / fraction) if fraction != 0. else 0
+
+        batch_indices = numpy.random.randint(
+            0,
+            high=n,
+            size=size
+        )
+        self.train_sequences = self.sequences[batch_indices]
+
     def init_encoder(self):
         classes = numpy.unique(
             [tag for sequence in self.sequences
@@ -41,16 +52,18 @@ class SequenceTask(Task):
     def __init__(self, name, is_target):
         super().__init__(name, is_target)
         self.sequences = None
+        self.train_sequences = None
 
     def get_batch(self, size=arguments.batch_size):
-        n = len(self.sequences)
-
+        n = len(self.train_sequences)
+        if n == 0:
+            return self.format_set(numpy.array([]))
         batch_indices = numpy.random.randint(
             0,
             high=n,
             size=size
         )
-        batch_sequences = self.sequences[batch_indices]
+        batch_sequences = self.train_sequences[batch_indices]
         return self.format_set(batch_sequences)
 
     def compile_model(self):

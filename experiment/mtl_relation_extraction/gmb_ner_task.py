@@ -14,5 +14,6 @@ class GMBNERTask(SequenceCNN):
         corpus_root = os.path.join(arguments.data_path, config.gmb_root)
         train_sequences = gmb_parser.gmb_named_entities(corpus_root)
         self.sequences = train_sequences
+        self.train_sequences = train_sequences
         self.init_encoder()
 
