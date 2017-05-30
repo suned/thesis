@@ -17,6 +17,17 @@ from .cnn import CNN
 
 class SemEvalTask(CNN):
 
+    def reduce_train_data(self, fraction):
+        n = len(self.train_relations)
+        reduced_n = int(n * fraction) if fraction != 0. else 0
+        indices = numpy.random.randint(
+            0,
+            high=n,
+            size=reduced_n
+        )
+        self.train_relations = self.train_relations[indices]
+        self.train_labels = self.train_labels[indices]
+
     def early_stopping_set(self):
         if self.early_stopping_relations is None:
             raise ValueError(

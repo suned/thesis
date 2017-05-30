@@ -29,7 +29,7 @@ class SequenceTask(Task):
 
     def reduce_train_data(self, fraction):
         n = len(self.sequences)
-        size = int(n / fraction) if fraction != 0. else 0
+        size = int(n * fraction) if fraction != 0. else 0
 
         batch_indices = numpy.random.randint(
             0,

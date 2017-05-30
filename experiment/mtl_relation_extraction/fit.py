@@ -45,38 +45,38 @@ def init_weights():
 
 
 def save_metrics():
-    if arguments.save:
-        root = os.path.join(config.out_path, arguments.save)
-        os.makedirs(root, exist_ok=True)
-        metrics_path = os.path.join(root, "metrics.csv")
-        metrics_frame = pandas.DataFrame(metrics)
-        if os.path.exists(metrics_path):
-            metrics_frame.to_csv(
-                metrics_path,
-                index=False,
-                mode="a",
-                header=False
-            )
-        else:
-            metrics_frame.to_csv(
-                metrics_path,
-                index=False
-            )
+    root = os.path.join(config.out_path, arguments.save)
+    os.makedirs(root, exist_ok=True)
+    metrics_path = os.path.join(root, "metrics.csv")
+    metrics_frame = pandas.DataFrame(metrics)
+    if os.path.exists(metrics_path):
+        metrics_frame.to_csv(
+            metrics_path,
+            index=False,
+            mode="a",
+            header=False
+        )
+    else:
+        metrics_frame.to_csv(
+            metrics_path,
+            index=False
+        )
 
 
 def interleaved():
-    import ipdb
-    ipdb.sset_trace()
     global metrics
     if arguments.learning_surface:
-        fractions = [0, .2, .4, .6, .8, 1.0]
+        fractions = config.fractions
     else:
         fractions = [1.0]
-    for auxiliary_fraction in fractions:
-        for task in experiment_tasks:
-            if not task.is_target:
-                task.reduce_train_data(auxiliary_fraction)
+    auxiliary_fractions = (fractions
+                           if arguments.auxiliary_tasks != "none"
+                           else [0])
+    for auxiliary_fraction in auxiliary_fractions:
         for target_fraction in fractions:
+            for task in experiment_tasks:
+                if not task.is_target:
+                    task.reduce_train_data(auxiliary_fraction)
             for iteration in range(1, arguments.iterations + 1):
                 log.info(
                     "Starting iteration %i of %i",
@@ -116,8 +116,6 @@ def append(validation_metrics):
 
 
 def early_stopping(target_fraction, auxiliary_fraction):
-    import ipdb
-    ipdb.sset_trace()
     best_early_stopping_loss = float("inf")
     best_weights = None
     log.info(

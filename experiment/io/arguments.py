@@ -143,10 +143,9 @@ _parser.add_argument(
     default=50
 )
 _parser.add_argument(
-    "--save",
+    "save",
     help="name of experiment results to save",
-    type=str,
-    default=None
+    type=str
 )
 _parser.add_argument(
     "--hidden-layer-dimension",
@@ -189,14 +188,18 @@ class ExperimentExistsError(Exception):
 
 
 def experiment_exists():
+    experiment_path = os.path.join(
+        config.out_path,
+        save,
+        "metrics.csv"
+    )
+    if os.path.exists(experiment_path):
+        with open(experiment_path) as f:
+            lines = sum(1 for _ in f)
+        min_lines = (iterations * k_folds if not learning_surface
+                     else iterations * k_folds * len(config.fractions))
+        return lines > min_lines
     return False
-    # if save is not None:
-    #     experiment_path = os.path.join(
-    #         config.out_path,
-    #         save
-    #     )
-    #     return os.path.exists(experiment_path)
-    # return False
 
 
 def parse():

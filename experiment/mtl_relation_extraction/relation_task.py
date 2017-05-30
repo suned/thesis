@@ -13,7 +13,7 @@ class RelationTask(Task):
 
     def reduce_train_data(self, fraction):
         n = len(self.relations)
-        reduced_n = int(n / fraction) if fraction != 0. else 0
+        reduced_n = int(n * fraction) if fraction != 0. else 0
         indices = numpy.random.randint(
             0,
             high=n,

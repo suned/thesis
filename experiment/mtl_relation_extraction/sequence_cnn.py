@@ -34,7 +34,7 @@ class SequenceCNN(SequenceTask):
         self.num_classes = len(self.encoder.classes_)
 
     def format_set(self, sequences):
-        if not sequences:
+        if len(sequences) == 0:
             windows = numpy.array([]).reshape((0, self.window_size))
             labels = numpy.array([]).reshape((0, self.num_classes))
             return self.make_in_out_pair(labels, windows)
