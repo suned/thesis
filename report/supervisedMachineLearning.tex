@@ -45,6 +45,8 @@ Estimating $E$ with a sample that is independent of $h$ is a technique called \t
 \\\\
 Because $\mathcal{D}_{train}$ is used to select $h$, it cannot be used to estimate $E$ by Hoeffding's inequality, and we need more sophisticated techniques to understand the relationship between $\mathcal{D}_{train}$ and $E$. The central question in supervised machine learning is \textit{how can we best define $\mathcal{H}$ and use $\mathcal{D}_{train}$ to make $E$ small?} Answering this question is the objective of a field of research known as \textbf{statistical learning theory}.
 
+\subsection{Validation}
+
 \subsection{Statistical Learning Theory}
 \label{statistical_learning_theory}
 We would like to know how best to define $\mathcal{H}$ and use $\mathcal{D}_{train}$ in order to make $E$ small. $\mathcal{D}_{train}$ is the only information we have about $P(\mathbf{x}, \mathbf{y})$, and therefore also the only information we have about $E$. A straight-forward idea would be to find a function $g \in \mathcal{H}$ that minimises the \textbf{training error} $\hat{E}(g, \mathcal{D}_{train})$ in the hope that $g$ will also minimise $E$. 

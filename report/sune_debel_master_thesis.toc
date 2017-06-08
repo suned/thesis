@@ -22,13 +22,13 @@
 \contentsline {subsection}{\numberline {3.2.3}Regularisation}{17}
 \contentsline {subsection}{\numberline {3.2.4}Adam}{18}
 \contentsline {section}{\numberline {3.3}Convolutional Neural Networks}{18}
-\contentsline {section}{\numberline {3.4}Word Vectors}{18}
-\contentsline {chapter}{\numberline {4}Multi-Task Learning}{20}
-\contentsline {chapter}{\numberline {5}Experiment}{21}
-\contentsline {section}{\numberline {5.1}Auxiliary Tasks}{21}
-\contentsline {section}{\numberline {5.2}Network Architecture}{21}
-\contentsline {chapter}{\numberline {6}Results}{22}
-\contentsline {chapter}{\numberline {7}Discussion}{23}
-\contentsline {chapter}{\numberline {8}Conclusion}{24}
-\contentsline {chapter}{\numberline {A}Appendix}{26}
-\contentsline {section}{\numberline {A.1}First}{26}
+\contentsline {section}{\numberline {3.4}Word Vectors}{20}
+\contentsline {chapter}{\numberline {4}Multi-Task Learning}{22}
+\contentsline {chapter}{\numberline {5}Experiment}{23}
+\contentsline {section}{\numberline {5.1}Auxiliary Tasks}{23}
+\contentsline {section}{\numberline {5.2}Network Architecture}{23}
+\contentsline {chapter}{\numberline {6}Results}{24}
+\contentsline {chapter}{\numberline {7}Discussion}{25}
+\contentsline {chapter}{\numberline {8}Conclusion}{26}
+\contentsline {chapter}{\numberline {A}Appendix}{28}
+\contentsline {section}{\numberline {A.1}First}{28}

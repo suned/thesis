@@ -1,5 +1,5 @@
 import numpy
-from keras import layers, models
+from keras import layers, models, losses, backend
 from keras.utils import to_categorical
 from sklearn.preprocessing import LabelEncoder
 
@@ -10,6 +10,11 @@ from ..io import arguments
 from .. import config
 
 
+def clipped_cross_entropy(ytrue, ypred):
+    ypred = backend.clip(ypred, 0.0001, 0.99999)
+    return losses.categorical_crossentropy(ytrue, ypred)
+
+
 class SequenceCNN(SequenceTask):
     def __init__(self,
                  name,
@@ -17,12 +22,10 @@ class SequenceCNN(SequenceTask):
                  window_size=arguments.window_size):
         super().__init__(name, is_target)
         self.window_size = window_size
+        self.loss = clipped_cross_entropy
 
     def load(self):
         raise NotImplementedError()
-
-    def to_one_hot(self):
-        pass
 
     def init_encoder(self):
         classes = numpy.unique(

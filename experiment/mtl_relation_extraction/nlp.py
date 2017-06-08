@@ -55,7 +55,7 @@ def add_train_vocabulary(task):
             glove_vectors[word] if word in glove_vectors
             else numpy.random.rand(
                 arguments.word_embedding_dimension
-            )
+            ) / 100
         )
         if word in glove_vectors:
             glove_vector_count += 1

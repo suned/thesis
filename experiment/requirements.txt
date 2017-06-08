@@ -1,6 +1,7 @@
 spacy
 matplotlib
 numpy
+scipy
 scikit-learn
 funcparserlib
 colorlog

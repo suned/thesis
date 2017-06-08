@@ -3,9 +3,12 @@ import gc
 import math
 import random
 
+import numpy
+
+
 from .. import config
 from ..io import arguments
-from . import log, embeddings, convolutions
+from . import log, embeddings, convolutions, inputs
 from .tasks import target_task, experiment_tasks
 from sklearn.model_selection import KFold
 from keras import backend
@@ -63,21 +66,61 @@ def save_metrics():
         )
 
 
+def load_fractions():
+    root = os.path.join(config.out_path, arguments.save)
+    metrics_path = os.path.join(root, "metrics.csv")
+    if os.path.exists(root):
+        metrics_frame = pandas.read_csv(metrics_path)
+        max_aux_fraction = metrics_frame.auxFraction.max()
+        max_target_fraction = metrics_frame[
+            metrics_frame.auxFraction == max_aux_fraction
+        ].targetFraction.max()
+        target_fractions = numpy.arange(max_target_fraction, 1.1, .2)
+        auxiliary_fractions = (
+            numpy.arange(max_aux_fraction, 1.1, .2)
+            if arguments.auxiliary_tasks != "none"
+            else [0.0]
+        )
+        return target_fractions, auxiliary_fractions
+    else:
+        return config.fractions, config.fractions
+
+
+def find_start_iteration():
+    return 1
+    # root = os.path.join(config.out_path, arguments.save)
+    # metrics_path = os.path.join(root, "metrics.csv")
+    # if os.path.exists(metrics_path):
+    #     metrics_frame = pandas.read_csv(metrics_path)
+    #     max_aux_fraction = metrics_frame.auxFraction.max()
+    #     max_target_fraction = metrics_frame[
+    #         metrics_frame.auxFraction == max_aux_fraction
+    #         ].targetFraction.max()
+    #     start_iteration = len(metrics_frame[
+    #         (metrics_frame.targetFraction == max_target_fraction) &
+    #         (metrics_frame.auxFraction == max_aux_fraction)
+    #     ])
+    #     return start_iteration
+    # else:
+    #     return 1
+
+
 def interleaved():
     global metrics
     if arguments.learning_surface:
-        fractions = config.fractions
+        target_fractions, auxiliary_fractions = load_fractions()
     else:
-        fractions = [1.0]
-    auxiliary_fractions = (fractions
-                           if arguments.auxiliary_tasks != "none"
-                           else [0])
+        target_fractions = auxiliary_fractions = [1.0]
+    start_iteration = find_start_iteration()
     for auxiliary_fraction in auxiliary_fractions:
-        for target_fraction in fractions:
+        log.info("Starting auxiliary fraction %f", auxiliary_fraction)
+        for target_fraction in target_fractions:
+            log.info("Starting target fraction %f", target_fraction)
             for task in experiment_tasks:
                 if not task.is_target:
                     task.reduce_train_data(auxiliary_fraction)
-            for iteration in range(1, arguments.iterations + 1):
+            for iteration in range(start_iteration,
+                                   arguments.iterations + 1):
                 log.info(
                     "Starting iteration %i of %i",
                     iteration,
@@ -104,6 +147,8 @@ def interleaved():
                         init_weights()
                         save_metrics()
                         metrics = init_metrics()
+                        start_iteration = 1
+                        gc.collect()
                     except RuntimeError as e:
                         log.error(str(e))
                     except GpuArrayException as e:
@@ -113,6 +158,11 @@ def interleaved():
 def append(validation_metrics):
     for metric, value in validation_metrics.items():
         metrics[metric].append(value)
+
+
+def is_empty(batch_input):
+    rows, columns = batch_input[inputs.word_input].shape
+    return rows == 0
 
 
 def early_stopping(target_fraction, auxiliary_fraction):
@@ -136,6 +186,7 @@ def early_stopping(target_fraction, auxiliary_fraction):
             batch_input,
             batch_labels,
             epochs=1,
+            batch_size=arguments.batch_size,
             verbose=config.keras_verbosity
         )
         training_loss = (epoch_stats.history["loss"][0]
@@ -147,12 +198,10 @@ def early_stopping(target_fraction, auxiliary_fraction):
             verbose=config.keras_verbosity
         )
         if math.isnan(training_loss) or math.isnan(early_stopping_loss):
-            log.error("Illegal loss detected, restarting fold")
-            init_weights()
-            epoch = 1
-            best_early_stopping_loss = float("inf")
-            log.info(log_header)
-            continue
+            log.error("Illegal loss detected, skipping fold")
+            import ipdb
+            ipdb.sset_trace()
+            return
         if early_stopping_loss < best_early_stopping_loss:
             optimum = "*"
             best_early_stopping_loss = early_stopping_loss

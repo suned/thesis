@@ -188,17 +188,6 @@ class ExperimentExistsError(Exception):
 
 
 def experiment_exists():
-    experiment_path = os.path.join(
-        config.out_path,
-        save,
-        "metrics.csv"
-    )
-    if os.path.exists(experiment_path):
-        with open(experiment_path) as f:
-            lines = sum(1 for _ in f)
-        min_lines = (iterations * k_folds if not learning_surface
-                     else iterations * k_folds * len(config.fractions))
-        return lines > min_lines
     return False
 
 

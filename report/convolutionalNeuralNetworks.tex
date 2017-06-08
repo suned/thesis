@@ -1,1 +1,84 @@
 \section{Convolutional Neural Networks}
+A convolution is a mathematical operation that takes as input two functions $f$ and $k$, commonly written as $f * k$.
+
+\begin{definition}[convolution] \label{convolution}
+	Let $f(x) \in \mathbb{R}$ and $k(x) \in \mathbb{R}$ be two real-valued functions defined for the entire real number line. Then the convolution $f * k$ is defined as
+	$$
+		(f * k)(x) = \int f(y)k(x - y)dy
+	$$
+\end{definition}
+
+In practical applications involving computers, $f$ and $k$ are discrete, and the integral turns into a sum:
+$$
+(f * k)(x) = \sum\limits_{y=-\infty}^\infty f(y)k(x - y)
+$$
+Most functions in practical applications of convolutions represent signals such as images, sound or text, which are only defined over a limited range of indices $x$. In these cases it's assumed that whenever $x$ is beyond the domain of $f$ or $k$, the output of either function is 0.
+\\\\
+We can think of a convolution as a weighted sum of the output of $f$ where the output of $k$ acts as the weights. This view of convolution is used heavily in signal processing applications, where $k$ is chosen to produce certain properties in the convolution output, such as reducing noise in $f$. In this setting $k$ is often referred to as a \textbf{kernel}. As an example consider the noisy signal convolved with a gaussian kernel in figure \ref{gaussian_convolution}.
+
+\begin{figure}
+	\centering
+	\input{img/gaussian.pgf}
+	\caption{Visualisation of a noisy signal $f$ convolved with a small Gaussian kernel $k$. The output of the convolution $f * k$ captures the general trend of $f$ by averaging the outputs of $f$ at every $x$, such values of $f$ of inputs close to $x$ contribute more to the output of the convolution, than inputs far away from $x$ thanks to the weights of the Gaussian kernel.}
+	\label{gaussian_convolution}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\input{img/detector.pgf}
+	\caption{Visualisation of convolutional kernel as feature detector. When the signal $f$ is similar to the kernel, the output of the convolution is maximally positive.}
+	\label{feature_detector}
+\end{figure}
+
+The kernel $k$ can also act as a \textbf{feature detector}. When the output of $f$ is closely correlated with the output of $k$, the output of the convolution spikes. See for example figure \ref{feature_detector}.
+\\\\
+\textbf{Convolutional neural networks} are neural networks that take advantage of convolutions as feature detectors. By arranging the layers and weights in the network in specific ways, we can construct a network such that the output of each layer $l$ is the output of layer $l - 1$ convolved with a kernel $k$, where the weights of $k$ are exactly the neural network weights connecting the units in layer $l$ and $l - 1$.
+
+Specifically, the weights connecting layers $l$ and $l - 1$ in a convolutional neural network should be arranged such that they are:
+
+\begin{labeling}{shared}
+	\item [\textbf{sparse}] each unit in layer $l$ receives input from a small number of units layer $l - 1$.
+	\item [\textbf{shared}] the weights connecting units in layer $l$ and $l - 1$ are shared across the layer, in the same way that the same kernel weights are used at every index $x$ in the convolution operation. See figure \ref{convolutional_network}.
+\end{labeling}
+
+These restrictions on the network architecture reduces the number of unique weights of the model. This has the effect of reducing both the memory requirements of storing the network, but also limits the number of operations required to compute the output of the network for a given input.
+\\\\
+Intuitively, the output at each unit $u$ in $l$ in a convolutional layer indicates how strongly the feature detected by the kernel given by its connecting weights is present in the output of units that $u$ connects to in layer $l - 1$. Since the weights are learned by gradient descent, the feature detected by units in layer $l$ is learnt as well.
+
+Often, the simple presence or absence of a feature in the output of layer $l - 1$ is very informative for the classification task the convolutional network was built to solve. The exact position of a detected feature in layer $l - 1$ is often less informative however. For this reason, convolutional layers are often interleaved with so called \textbf{pooling layers}. The output of a pooling layer can be thought of as a summary how strongly a feature is detected in layer $l$, that discards information about the exact position at which the features was detected. Very commonly, max-pooling is used which simply outputs the maximum value over all outputs of units in layer $l$.
+
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}[->, >=stealth, swap]
+			\node [neuron] (x1) at (0,0) {$x_1$};
+			\node [neuron] (x2) at (1,0) {$x_2$};
+			\node [neuron] (x3) at (2,0) {$x_3$};
+			\node [neuron] (x4) at (3,0) {$x_4$};
+			\node [neuron] (x5) at (4,0) {$x_5$};
+			\node [neuron] (x6) at (5,0) {$x_6$};
+			\node [neuron] (sigma1) at (1,2) {$\sigma$};
+			\node [neuron] (sigma2) at (2,2) {$\sigma$};
+			\node [neuron] (sigma3) at (3,2) {$\sigma$};
+			\node [neuron] (sigma4) at (4,2) {$\sigma$};
+			
+			\draw (x1) edge[red] (sigma1);
+			\draw (x2) edge[black] (sigma1);
+			\draw (x3) edge[blue] (sigma1);
+			
+			\draw (x2) edge[red] (sigma2);
+			\draw (x3) edge[black] (sigma2);
+			\draw (x4) edge[blue] (sigma2);
+			
+			\draw (x3) edge[red] (sigma3);
+			\draw (x4) edge[black] (sigma3);
+			\draw (x5) edge[blue] (sigma3);
+			
+			\draw (x4) edge[red] (sigma4);
+			\draw (x5) edge[black] (sigma4);
+			\draw (x6) edge[blue] (sigma4);
+	\end{tikzpicture}
+	\caption{Visual representation of a one-dimensional convolution implemented as the first layer of a convolutional neural network. The connections between the input layer and the convolutional layer are sparse in that each unit is connected only to three of six inputs. The colors of the connections indicate how the weights are shared.}
+	\label{convolutional_network}
+\end{figure}
+
+
