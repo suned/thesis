@@ -83,7 +83,10 @@ def load_fractions():
         )
         return target_fractions, auxiliary_fractions
     else:
-        return config.fractions, config.fractions
+        auxiliary_fractions = (config.fractions
+                               if arguments.auxiliary_tasks != "none"
+                               else [0.0])
+        return config.fractions, auxiliary_fractions
 
 
 def find_start_iteration():
@@ -138,21 +141,16 @@ def interleaved():
                     )
                     target_task.split(train_indices, test_indices)
                     target_task.reduce_train_data(target_fraction)
-                    try:
-                        early_stopping(
-                            target_fraction,
-                            auxiliary_fraction
-                        )
-                        k += 1
-                        init_weights()
-                        save_metrics()
-                        metrics = init_metrics()
-                        start_iteration = 1
-                        gc.collect()
-                    except RuntimeError as e:
-                        log.error(str(e))
-                    except GpuArrayException as e:
-                        log.error(str(e))
+                    early_stopping(
+                        target_fraction,
+                        auxiliary_fraction
+                    )
+                    k += 1
+                    init_weights()
+                    save_metrics()
+                    metrics = init_metrics()
+                    start_iteration = 1
+                    gc.collect()
 
 
 def append(validation_metrics):

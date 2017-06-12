@@ -41,11 +41,9 @@ Secondly, we assume that $h$ is independent of $\mathcal{D}$, in other words, th
 
 The inequality tells us that the probability that $E$ is more than $\epsilon$ away from $\hat{E}$ decreases exponentially in $\epsilon$ and $N$. In other words, the more samples in $D$, the less likely it is that $E$ will be misleading.
 \\\\
-Estimating $E$ with a sample that is independent of $h$ is a technique called \textbf{validation}. In validation, the sample provided by a human annotator is split into two datasets, $\mathcal{D}_{train}$, which we intend to use to search for $h^*$, and $\mathcal{D}_{validate}$, which saved until we are done searching. Since $\mathcal{D}_{validate}$ is independent of whichever $h$ we selected, Hoeffding's inequality applies and $\mathcal{D}_{validate}$ can be used to estimate $E$.
+Estimating $E$ with a sample that is independent of $h$ is a technique called \textbf{validation}. In validation, the sample provided by a human annotator is split into two datasets, $\mathcal{D}_{train}$, which we intend to use to search for $h^*$, and $\mathcal{D}_{validate}$, which we save until we're done searching. Since $\mathcal{D}_{validate}$ is independent of whichever $h$ we selected, Hoeffding's inequality applies and $\mathcal{D}_{validate}$ can be used to estimate $E$.
 \\\\
 Because $\mathcal{D}_{train}$ is used to select $h$, it cannot be used to estimate $E$ by Hoeffding's inequality, and we need more sophisticated techniques to understand the relationship between $\mathcal{D}_{train}$ and $E$. The central question in supervised machine learning is \textit{how can we best define $\mathcal{H}$ and use $\mathcal{D}_{train}$ to make $E$ small?} Answering this question is the objective of a field of research known as \textbf{statistical learning theory}.
-
-\subsection{Validation}
 
 \subsection{Statistical Learning Theory}
 \label{statistical_learning_theory}
@@ -111,3 +109,10 @@ The bound tells us that $E(h)$ will be close to $\hat{E}(h, \mathcal{D}_{train})
 On the other hand, having a set $\mathcal{H}$ that can realise a large number of dichotomies on $N$ points, will make it easier to find a function that will make $\hat{E}(h, \mathcal{D}_{train})$ small. Using a $\mathcal{H}$ with functions that are too simple is called \textbf{underfitting}. It occurs when we search for a function in the set of functions $\mathcal{H}$, when there is another, more diverse set of functions $\mathcal{G}$ which contain a function with lower generalisation error.
 \\\\
 This analysis tells us that an optimally diverse $\mathcal{H}$ balances the tradeoff between the risk of overfitting, represented in the bound by $m$, and the risk of underfitting, represented by $\hat{E}$. In practice, underfitting is less of a problem than overfitting, since modern supervised machine learning algorithms search in extremely diverse spaces of functions $\mathcal{H}$. In fact, most $\mathcal{H}$ are so diverse that steps must be taken to avoid minimising $\hat{E}$ as much as is actually possible. These techniques are known as \textbf{regularisation}, which we will see an instance of in section \ref{early_stopping}.
+
+\subsection{Validation}
+Statistical learning theory tells us how to design $\mathcal{H}$ given a dataset of limited size by revealing the relationship between $\trerror{h}$ and $E(h)$. While Vapnik-Chervonenkis analysis gives us a theoretical bound on $E(h)$, we may be interested in getting a concrete empirical estimate of $E$, e.g in order to decide whether a system is good enough to be put in to production, or to select so called \textbf{hyper-parameters}.
+\\\\
+In general, $\dtrain$ is unsuited for this estimation because of \textbf{bias}: we use $\dtrain$ to specifically select $g$ to minimise $\trerror{h}$, and so the performance of $g$ on $\dtrain$ is likely an optimistic estimate of $E$.
+
+In order to get an unbiased empirical estimate of $E$, we can split $\dtrain$ into two datasets. One is used for training. Lets call this $dtrain^-$ to distinguish it from and one is used for estimating $E$. Lets cal
