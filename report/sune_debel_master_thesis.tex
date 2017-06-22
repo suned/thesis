@@ -48,10 +48,12 @@ the#1\endcsname\quad}}
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\expect}{\mathbb{E}}
 \newcommand{\dtrain}{\mathcal{D}_{train}}
+\newcommand{\dval}{\mathcal{D}_{val}}
 \newcommand{\me}{\mathrm{e}}
 \newcommand{\pderiv}[2]{\ensuremath\frac{\partial #1}{\partial #2}}
 \newcommand{\emperror}[2]{\ensuremath\hat{E}(#1, #2)}
 \newcommand{\trerror}[1]{\emperror{#1}{\dtrain}}
+\newcommand{\valerror}[1]{\emperror{#1}{\dval}}
 \renewcommand{\vector}[1]{\mathbf{#1}}
 \renewcommand{\matrix}[1]{\vector{#1}}
 \newcommand{\dotp}[2]{\ensuremath\vector{#1}^T\vector{#2}}

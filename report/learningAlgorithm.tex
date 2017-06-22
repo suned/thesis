@@ -36,6 +36,9 @@ Another practical issue of using gradient descent is how to choose the learning 
 \\\\
 Gradient descent gives us an algorithm for minimising $\hat{E}$ using $\nabla\hat{E}$. In the next section we explore an algorithm for computing $\nabla\hat{E}$ called backpropagation.
 
+\subsection{Adam}
+\label{adam}
+
 \subsection{Backpropagation}
 We want to compute $\nabla\hat{E}$ in order to use gradient descent to make $\hat{E}$ small. Because of the sum and product rules of differential calculus, we can simplify our analysis by computing $\nabla\hat{E}$ of a single example $(\mathbf{x}, \mathbf{y})$:
 $$
@@ -117,6 +120,7 @@ $$
 $$
 
 \subsection{Regularisation}
+\label{regularisation}
 In section \ref{statistical_learning_theory} we saw that the distance between $E$ and $\hat{E}(h, \mathcal{D}_{train})$ is bounded by a function that's roughly a measure of the diversity of $\mathcal{H}$. In this section we discuss techniques for restricting the learning algorithm to search only in subsets of $\mathcal{H}$, with the aim of reducing $E$. These techniques are collectively known as regularisation.
 \\\\
 For a $\mathcal{H}$ thats parameterized by a weight vector $\mathbf{w}$, such as the hypothesis space given by a particular neural network architecture, we can limit the region of weight space that our learning algorithm is allowed to consider by imposing the constraint that the norm of $\mathbf{w}$ must be smaller than some constant $C$. This has the effect that the weights can be selected only from a limited spherical region around the origin. This reduces the effective number of different hypotheses available during learning, and the Vapnik-Chervonenkis bound gives us confidence that this should improve generalisation.
@@ -140,6 +144,3 @@ $$
 \vector{w}_i = \vector{w}_{i-1} - \eta \nabla \augerror = \vector{w}_{i-1}(1 - 2\eta\lambda) - \eta \nabla \trerror{\vector{w}_{i-1}}	
 $$
 In words, the added norm penalty of $\augerror$ has the effect of pulling the vector $\vector{w}_i$ towards $\vector{0}$, by multiplying by $1 - 2\eta\lambda$ in each iteration. In this way, weight decay is limiting the region that gradient descent can explore in a finite number of iterations, and is therefore limiting the diversity of $\hypspace$.
-
-\subsection{Adam}
-\label{adam}

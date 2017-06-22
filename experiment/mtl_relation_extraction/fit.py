@@ -90,22 +90,21 @@ def load_fractions():
 
 
 def find_start_iteration():
-    return 1
-    # root = os.path.join(config.out_path, arguments.save)
-    # metrics_path = os.path.join(root, "metrics.csv")
-    # if os.path.exists(metrics_path):
-    #     metrics_frame = pandas.read_csv(metrics_path)
-    #     max_aux_fraction = metrics_frame.auxFraction.max()
-    #     max_target_fraction = metrics_frame[
-    #         metrics_frame.auxFraction == max_aux_fraction
-    #         ].targetFraction.max()
-    #     start_iteration = len(metrics_frame[
-    #         (metrics_frame.targetFraction == max_target_fraction) &
-    #         (metrics_frame.auxFraction == max_aux_fraction)
-    #     ])
-    #     return start_iteration
-    # else:
-    #     return 1
+    root = os.path.join(config.out_path, arguments.save)
+    metrics_path = os.path.join(root, "metrics.csv")
+    if os.path.exists(metrics_path):
+        metrics_frame = pandas.read_csv(metrics_path)
+        max_aux_fraction = metrics_frame.auxFraction.max()
+        max_target_fraction = metrics_frame[
+            metrics_frame.auxFraction == max_aux_fraction
+            ].targetFraction.max()
+        start_iteration = len(metrics_frame[
+            (metrics_frame.targetFraction == max_target_fraction) &
+            (metrics_frame.auxFraction == max_aux_fraction)
+        ])
+        return start_iteration
+    else:
+        return 1
 
 
 def interleaved():
@@ -119,9 +118,7 @@ def interleaved():
         log.info("Starting auxiliary fraction %f", auxiliary_fraction)
         for target_fraction in target_fractions:
             log.info("Starting target fraction %f", target_fraction)
-            for task in experiment_tasks:
-                if not task.is_target:
-                    task.reduce_train_data(auxiliary_fraction)
+            reduce_aux_data(auxiliary_fraction)
             for iteration in range(start_iteration,
                                    arguments.iterations + 1):
                 log.info(
@@ -151,6 +148,12 @@ def interleaved():
                     metrics = init_metrics()
                     start_iteration = 1
                     gc.collect()
+
+
+def reduce_aux_data(auxiliary_fraction):
+    for task in experiment_tasks:
+        if not task.is_target:
+            task.reduce_train_data(auxiliary_fraction)
 
 
 def append(validation_metrics):
