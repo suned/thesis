@@ -116,7 +116,7 @@ Statistical learning theory tells us how to design $\mathcal{H}$ given a dataset
 \\\\
 In general, $\mathcal{D}$ is unsuited for this estimation because of \textbf{bias}: we use $\mathcal{D}$ to specifically select $g$ to minimise $\emperror{\mathcal{D}}{h}$, and so the performance of $g$ on $\mathcal{D}$ is likely an optimistic estimate of $E$.
 
-In order to get an unbiased empirical estimate of $E$, we can split $\mathcal{D}$ into two datasets: $\dval$ containing $K$ samples, and $\dtrain$ containing $N - V$ samples. $\dtrain$ is used by the learning system to find a function $g^- \in \mathcal{H}$. The minus indicates that the function was selected using only a subset of $\mathcal{D}$. $\dval$ is used to compute $\valerror{g^-}$ as an unbiased estimate of $E$.
+In order to get an unbiased empirical estimate of $E$, we can split $\mathcal{D}$ into two datasets: $\dval$ containing $V$ samples, and $\dtrain$ containing $N - V$ samples. $\dtrain$ is used by the learning system to find a function $g^- \in \mathcal{H}$. The minus indicates that the function was selected using only a subset of $\mathcal{D}$. $\dval$ is used to compute $\valerror{g^-}$ as an unbiased estimate of $E$.
 \\\\
 We can use Vapnik-Chervonenkis analysis to bound the error of $\valerror{g^-}$ as an estimate of $E(g^-)$. We can view $\dval$ as a training set, which we use to search a hypothesis space containing just $g^-$:
 $$
@@ -128,8 +128,14 @@ The inequality tells us that $V$ should be large in order for $\valerror{g^-}$ t
 $$
 E_{cv} = \frac{1}{K}\sum\limits_{k=1}^K e_k
 $$
-To understand how $E_{cv}$ relates to $E$. We want to know $E$, but it would be almost as useful to know the expected $E$ of our learning system, when trained on any dataset $\mathcal{D}$ of size $N$. For this purpose, we can define 
+We want to know $E$, but it would be almost as useful to know the expected $E$ of our learning system, when trained on any dataset $\mathcal{D}$ of size $N$. For this purpose, we can define 
 $$
 \tilde{E}(N) = \mathbb{E}_{\mathcal{D}}[E(g)]
 $$
-That is, the expected generalisation error with respect to datasets of size $N$. The expected value of $E_{cv}$ is $\tilde{E}(N - \frac{N}{K})$
+That is, the expected generalisation error with respect to datasets of size $N$. The expected value of $E_{cv}$ is $\tilde{E}(N - \frac{N}{K})$. To see why, consider the expected value of a single estimate $e_k$:
+$$
+\mathbb{E}[e_k] = \mathbb{E}_{\mathcal{D}_{train}}\mathbb{E}_{\mathcal{D}_{val}}[\valerror{g^-_k}] = \mathbb{E}_{\mathcal{D}_{train}}[E(g^-_k)] = \tilde{E}(N - \frac{N}{K})
+$$
+Since the equality holds for a single estimate, it also holds for the average $E_{cv}$.
+
+In words, the cross validation error estimates the expected generalisation error of the learning system when trained on $N - \frac{N}{K}$ samples. We can control the number of samples available for finding each function $g^-_k$ by increasing $K$, at no cost of estimation accuracy. Increasing $K$ increases computation time however, since we have to train $K$ different models.

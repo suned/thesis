@@ -98,10 +98,11 @@ def find_start_iteration():
         max_target_fraction = metrics_frame[
             metrics_frame.auxFraction == max_aux_fraction
             ].targetFraction.max()
-        start_iteration = len(metrics_frame[
+        folds = len(metrics_frame[
             (metrics_frame.targetFraction == max_target_fraction) &
             (metrics_frame.auxFraction == max_aux_fraction)
         ])
+        start_iteration = (folds % arguments.k_folds) - 1
         return start_iteration
     else:
         return 1
@@ -146,8 +147,7 @@ def interleaved():
                     init_weights()
                     save_metrics()
                     metrics = init_metrics()
-                    start_iteration = 1
-                    gc.collect()
+            start_iteration = 1
 
 
 def reduce_aux_data(auxiliary_fraction):

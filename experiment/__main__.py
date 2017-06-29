@@ -23,8 +23,6 @@ def run():
         gc.collect()
         models.compile()
         models.train()
-        if arguments.save is not None:
-            report.save()
     except arguments.ExperimentExistsError:
         from .mtl_relation_extraction import log
         log.error("Experiment already exists!")
