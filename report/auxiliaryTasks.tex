@@ -1,1 +1,93 @@
 \section{Auxiliary Tasks}
+\label{auxiliary_tasks}
+Here we describe each of the datasets used as auxiliary tasks in our multi-task learning experiment.
+\subsection{ACE 2005 Relations}
+Intuitively, we expect that a low-level representation that's useful for one relation classification task should also be useful to another, assuming the targeted relations in one task are related to the relations in another.
+
+We would therefore like to test the usefulness of incorporating an auxiliary relation extraction task, as measured by generalization error on the SemEval dataset. Next to SemEval, the ACE 2005 relation classification dataset is the most widely used in contemporary literature  \citep{walker2006}. Unlike the SemEval 2010 dataset, the ACE 2005 relation classification task is concerned with identifying relations between named entities. Specifically, the relations in the ACE 2005 dataset are defined between the entity types: person, organization, location, facility, weapon, vehicle and geo-political entity. Unlike the SemEval annotation process however, the annotation guide for ACE 2005  contains no restrictions on the complexity of the sentences in terms of dependence on discourse knowledge or sentential clauses.
+\\\\
+The ACE 2005 dataset contains 8,365 english sentences collected from various sources such as transcribed news broadcasts and phone conversations, as well as Usenet discussion forums and Newswire. Each sentence is annotated with exactly one of the following relations:
+\begin{labeling}{Physical}
+	\item \textbf{Physical} Two entities are physically related. Example: \textit{[Donald Trump] lives in [The White House].}
+	\item \textbf{Part-Whole} One entity constitutes part of another. Example: \textit{[Gibraltar] is territory of the [UK].}
+	\item \textbf{Personal-Social} Entities are people with a social relation. Example: \textit{[Darth Vader] is the father of [Luke Skywalker].}
+	\item \textbf{Organization-Affiliation} A person is affiliated with an organization. Example: \textit{[Ray Kroc] founded [McDonald's]}.
+	\item \textbf{Agent-Artifact} An entity is the agent of an artifact. Example: \textit{[James Bond] drives an [Aston Martin DB5].}
+	\item \textbf{Gen-Affiliation} General affiliation between two entities. Example: \textit{[Mitt Romney] is a member of [the Mormon church]}.
+\end{labeling} 
+
+
+\subsection{CONLL2000 Part-of-Speech}
+Part-of-Speech tagging is the task of assigning part-of-speech tags such as noun, verb etc. to word tokens \citep{jurafsky09}. Part-of-Speech tagging is known to be a useful input feature for a number of other learning tasks, here-among named entity recognition and relation extraction. This believed to be the case since word classes are highly informative of a word's semantic role in a sentence.
+\\\\
+Several tagging schemes exists. The universal tag set is a simple and commonly used scheme which contains 12 different tags:
+\begin{description}[labelindent=4em,leftmargin=8em,style=nextline]
+	\item [VERB] Verbs (all tenses and modes)
+	\item [NOUN] Nouns (common and proper)
+	\item [PRON] Pronouns
+	\item [ADJ] Adjectives
+	\item [ADV] Adverbs
+	\item [ADP] Adpositions (prepositions and postpositions)
+	\item [CONJ] Conjunctions
+	\item [DET] Determiners
+	\item [NUM] Cardinal numbers
+	\item [PRT] Particles or other function words
+	\item [X] Other - foreign words, typos, abbreviations.
+	\item [.] Punctuation
+\end{description}
+\noindent
+Part-of-Speech tagging can be seen as sequence labelling scheme. The goal is to assign a tag to each token in a sentence. For example:
+\begin{figure}[h]
+	\begin{center}
+		\begin{tabular}{c c c c c c c c}
+	I & saw & the & man & with & the & telescope & . \\
+	\texttt{PRON} & \texttt{VERB} & \texttt{DET} & \texttt{NOUN} & \texttt{ADP} & \texttt{DET} & \texttt{NOUN} & \texttt{.}	
+		\end{tabular}
+	\end{center}
+	\caption{A sentence tagged with universal Part-of-Speech tags.}
+	\label{pos}
+\end{figure}
+
+The CONLL2000 dataset was produced as a shared task for the year 2000 Conference on Computational Natural Language Learning \citep{kimsang2000}. It contains 10,948 sentences with 259,104 tokens from the Wall Street Journal section of the Penn Treebank \citep{marcus1999}. The part-of-speech tag for each token is supplied not by a human annotator, but from an automatic tagging system called the Brill tagger \citep{brill1992}.
+
+\subsection{CONLL2000 Chunking}
+Identifying the structure of sentences is generally known as parsing. Syntactic parsing is a fundamental task in natural language processing, which involves segmenting a sentence into a hierarchical structure that captures its syntactic elements \citep{jurafsky09}. Consider figure \ref{parse_tree} as an example.
+\begin{figure}[h]
+	\centering
+\Tree[.IP [.NP [.Det \textit{the} ]
+               [.N\1 [.N \textit{package} ]]]
+          [.I\1 [.I \textsc{3sg.Pres} ]
+                [.VP [.V\1 [.V \textit{is} ]
+                           [.AP [.Deg \textit{really} ]
+                                [.A\1 [.A \textit{simple} ]
+                                      \qroof{\textit{to use}}.CP ]]]]]]
+	\caption{Syntactic parse tree for the sentence: \emph{I shot an elephant in my pajamas.}}
+	\label{parse_tree}
+\end{figure}
+\\\\
+Many practical applications do not require full syntactic parses. \textbf{Chunking} is a simpler partial parsing technique that can often be used as an alternative. The goal of chunking is to identify identifying the flat, non-overlapping parts of a sentence that constitute the major its basic non-recursive phrases. Se for example figure \ref{chunking}.
+\begin{figure}
+	\centering
+	\begin{tabular}{c c c c c c c c}
+		I & shot & an & elephant & in & my & pajamas & . \\
+		\texttt{B-NP} & \texttt{B-VP} & \texttt{B-NP} & \texttt{I-NP} & \texttt{B-PP} & \texttt{I-PP} & \texttt{I-PP} & \texttt{O}
+	\end{tabular}
+	\caption{Chunks of the sentence: \emph{I shot an elephant in my pajamas}, annotated with BIO-labelling.}
+	\label{chunking}
+\end{figure}
+\\\\
+In addition to part-of-speech tags, The CONLL2000 dataset is annotated with chunking information in the BIO-labelling scheme introduced in section \ref{named_entity_recognition}.
+
+\subsection{GMB Named Entity Recognition}
+We described the named entity recognition problem in section \ref{named_entity_recognition}. Groningen Meaning Bank is a corpus annotated with various semantic information such as named entity information, developed at University of Groningen \citep{basile2012}. The corpus contains 62,010 sentences annotated with the following named entity types:
+
+\begin{description}[labelindent=4em, leftmargin=4em]
+	\item [Person] Individuals that are human or have human characteristics, such as divine entities.
+	\item [Location]  Geographical entities such as geographical areas and landmasses, bodies of water, and geological formations.
+	\item [Organization] Corporations, agencies, and othe	r groups of people defined by an established organizational structure.
+	\item [Geo-Political Entity] Geographical regions defined by political and/or social groups. A GPE entity subsumes and does not distinguish between a city, a nation, its region, its government, or its people.
+	\item [Artifact] Manmade objects, structures and abstract entities, including buildings, facilities, art and scientific theories.
+	\item [Natural Object] Entities that occur naturally and are not manmade, such as diseases, biological entities and other living things.
+	\item [Event] Incidents and occasions that occur during a particular time.
+	\item [Time] References to certain temporal entities that have a name, such as the days of the week and months of a year.
+\end{description}		

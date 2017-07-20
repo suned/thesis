@@ -141,7 +141,7 @@ $$
 \pderiv{e}{w^{(l)}_{ij}} = x^{(l-1)}_i \delta^{(l)}_j,\quad \delta^{(l)}_j = \sigma'(a^{(l)}_i) \sum\limits_{i=1}^{d^{(l+1)}} w^{(l+1)}_{ij} \delta^{(l+1)}_j
 $$
 
-\subsection{Regularisation}
+\subsection{Regularization}
 \label{regularisation}
 In section \ref{statistical_learning_theory} we saw that the distance between $E$ and $\hat{E}(h, \mathcal{D}_{train})$ is bounded by a function that's roughly a measure of the diversity of $\mathcal{H}$. In this section we discuss techniques for restricting the learning algorithm to search only in subsets of $\mathcal{H}$, with the aim of reducing $E$. These techniques are collectively known as regularisation.
 \\\\
@@ -166,3 +166,24 @@ $$
 \vector{w}_i = \vector{w}_{i-1} - \eta \nabla \augerror = \vector{w}_{i-1}(1 - 2\eta\lambda) - \eta \nabla \trerror{\vector{w}_{i-1}}	
 $$
 In words, the added norm penalty of $\augerror$ has the effect of pulling the vector $\vector{w}_i$ towards $\vector{0}$, by multiplying by $1 - 2\eta\lambda$ in each iteration. In this way, weight decay is limiting the region that gradient descent can explore in a finite number of iterations, and is therefore limiting the diversity of $\hypspace$.
+\\\\
+\textbf{Early stopping} is a form of regularization for iterative optimization methods that is particularly straight-forward to implement, and as an added bonus gives a reasonable stopping criterion for gradient descent. It works very similarly to weight decay, by limiting the region of $\hypspace$ that can be explored in a finite number of iterations.
+
+For a single iteration $i$ of gradient descent with step size $\eta$, gradient descent explores all weights in a radius of $\eta$ around $\vector{w}_i$, since a step in the direction of the negative gradient minimizes $\trerror{\vector{w}}$ among all weights with $||\vector{w} - \vector{w}_i|| \leq \eta$. In other words, we can think of an effective hypothesis space $\hypspace_i$ for each iteration thats limited by $\eta$:
+$$
+\hypspace_i = \{\vector{w} \mid ||\vector{w} - \vector{w}_i|| \leq \eta\}
+$$
+We can think of the hypothesis space $\hypspace$ explored by gradient descent in a finite number of steps $I$ as the union of these sets:
+$$
+\hypspace = \bigcup\limits_{i = 1}^I \hypspace_i
+$$
+\\\\
+As $I$ increases, $\hypspace$ becomes more diverse, and Vapnik-Chervonenkis theory tells us that the risk of selecting $\vector{w} \in \hypspace$ that fits the noise in $\data$ increases. In practice, it is consistently observed that both $E(\vector{w_i})$ and $\trerror{\vector{w}_i}$ is decreased as a function of $i$, until a certain point $i^*$, after which only $\trerror{\vector{w}_i}$ is decreased, as a consequence of fitting the noise in $\data$, which causes $E(\vector{w}_i)$ to increase. See figure \ref{early_stopping} for a visualization.
+\begin{figure}
+	\input{img/early_stopping.pgf}
+	\caption{Typical behavior of $E$ and $\hat{E}$ as a function of the number of iterations $i$ of gradient descent. Both errors are reduced until a point $i^*$ beyond which the training error is reduced, but generalization error increases.}
+	\label{early_stopping}
+\end{figure}
+When using early stopping, we treat $i^*$ the optimal number of iterations of gradient descent as a parameter we want to estimate. This is done through validation, as described in section \ref{validation}. Specifically, after each gradient descent iteration, $\hat{E}(\vector{w}_i, \data_{val})$ is computed as an estimate of $E$. When this quantity is no longer improving, gradient descent is halted, and the the parameters $\vector{w}_{i^*}$ are returned.
+\\\\
+When using stochastic gradient descent, $\hat{E}(\vector{w}_i, \data_{val})$ may vary slightly from iteration to iteration due to the noise introduced by the stochastic gradient, which means that the simple heuristic described above may fail. A so called \textbf{patience} parameter is a simple solution to this problem. When using patience $p$, gradient descent is only halted when no improvement on $\hat{E}(\vector{w}_i, \data_{val})$ has been observed for $p$ iterations.

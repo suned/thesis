@@ -1,0 +1,21 @@
+\section{Representation Learning}
+\label{representation_learning}
+\textbf{Representation learning} is a special case of bias learning that's especially relevant for deep learning techniques. In this view, the bias is modeled specifically as a transformation of the input data, a representation, that is shared across the $M$ learning tasks.
+\\\\
+\citet{baxter1995} provides a basic framework for formally understanding the mechanics of representation learning. To enable the learning system to take advantage of the disperse datasets, the hypothesis space $\mathcal{H}$ is split into two parts $\mathcal{F} = \{f \mid f: \mathcal{X} \to \mathcal{V}\}$ and $\mathcal{G} = \{g \mid g: \mathcal{V} \to \mathcal{Y} \}$ where $\mathcal{V}$ is an arbitrary set. We achieve this by defining each function $h \in \mathcal{H}$ as a composition of two functions, i.e $h = g \circ f$ where $f \in \mathcal{F}$ and $g \in \mathcal{G}$. $\mathcal{F}$ is called the \textbf{representation space}, and $\mathcal{G}$ is called the \textbf{output space}.
+\\\\
+The objective of representation learning, according to Baxter, is to find a good representation $f \in \mathcal{F}$, which is shared between each of the output functions $g_1$ to $g_M$. To formalise this, he introduces the notation $\vector{g} \circ f$ which denotes the composition of a vector $\vector{g}$ of $M$ output functions with the representation function $f$ as $\vector{g} \circ f = [g_1 \circ f, \dots, g_M \circ f)]$. A good representation $f$ is then a function which reduces the generalization error $E(\vector{g} \circ f)$:
+$$
+E(\vector{g} \circ f) = \frac{1}{M}\sum\limits_{m = 1}^M E_m(g_m \circ f)
+$$
+In words, the generalisation error of $f$ is the average single task generalisation error over the $M$ tasks, where the tasks share a common representation $f$.
+\\\\
+Since $\mathcal{P}$ is unknown, we can only estimate the true generalization by an empirical error measure, $\hat{E}(\vector{g} \circ f,\data_M)$:
+$$
+\hat{E}(\vector{g} \circ f,\data_M) = \frac{1}{M} \sum\limits_{m = 1}^M \hat{E}(g_m \circ f, \data_m)
+$$
+In words, the average empirical error over each task and each training sample for each task, using a common representation for all tasks.
+\\\\
+\citet{baxter1995} is able to show that if the tasks are learnt by minimizing $\hat{E}$ with a common representation $f$, we can decrease the number of examples $N$ for each task required to ensure that $\hat{E}$ will be close to $E$ with high probability by increasing the number of tasks $M$. In other words, learning with a common representation reduces the gap between training error and generalization error.
+\\\\
+As we will see in section \ref{deep_multi-task_learning}, the potential advantages multi-task learning with neural networks are enabled precisely by a shared representation. This makes the contribution of \citet{baxter1995} important since it provides a theoretical basis for deep multi-task learning.

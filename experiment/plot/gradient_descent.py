@@ -5,6 +5,7 @@ import random
 from matplotlib import pyplot as plt
 from util import figure_size, format_ticks, move_spines_to_zero, remove_first_ylabel, remove_first_xlabel
 import os
+from scipy import misc
 
 
 def cost(x, y, h):
@@ -103,3 +104,38 @@ def plot_weights(colors, step, w0, w1, weights):
     plt.plot(w0, w1, "o", c=color)
     plt.text(w0 + 1, w1, r"$\mathbf{w}_" + str(step) + r"$")
 
+
+def plot_early_stopping(path="data"):
+    e_train = lambda i: 1 / (1.7 ** i) + .9
+    e = lambda i: -(i * .5) / (1.25 ** i) + 2
+    plt.figure(figsize=figure_size())
+    iss = np.arange(0, 10, .1)
+    plt.plot(
+        iss,
+        e_train(iss),
+        label=r"$\hat{E}(\mathbf{w}_i, \mathcal{D})$"
+    )
+    plt.plot(
+        iss,
+        e(iss),
+        label=r"$E(\mathbf{w}_i)$"
+    )
+    plt.tick_params(
+        axis="y",
+        which="both",
+        left="off",
+        labelleft="off"
+    )
+    plt.xticks([])
+    plt.xticks([4.5], [r'$i^*$'])
+    plt.tick_params(
+        axis="x",
+        which="both",
+        bottom="off",
+        labelsize="12"
+    )
+    plt.axvline(x=4.5, linestyle="--", ymax=.27, color="black", linewidth=1)
+    plt.xlabel(r"Iterations $i$", horizontalalignment="right", position=(1,25))
+    plt.legend()
+    filename = os.path.join(path, "early_stopping.pgf")
+    plt.savefig(filename)

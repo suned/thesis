@@ -34,20 +34,44 @@ $$
 $$ 
 Imagine we have designed a relation extraction system that recognises the relation \textit{MergerBetween(organisation, organisation)} between two mentions of organisations. Ideally, we would like that system to extract the relation \textit{MergerBetween(Foo Inc., Bar Corp.)} from the above sentence.
 \\\\
-Because relation extraction is concerned with relationships between named entities, many systems that perform relation extraction applies named entity recognition first as a pre-processing step. This approach is sometimes called \textbf{pipelining}. An alternative to pipelining is \textbf{end-to-end} relation extraction, where relations and entities are extracted simultaneously. Pipeline approaches can suffer from the problem of \textbf{error propagation}, where the system erroneously assigns a label in the named entity recognition step, which later causes it to make an error in the relation extraction step.
+To simplify the relation extraction problem, its often solved in three steps:
+\begin{enumerate}
+	\item \textbf{Named entity recognition} \enspace Identify the named entities in the input text.
+	\item \textbf{Relation detection} \enspace For each pair of named entities in the input text, determine if a relation exists between them. This is a binary classification problem where the input is the text and the named entities detected in step 1, and the output is yes/no.
+	\item \textbf{Relation classification} \enspace Classify each of the detected relations in the previous step. This a multi-label classification problem where the input is the input text and the named entities for which a relation was detected in step 2, and the output is a relation label.
+\end{enumerate}
+In this thesis we focus on step 3, assigning labels to detected relations. This is a difficult problem because of ambiguity. As an example, consider the sentence \textit{Susan left JFK}. Imagine that we have want to design a relation extraction system that can detect the relations \textit{Physical(person, location): a person has a physical relation to a location} and \textit{Personal-Social(person, person): two persons have a social relation}. Both can reasonably be assigned the previous sentence, depending on whether \textit{JFK} refers to the airport near New York, or the former American president.
+\\\\
+Relation extraction is often framed as a sentence classification problem, where the input to the relation extraction system is a sentence, and the output is a relation present in that sentence, if any.
 
 \subsection{Accuracy Measures}
-Information extraction systems are often evaluated empirically by applying them to collections of text, so called corpora, in which $N$ mentions of named entities or relations are known. Accuracy measures used in such tests are usually defined in terms of:
-\begin{description}
-	\item [True positives ($tp$)] The number of true named entities or relations correctly labeled by the system.
-	\item [True negatives ($tn$)] The number of true non-entities or non-relations correctly labeled by the system.
-	\item [False positives ($fp$)] The number of true non-entities or relations incorrectly labeled by the system.
-	\item [False negatives ($fn$)] The number of true named entities or relations incorrectly labeled by the system.
-\end{description}
-The distribution of labels used in both named entity recognition and relation extraction is often highly imbalanced. Consider for example the BIO labelling scheme in figure \ref{bio}. Most words will be outside a mention of a named entity, and will have the label \texttt{O}. Using simple accuracy $\frac{tp + tn}{N}$ as a performance metric is therefore not very informative, since a useless system which labels all tokens with \texttt{O} would achieve high performance.
+Information extraction systems are often evaluated empirically by applying them to collections of text, so called corpora, in which $N$ mentions of named entities or relations are known. In these tests, accuracy measures for each class $c$ of information we wish to extract are usually defined in terms of how many times the system predicted class $c$ versus how many times $c$ actually occurs in the corpus. Most metrics use the following terminology:
+
+\begin{center}
+	\begin{tabular}{r | c c}
+	 & \textbf{predicted as $c$} & \textbf{predicted as not $c$}  \\ \hline
+	$c$ & True positives ($tp$) & False negatives ($fn$) \\
+	\textbf{not} $c$ & False positives ($fp$) & True negatives ($tn$)
+\end{tabular}
+\end{center}
+Where for example $tp$ is the number of true positives produced for class $c$.
+\\\\
+The distribution of labels used in both named entity recognition and relation extraction is often highly imbalanced. Consider for example the BIO labelling scheme for named entity recognition in figure \ref{bio}. Most words will be outside a mention of a named entity, and will have the label \texttt{O}. Using simple accuracy $\frac{tp + tn}{tp + tn + fn + fp}$ as a performance metric is therefore not very informative, since a useless system which labels all tokens with \texttt{O} would achieve high performance.
 
 \textbf{Precision} and \textbf{recall} are more appropriate performance metrics for this reason. Precision $\frac{tp}{tp + fp}$ is the fraction of true named entities or relations of all named entities or relations that were extracted by the system. This is equal to 0 when none of the information extracted by the system was correct and 1 when all of it was correct. 
 
 Recall $\frac{tp}{tp + fn}$ is the fraction of true named entities or relations that were extracted by the system. This is 0 when none of the extracted information was correct, and 1 when all of the extracted information was correct, and no true named entities or relations were incorrectly labeled.
 
-To get a single number that summarises the performance, precision $p$ and recall $r$ are often combined into a single metric, the $F1$ measure, defined as the harmonic mean of precision and recall $\frac{2pr}{p + r}$.
+To get a single number that summarizes the performance, precision $p$ and recall $r$ are often combined into a single metric, the $F1$ measure, defined as the harmonic mean of precision and recall $\frac{2pr}{p + r}$.
+\\\\
+In a multi-class classification problem, we are forced to decide how to average these metrics across classes. Specifically, there are two ways of averaging an accuracy measure across $C$ classes: micro and macro averaging \citep{sokolova2009}. In macro averaging, an accuracy measure is computed for each class $c$ separately, and then averaged across all $C$ classes. For example macro-precision $p_{M}$:
+$$
+p_{M} = \frac{1}{C}\sum_{c=1}^C p_c
+$$
+Where $p_c$ is the precision of the system for class $c$. Micro averaging on the other hand, averages an accuracy by accumulating $tp$, $tn$, $fp$ and $fn$ across all $C$ classes. For example micro-precision $p_{\mu}$:
+$$
+p_\mu = \frac{\sum\limits_{c=1}^C tp_c}{\sum\limits_{c=1}^C tp_c + fp_c}
+$$
+Where for example $tp_c$ is the true positives a system produces for class $c$.
+\\\\
+The main difference between macro and micro averages of accuracy measures is that micro averaging gives more weight to more frequent classes. In other words, micro averaging encodes the bias that infrequent classes are unimportant, and a misclassification of an example of such a class should not penalise the accuracy measure as much as a misclassification of a more frequent class. Whether on not this a reasonable bias depends on the problem.

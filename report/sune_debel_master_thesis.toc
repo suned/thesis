@@ -11,24 +11,37 @@
 \contentsline {section}{\numberline {2.2}Supervised Machine Learning}{4}
 \contentsline {subsection}{\numberline {2.2.1}The Supervised Learning Problem}{4}
 \contentsline {subsection}{\numberline {2.2.2}Statistical Learning Theory}{5}
-\contentsline {section}{\numberline {2.3}Summary}{7}
-\contentsline {chapter}{\numberline {3}Neural Networks}{8}
-\contentsline {section}{\numberline {3.1}Feed-Forward Neural Networks}{8}
-\contentsline {subsection}{\numberline {3.1.1}Activation Functions}{9}
-\contentsline {subsection}{\numberline {3.1.2}Objective Function}{12}
-\contentsline {section}{\numberline {3.2}Learning Algorithm}{13}
-\contentsline {subsection}{\numberline {3.2.1}Gradient Descent}{13}
-\contentsline {subsection}{\numberline {3.2.2}Backpropagation}{14}
-\contentsline {subsection}{\numberline {3.2.3}Regularisation}{17}
-\contentsline {subsection}{\numberline {3.2.4}Adam}{18}
-\contentsline {section}{\numberline {3.3}Convolutional Neural Networks}{18}
-\contentsline {section}{\numberline {3.4}Word Vectors}{20}
-\contentsline {chapter}{\numberline {4}Multi-Task Learning}{22}
-\contentsline {chapter}{\numberline {5}Experiment}{23}
-\contentsline {section}{\numberline {5.1}Auxiliary Tasks}{23}
-\contentsline {section}{\numberline {5.2}Network Architecture}{23}
-\contentsline {chapter}{\numberline {6}Results}{24}
-\contentsline {chapter}{\numberline {7}Discussion}{25}
-\contentsline {chapter}{\numberline {8}Conclusion}{26}
-\contentsline {chapter}{\numberline {A}Appendix}{28}
-\contentsline {section}{\numberline {A.1}First}{28}
+\contentsline {subsection}{\numberline {2.2.3}Validation}{7}
+\contentsline {section}{\numberline {2.3}Summary}{8}
+\contentsline {chapter}{\numberline {3}Neural Networks}{9}
+\contentsline {section}{\numberline {3.1}Feed-Forward Neural Networks}{9}
+\contentsline {subsection}{\numberline {3.1.1}Activation Functions}{10}
+\contentsline {subsection}{\numberline {3.1.2}Objective Function}{13}
+\contentsline {section}{\numberline {3.2}Learning Algorithm}{14}
+\contentsline {subsection}{\numberline {3.2.1}Gradient Descent}{14}
+\contentsline {subsection}{\numberline {3.2.2}Adam}{15}
+\contentsline {subsection}{\numberline {3.2.3}Backpropagation}{17}
+\contentsline {subsection}{\numberline {3.2.4}Regularisation}{19}
+\contentsline {section}{\numberline {3.3}Convolutional Neural Networks}{20}
+\contentsline {section}{\numberline {3.4}Word Vectors}{22}
+\contentsline {chapter}{\numberline {4}Multi-Task Learning}{24}
+\contentsline {section}{\numberline {4.1}Multi-Task and Single-Task Learning}{24}
+\contentsline {section}{\numberline {4.2}Representation Learning}{24}
+\contentsline {section}{\numberline {4.3}Bias Learning}{25}
+\contentsline {section}{\numberline {4.4}Task Relatedness}{26}
+\contentsline {section}{\numberline {4.5}Deep Multi-Task Learning}{28}
+\contentsline {chapter}{\numberline {5}Experiment}{30}
+\contentsline {section}{\numberline {5.1}Target Task}{30}
+\contentsline {section}{\numberline {5.2}Auxiliary Tasks}{32}
+\contentsline {subsection}{\numberline {5.2.1}ACE 2005 Relations}{32}
+\contentsline {subsection}{\numberline {5.2.2}CONLL2000 Part-of-Speech}{32}
+\contentsline {subsection}{\numberline {5.2.3}CONLL2000 Chunking}{33}
+\contentsline {subsection}{\numberline {5.2.4}GMB Named Entity Recognition}{34}
+\contentsline {section}{\numberline {5.3}Neural Network Architecture}{34}
+\contentsline {section}{\numberline {5.4}Algorithm}{36}
+\contentsline {chapter}{\numberline {6}Results}{39}
+\contentsline {section}{\numberline {6.1}Learning Surfaces}{39}
+\contentsline {section}{\numberline {6.2}Hypothesis Testing}{39}
+\contentsline {chapter}{\numberline {7}Discussion}{40}
+\contentsline {chapter}{\numberline {8}Perspectives}{41}
+\contentsline {chapter}{\numberline {9}Conclusion}{42}

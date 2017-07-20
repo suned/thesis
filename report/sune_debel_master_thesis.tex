@@ -9,14 +9,20 @@
 \usepackage{mathpazo}
 \usepackage[scaled]{helvet}
 \usepackage{sectsty}
-\usepackage{pgfplots}
 \usepackage{amsmath}
 \usepackage{amsthm}
 \usepackage{gensymb}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage{pgfplots}
 \usepackage{tikz}
+\usetikzlibrary{positioning}
 \usepackage{scrextend}
+\usepackage[inline]{enumitem}
+\usepackage{qtree}
 \usetikzlibrary{arrows,shapes,positioning}
 \usepackage[format=plain, labelfont={small, sf, bf}, textfont={small, it}, singlelinecheck=off, margin={1cm, 0cm}, oneside, labelsep=newline]{caption}
+\captionsetup[algorithm]{format=plain, labelfont={small, sf, bf}, textfont={small, it}, singlelinecheck=off, oneside}
 
 % Change chapter headings to "Part"
 \addto\captionsenglish{\renewcommand{\chaptername}{Part}}
@@ -44,15 +50,18 @@ the#1\endcsname\quad}}
 \newtheorem{definition}{Definition}[section]
 \newtheorem{theorem}{Theorem}[section]
 
+
 % Math commands
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\expect}{\mathbb{E}}
+\newcommand{\data}{\mathcal{D}}
+\newcommand{\daux}{\mathcal{D}_{aux}}
 \newcommand{\dtrain}{\mathcal{D}_{train}}
 \newcommand{\dval}{\mathcal{D}_{val}}
 \newcommand{\me}{\mathrm{e}}
 \newcommand{\pderiv}[2]{\ensuremath\frac{\partial #1}{\partial #2}}
 \newcommand{\emperror}[2]{\ensuremath\hat{E}(#1, #2)}
-\newcommand{\trerror}[1]{\emperror{#1}{\dtrain}}
+\newcommand{\trerror}[1]{\emperror{#1}{\data}}
 \newcommand{\valerror}[1]{\emperror{#1}{\dval}}
 \renewcommand{\vector}[1]{\mathbf{#1}}
 \renewcommand{\matrix}[1]{\vector{#1}}
@@ -94,10 +103,15 @@ the#1\endcsname\quad}}
 \pagebreak
 \newgeometry{twoside, inner=4.8cm, outer=3.2cm, vmargin=3cm}
 
-\addtocontents{toc}{\protect\thispagestyle{empty}}
+\pagestyle{empty}
+{
+  \renewcommand{\thispagestyle}[1]{}
+  \tableofcontents
+}
+\clearpage
+\pagestyle{plain}
 
-\tableofcontents
-\setcounter{page}{0}
+\setcounter{page}{1}
 \input{introduction}
 \input{background}
 \input{neuralNetworks}
@@ -105,6 +119,7 @@ the#1\endcsname\quad}}
 \input{experiment}
 \input{results}
 \input{discussion}
+\input{perspectives}
 \input{conclusion}
 \input{bib}
 \input{appendix}

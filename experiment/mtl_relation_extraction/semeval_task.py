@@ -105,17 +105,17 @@ class SemEvalTask(CNN):
             "f1": metrics.f1_score(
                 self.validation_labels,
                 label_prediction,
-                average="micro"
+                average="macro"
             ),
             "precision": metrics.precision_score(
                 self.validation_labels,
                 label_prediction,
-                average="micro"
+                average="macro"
             ),
             "recall": metrics.recall_score(
                 self.validation_labels,
                 label_prediction,
-                average="micro"
+                average="macro"
             )
         }
         return validation_metrics

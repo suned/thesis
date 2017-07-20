@@ -1,1 +1,33 @@
 \section{Target Task}
+In order to empirically investigate the dynamics of sample complexity for multi-task relation classification, we have chosen a target relation classification dataset which will act as a baseline across our experiments. The SemEval 2010 Task 8 dataset has arguably become somewhat of a standard for relation classification papers, and so is a reasonable choice for the role of target task in this context \citep{hendrickx2009}.
+\\\\
+The SemEval 2010 Task 8 dataset consists of 10,717 English sentences. Each sentence is annotated with exactly one of the following semantic relations:
+
+\begin{labeling}{Instrument-Agency}
+	\item [\textbf{Cause-Effect}] An event or object leads to an
+effect. Example: \emph{those [cancers] were caused
+by radiation [exposures].}
+	\item [\textbf{Instrument-Agency}] An agent uses an instrument. Example: \emph{[phone] [operator].}
+	\item [\textbf{Product-Producer}] A producer causes a product to exist. Example: \emph{a [factory] manufactures [suits].}
+	\item [\textbf{Content-Container}] An object is physically stored in a delineated area of space. Example: \emph{a [bottle] full of [honey] was weighed}
+	\item [\textbf{Entity-Origin}] An entity is coming or is derived from an origin (e.g., position or material). Example: \emph{[letters] from foreign [countries].}
+	\item [\textbf{Entity-Destination}] An entity is moving towards a destination. Example: \emph{the [boy] went to [bed].}
+	\item [\textbf{Component-Whole}] An object is a component of a larger whole. Example: \emph{my [apartment] has a large [kitchen].}
+	\item [\textbf{Member-Collection}] A member forms a nonfunctional part of a collection. Example: \emph{there are many [trees] in the [forest].}
+	\item [\textbf{Message-Topic}] A message, written or spoken, is about a topic. Example: \emph{the [lecture] was about [semantics].}
+	\item [\textbf{Other}] Any other relation.
+\end{labeling}
+
+SemEval 2010 Task 8 differs somewhat from what is traditionally meant by relation classification. In particular, the objective of traditional relation extraction is to identify semantic relationships between named entities. In the SemEval dataset however, the annotated relationships are between head words of noun-phrases, for example \textit{Message-Topic(lecture, semantics)} in the sentence \textit{the lecture was about semantics} where neither \textit{lecture} nor \textit{semantics} are named entities.
+\\\\
+Moreover, the annotation process for the SemEval dataset includes some restrictions which are designed to make the resulting learning problem easier. Firstly, the annotators exclude sentences where relationships depend on discourse knowledge, for example when one of the arguments are pronouns. Secondly, sentences where the relation arguments occur in different sentential clauses are excluded. For example, we could argue that the relationship \textit{Instrument-Agency(man, unicycle)} exists in the sentence \textit{the man, who rides a unicycle, came to see me.}, but since the arguments occur in different sentential clauses it would be excluded from the SemEval dataset.
+\\\\
+The annotators aimed for a uniform distribution of relations in the SemEval dataset. To achieve this, they initially collected approximately 1200 sentences for each category by pattern based web search. This ultimately lead to the distribution shown in figure \ref{semeval_dist}. One consequence of this selection procedure is that the label distribution does not follow the distribution of relations found in natural language data in the wild. This may lead to optimistic performance of trained models.
+
+\begin{figure}
+	\center
+	\input{img/semeval_dist.pgf}
+	\caption{Label distribution of SemEval 2010 Task 8.}
+	\label{semeval_dist}
+\end{figure}
+

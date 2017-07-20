@@ -9,7 +9,7 @@ def get_words(sentence):
 
 
 def get_pos(sentence):
-    return [token[1] for token in sentence]
+    return [token[1]  for token in sentence]
 
 
 def conll2000pos():
