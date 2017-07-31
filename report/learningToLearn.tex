@@ -1,12 +1,12 @@
 \section{Bias Learning}
 \label{bias_learning}
-Selecting the hypothesis space $\mathcal{H}$, sometimes referred to as \textbf{biasing} the hypothesis space, is often the hardest problem in supervised machine learning \citep{baxter2000}. Vapnik-Chervonenkis analysis tells us that $\mathcal{H}$ must be large enough to contain a good solution to the learning problem of interest, yet small that the selected model can generalize from a small sample. This motivates developing techniques that can learn a good bias from the data.
+Selecting the hypothesis space $\mathcal{H}$, sometimes referred to as \textbf{biasing} the hypothesis space, is often the hardest problem in supervised machine learning \citep{baxter2000}. Vapnik-Chervonenkis analysis tells us that $\mathcal{H}$ must be large enough to contain a good solution to the learning problem of interest, yet small that the selected model can generalize from a small sample. This motivates developing techniques that can learn a good $\hypspace$ from the data.
 \\\\
 \citet{baxter2000} formalizes this idea by introducing a model of \textbf{bias learning}, in which the learning system is tasked with learning a hypothesis space $\mathcal{H}$ from a family of hypothesis spaces $\mathbb{H} = \{\mathcal{H}\}$. The system is supplied with $M$ datasets $\data_m$ each drawn from $M$ distributions $P_m$ over $\mathcal{X} \times \mathcal{Y}$. The goal of the system is then to first select a good hypothesis space $\mathcal{H} \in \mathbb{H}$, and then to select a vector $\vector{h}$ of $M$ hypothesis $h_m \in \mathcal{H}$. In his framework, the goal of the learning system is to minimize the multi-task generalization error defined as the average generalization error over the $M$ learning problems:
 $$
 E(\vector{h}) = \frac{1}{M}\sum\limits_{m = 1}^M E_m(h_m)
 $$
-Similarly, we can generalize the empirical single-task error to an average empirical error $\hat{E}(\vector{h}, \data_M)$: 
+Similarly, we can generalize the empirical single-task error to an average multi-task empirical error $\hat{E}(\vector{h}, \data_M)$: 
 $$
 \hat{E}(\vector{h}, \data_M) = \frac{1}{M}\sum\limits_{m = 1}^M\hat{E}(h_m, \data_m)
 $$

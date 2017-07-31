@@ -13,4 +13,4 @@ kbp37_train = "kbp37/train.clean.txt"
 kbp37_test = "kbp37/test.txt"
 kbp37_dev = "kbp37/dev.txt"
 gmb_root = "gmb-2.2.0/data"
-fractions = [0, .2, .4, .6, .8, 1.0]
+fractions = [.0, .2, .4, .6, .8, 1.0]

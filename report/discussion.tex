@@ -1,1 +1,27 @@
 \chapter{Discussion}
+In the previous section we saw that the particular type of weight sharing tested in our experiments did not lead to significant improvements in generalization error for relation classification. In this section, we reflect on this result in order to outline the conclusions we can draw.
+
+\section{Impact of Limited Weight Sharing}
+As discussed, the neural network architecture adopted from \citet{nguyen2015} puts certain limitations on how neural network weights can be shared between tasks in practice. We believe the solution we chose, sharing only the word embedding weights, may reduce the effectiveness of multi-task learning. This choice was motivated by \citet{collobert2008} in which they show that sharing the word vector weights leads to significant improvements in generalization error for a semantic role labeling task. 
+\\\\
+However, all their learning tasks are derived from annotations of the same sections of the PropBank corpus \citep{kingsbury2002}. When annotations for auxiliary tasks are taken from different corpora, the potential benefits made possible by sharing only the word embedding is limited by the degree of overlap of words occurring in both corpora. The set of words that occur in a corpora is commonly referred to as the \textbf{vocabulary}. The only way an auxiliary can benefit the target task, is if the weights that are updated while learning from an auxiliary task are also used by the target task. When sharing only the word embedding, this happens only when a word is in both the auxiliary vocabulary and in the target vocabulary.
+\\\\
+In \citet{collobert2008} the vocabulary overlap is maximal since all annotations for all tasks pertain to the same text. This is not the case for the corpora used in our experiments as seen in figure \ref{vocab_overlap}. We speculate that when combining text from different corpora for multi-task learning using word-vectors, it's more beneficial to share the convolutional filters than the word-embedding since the filters are guaranteed to be used by both tasks. Intuitively, one task may then benefit the other if the features detected by a filter learnt by one task is useful for the other.
+\newpage
+\thispagestyle{empty}
+\begin{figure}
+	\centering
+	\input{img/ace_vocab_overlap.pgf}
+	\input{img/conll_pos_vocab_overlap.pgf}
+	\input{img/gmb_vocab_overlap.pgf}
+	\caption{Vocabulary overlap between the corpora used in our experiments. The Venn diagrams show the number of tokens occurring in both the SemEval 2010 Task 8 vocabulary and each of the vocabularies of the auxiliary tasks.}
+	\label{vocab_overlap}
+\end{figure}
+\FloatBarrier
+
+\section{Why is ACE not a Useful Auxiliary task?}
+The reasoning in the previous section does not explain why there is no observable improvement when sharing both the word embeddings and the convolutional filters between between the hypotheses for SemEval 2010 Task 8 and the ACE 2005 relation classification task.
+\section{Are the Sequence Classification Tasks Useful?}
+In the absence of a full fledged theory of how tasks should be related and neural network weights be shared in order for multi-task learning to improve generalization, the most reliable way to investigate the theses dynamics for a specific application is trial and error. In other words, there is no real way of knowing whether our informal reasoning on why the auxiliary tasks should benefit a target relation classification task may be totally wrong.
+
+Something about tests...

@@ -1,7 +1,7 @@
 \section{Deep Multi-Task Learning}
 \label{deep_multi-task_learning}
-Neural networks have the advantage of being easy to adapt from single-task learning to multi-task learning by sharing the weights of early layers of a neural network architecture between learning tasks and learning them simultaneously \citep{caruana1997}. As an example, consider figure \ref{no_weight_sharing} and \ref{weight_sharing}.
-
+Neural networks have the advantage of being easy to adapt from single-task learning to multi-task learning. The simplest way of turning two single task learning problems into a multi-task learning problem is by hard weight sharing of the weights of layers of a neural network architecture between learning tasks and learning them simultaneously \citep{caruana1997}. As an example, consider figure \ref{no_weight_sharing} and \ref{weight_sharing}.
+\\\\
 \begin{figure}[h]
 	\centering
 	\begin{tikzpicture}[->, >=stealth, swap]
@@ -102,11 +102,44 @@ Neural networks have the advantage of being easy to adapt from single-task learn
 \noindent
 Multi-task learning techniques that are based on sharing neural network weights between tasks are collectively known as \textbf{deep multi-task learning} techniques. Deep multi-task learning is closely associated with the idea of representation learning presented in section \ref{representation_learning} and the more general framework of bias learning presented in section \ref{bias_learning}. The network represents a shared representation $f(\vector{x})$ represented by $S$ shared layers, often the first layers, and hypotheses $h_1 = (g_1 \circ f)(\vector{x})$ to $h_M = (g_M \circ f)(\vector{x})$ for each learning task, where $g_m$ is $L - S$ neural network layers specific to each task.
 \\\\
-The exact circumstances under which deep multi-task learning leads to lower overall generalisation error compared to deep single-task learning are not yet theoretically well understood. \citet{caruana1997} lists 3 conjectures on how multi-task learning can reduce generalisation error:
+The exact circumstances under which deep multi-task learning leads to lower overall generalization error compared to deep single-task learning are not yet theoretically well understood. \citet{caruana1997} lists 3 suggestions for how multi-task learning can reduce generalization error:
 \begin{description}
-	\item [Statistical Data Amplification] The effective number of training examples available to a deep multi-task learning system is increased due to the examples in the auxiliary data. The extensions to the Vapnik-Chervonenkis bound seen in the preceding sections gives us confidence that this reduces the risk that generalisation error is far away from training error.
-	\item [Eavesdropping] If a hidden layer feature is useful to both Task 1 and Task 2, but much easier to learn when learning Task 2, sharing the hidden layer between the two tasks is likely to reduce generalisation error for Task 1.
-	\item [Representation Bias] If Task 1 and Task 2 share a common minimum in weight-space, learning the tasks with weight sharing biases the learning system to choose the shared minimum. This is effectively a form of regularisation that forces the learning system to search for a good hypothesis in a hypothesis space that is restricted to hypotheses that are useful for more than one task.
-	\item \end{description}
+	\item [Statistical Data Amplification] The effective number of training examples available to a deep multi-task learning system is increased due to the examples in the auxiliary data. The extensions to the Vapnik-Chervonenkis bound seen in the preceding sections gives us confidence that this reduces the risk that generalization error is far away from training error.
+	\item [Eavesdropping] If a hidden layer feature is useful to both Task 1 and Task 2, but much easier to learn when learning Task 2, sharing the hidden layer between the two tasks is likely to reduce generalization error for Task 1.
+	\item [Representation Bias] If Task 1 and Task 2 share a common minimum in weight-space, learning the tasks with weight sharing biases the learning system to choose the shared minimum. This is effectively a form of regularization that forces the learning system to search for a good hypothesis in a hypothesis space that is restricted to hypotheses that are useful for more than one task.
+\end{description}
+\noindent
+\citet{baxter2000} applies his bias learning framework to the case where the hypothesis space family $\mathbb{H}$ is constructed of neural networks where the first two layers are shared between tasks.
 
-\citet{galanti2016} develops a framework based on the bias learning framework by \citet{baxter2000} that may be used to gain some intuition on when and how deep multi-task learning is beneficial.
+Specifically, a feature map $\phi_{\vector{w}}:\mathbb{R}^d\mapsto\mathbb{R}^{d^{(2)}}$ is a two layer neural network parameterized by $\vector{w}$ that maps an input vector $\vector{x} \in \mathbb{R}^d$ to feature vector $\phi_{\vector{w}}(\vector{x})$. Each feature $\phi_{\vector{w},j} \in \phi_{\vector{w}}$ is defined by:
+$$
+\phi_{\vector{w},j}(\vector{x}) = \sigma\left( w_{0j} + \sum\limits_{i=1}^{d^{(1)}} w_{ij}h_i(\vector{x}) \right)
+$$
+\noindent
+$h_{i}$ is the output of unit $i$ in the first layer, $w_{ij}$ is the weight connecting unit $\phi_{\vector{w},j}$ and $i$ and $w_{0j}$ is the bias weight. For simplicity, \citet{baxter2000} considers only the binary threshold activation function:
+$$
+\sigma(a) = \begin{cases}
+	+1 & \text{when } a \geq 0 \\
+	-1 & \text{otherwise}
+\end{cases}
+$$
+The output of each unit in the first layer $h_j$ is computed as
+$$
+h_j(\vector{x}) = \sigma\left( v_{0j} + \sum\limits_{i=1}^{d} v_{ij}x_{i} \right)
+$$
+
+where $v_{ij}$ is the weight connecting the input feature $x_i$ to unit $j$ in the first layer and $v_{0j}$ is a bias weight. The total number of weights $W$ in these two layers is thus $W = d^{(1)}(d^{(0)} + 1) + d^{(0)}(d + 1)$. The space of all such feature maps $\{\phi_{\vector{w}} \mid \vector{w} \in \mathbb{R}^W\}$ can be thought of as the representation space $\mathcal{F}$ in the representation learning framework of \citet{baxter1995}.
+\\\\
+\cite{baxter2000} defines a hypothesis space $\hypspace_{\vector{w}}$ as a set of binary decision functions on top the feature maps. Specifically:
+$$
+\hypspace_{\vector{w}} = \left\{ \sigma\left(  a_{0} + \sum\limits_{i=1}^{d^{(2)}} a_i\phi_{\vector{w},i}\right) \;\middle| \; a_{0},\dots,a_{d^{(2)}} \in \mathbb{R} \right\}
+$$
+where $a_i$ is the weight connecting feature $\phi_{\vector{w},i}$ and the output unit and $a_0$ is a bias weight. The set of all such hypothesis spaces can be considered a hypothesis space $\mathbb{H}$ family such that:
+$$
+\mathbb{H} = \{\hypspace_{\vector{w}} \mid \vector{w} \in \mathbb{R}^W\}
+$$
+Recall that the goal in bias learning is to select a vector $\vector{h}$ of M hypotheses $h_m$ that minimizes the average generalization error $E(\vector{h}) = \frac{1}{M}\sum_{m=1}^M E_m(h_m)$. With the limitations described above, \citet{baxter2000} is able to show that in order for the average empirical error $\hat{E}(\vector{h}, \data_M)$ to be within $\epsilon$ of the average generalization error $E(\vector{h})$ with probability $1 - \delta$, it suffices that the number of examples $N$ per task satisfies:
+$$
+N \geq O\left( \frac{1}{\epsilon^2}\left( \frac{W}{M} + d^{(2)} + 1\right)\log \frac{1}{\epsilon} + \frac{1}{M}\log\frac{1}{\delta} \right)
+$$
+Ignoring the confidence parameters $\epsilon$ and $\delta$, the sample complexity bound tells us that learning complicated neural network representations where $d^{(1)}$ and $d^{(2)}$ and therefore also $W$ are large, is harder than learning simple representations in the sense that it requires more samples to succeed. The benefit gained by multi-task learning is that we can reduce $N$ by increasing $M$, an option we don't have in the single task learning setting. This means we can afford to learn more complicated representations in the hope that this can lead to lower training error and still have high confidence that generalization is possible by increasing $M$.

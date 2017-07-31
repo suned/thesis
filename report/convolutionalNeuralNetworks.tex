@@ -1,5 +1,5 @@
 \section{Convolutional Neural Networks}
-A convolution is a mathematical operation that takes as input two functions $f$ and $k$, commonly written as $f * k$.
+A convolution $f * k$ is a mathematical operation that takes as input two functions $f$ and $k$.
 
 \begin{definition}[convolution] \label{convolution}
 	Let $f(x) \in \mathbb{R}$ and $k(x) \in \mathbb{R}$ be two real-valued functions defined for the entire real number line. Then the convolution $f * k$ is defined as
@@ -14,7 +14,7 @@ $$
 $$
 Most functions in practical applications of convolutions represent signals such as images, sound or text, which are only defined over a limited range of indices $x$. In these cases it's assumed that whenever $x$ is beyond the domain of $f$ or $k$, the output of either function is 0.
 \\\\
-We can think of a convolution as a weighted sum of the output of $f$ where the output of $k$ acts as the weights. This view of convolution is used heavily in signal processing applications, where $k$ is chosen to produce certain properties in the convolution output, such as reducing noise in $f$. In this setting $k$ is often referred to as a \textbf{kernel}. As an example consider the noisy signal convolved with a gaussian kernel in figure \ref{gaussian_convolution}.
+We can think of a convolution as a weighted sum of the output of $f$ where the output of $k$ acts as the weights. This view of convolution is used heavily in signal processing applications where $k$ is chosen to produce certain properties in the convolution output, such as reducing noise in $f$. In this setting $k$ is often referred to as a \textbf{kernel}. As an example consider the noisy signal convolved with a gaussian kernel in figure \ref{gaussian_convolution}.
 
 \begin{figure}
 	\centering
@@ -38,7 +38,7 @@ Specifically, the weights connecting layers $l$ and $l - 1$ in a convolutional n
 
 \begin{labeling}{shared}
 	\item [\textbf{sparse}] each unit in layer $l$ receives input from a small number of units layer $l - 1$.
-	\item [\textbf{shared}] the weights connecting units in layer $l$ and $l - 1$ are shared across the layer, in the same way that the same kernel weights are used at every index $x$ in the convolution operation. See figure \ref{convolutional_network}.
+	\item [\textbf{shared}] the weights connecting units in layer $l$ and $l - 1$ are shared across the layer, in the same way that the same kernel weights are re-used around every index of $f$. See figure \ref{convolutional_network}.
 \end{labeling}
 
 These restrictions on the network architecture reduces the number of unique weights of the model. This has the effect of reducing both the memory requirements of storing the network, but also limits the number of operations required to compute the output of the network for a given input.

@@ -12,6 +12,7 @@
 \usepackage{amsmath}
 \usepackage{amsthm}
 \usepackage{gensymb}
+\usepackage{placeins}
 \usepackage{algpseudocode}
 \usepackage{algorithm}
 \usepackage{pgfplots}
@@ -66,7 +67,7 @@ the#1\endcsname\quad}}
 \renewcommand{\vector}[1]{\mathbf{#1}}
 \renewcommand{\matrix}[1]{\vector{#1}}
 \newcommand{\dotp}[2]{\ensuremath\vector{#1}^T\vector{#2}}
-\newcommand{\augerror}{\ensuremath\bar{E}(\vector{w}, \dtrain)}
+\newcommand{\augerror}{\ensuremath\bar{E}(\vector{w}, \data)}
 \newcommand{\hypspace}{\mathcal{H}}
 \newcommand{\fspace}{\mathcal{X}}
 \newcommand{\lspace}{\mathcal{Y}}
@@ -97,18 +98,18 @@ the#1\endcsname\quad}}
 \begin{document}
 \maketitle
 \thispagestyle{empty}
-\newpage
+\clearpage
 
 \input{abstract}
 \pagebreak
-\newgeometry{twoside, inner=4.8cm, outer=3.2cm, vmargin=3cm}
+\newgeometry{twoside, inner=4.8cm, outer=3.2cm}
 
 \pagestyle{empty}
 {
   \renewcommand{\thispagestyle}[1]{}
   \tableofcontents
 }
-\clearpage
+\cleardoublepage
 \pagestyle{plain}
 
 \setcounter{page}{1}

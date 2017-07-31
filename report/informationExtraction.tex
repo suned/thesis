@@ -1,20 +1,22 @@
 \section{Information Extraction}
 \label{information_extraction}
-In natural language processing, information extraction is the problem of extracting structured information from unstructured text. Many practical information extraction problems fall in one of two categories: \textbf{named entity recognition}, or \textbf{relation extraction} \citep{jurafsky09}. Here, we introduce each of them, and explain why they are difficult.
+In natural language processing, information extraction is the problem of extracting structured information from unstructured text. Many practical information extraction problems fall in one of two categories: \textbf{named entity recognition}, or \textbf{relation extraction} \citep{jurafsky09}. Here, we introduce each of them, and explain the challenges they pose.
 
 \subsection{Named Entity Recognition}
 \label{named_entity_recognition}
-A named entity is roughly anything that has a proper name. The task in named entity recognition is to label mentions of entities such as people, organisations or places occurring in natural language. As an example, consider the sentence: 
+A named entity is roughly anything that has a proper name. The goal of named entity recognition is to label mentions of entities such as people, organizations or places occurring in natural language. The list of things these systems are tasked with recognizing is often extended to include things that aren't technically named entities such as amounts of money or calendar dates.
+
+As an example, consider the sentence: 
 $$
 \text{Jim bought 300 shares of Acme Corp. in 2006.}
 $$ 
-A named entity recognition system designed to extract the entities \textit{person} and \textit{organisation} should ideally assign the labels:
+A named entity recognition system designed to extract the entities \textit{person} and \textit{organization} should ideally assign the labels:
 $$
-	[\text{Jim}]_{person} \text{ bought 300 shares of } [\text{Acme Corp.}]_{organisation} \text{ in 2006.}
+	[\text{Jim}]_{person} \text{ bought 300 shares of } [\text{Acme Corp.}]_{organization} \text{ in 2006.}
 $$
 This is a difficult problem because of two types of ambiguity. Firstly, two distinct entities may share the same name and category, such as \textit{Francis Bacon} the painter and \textit{Francis Bacon} the philosopher. Secondly, two distinct entities can have the same name, but belong to different categories such as \textit{JFK} the former American president and \textit{JFK} the airport near New York.
 \\\\
-Named entity recognition can be framed as a sequence labelling problem. A common approach is to apply so called tokenisation to the text, i.e finding boundaries between words and punctuation, and associate each token with a label indicating which entity it belongs to. BIO (figure \ref{bio}) is a widely used labelling scheme in which token labels indicate whether the token is at the \textbf{B}eginning, \textbf{I}nside, or \textbf{O}utside an entity mention.
+Named entity recognition can be framed as a sequence labeling problem. A common approach is to apply so called tokenization to the text, i.e finding boundaries between words and punctuation, and associate each token with a label indicating which entity it belongs to. BIO (figure \ref{bio}) is a widely used labelling scheme in which token labels indicate whether the token is at the \textbf{B}eginning, \textbf{I}nside, or \textbf{O}utside an entity mention.
 \begin{figure}
 	\begin{center}
 		\begin{tabular}{c c c c c c c c c c c}
@@ -22,25 +24,27 @@ Named entity recognition can be framed as a sequence labelling problem. A common
 	\texttt{B-PER} & \texttt{O} & \texttt{O} & \texttt{O} & \texttt{O} & \texttt{B-ORG} & \texttt{I-ORG} & \texttt{I-ORG} & \texttt{O} & \texttt{O} & \texttt{O}
 	\end{tabular}
 	\end{center}
-	\caption{A sentence labeled with the BIO labels for named entity recognition.}
+	\caption{A sentence labeled with BIO labels for named entity recognition.}
 	\label{bio}
 \end{figure}
 
 \subsection{Relation Extraction}
 \label{relation_extract}
-Relation extraction refers to the problem of identifying relationships such as \textit{Family} or \textit{Employment} between entities. As an example, consider the sentence: 
+The goal of relation extraction is to identify relationships such as \textit{Family} or \textit{Employment} in natural language. Most often, the relations of interest are limited to relations between named entities. 
+
+As an example, consider the sentence: 
 $$
 \text{Yesterday, New York based Foo Inc. announced their acquisition of Bar Corp.}
 $$ 
-Imagine we have designed a relation extraction system that recognises the relation \textit{MergerBetween(organisation, organisation)} between two mentions of organisations. Ideally, we would like that system to extract the relation \textit{MergerBetween(Foo Inc., Bar Corp.)} from the above sentence.
+Imagine we have designed a relation extraction system that recognizes the relation \textit{MergerBetween(organization, organization)} between two mentions of organizations. Ideally, we would like that system to extract the relation \textit{MergerBetween(Foo Inc., Bar Corp.)} from the above sentence.
 \\\\
-To simplify the relation extraction problem, its often solved in three steps:
+To simplify the relation extraction problem, it's often solved in three steps:
 \begin{enumerate}
 	\item \textbf{Named entity recognition} \enspace Identify the named entities in the input text.
 	\item \textbf{Relation detection} \enspace For each pair of named entities in the input text, determine if a relation exists between them. This is a binary classification problem where the input is the text and the named entities detected in step 1, and the output is yes/no.
 	\item \textbf{Relation classification} \enspace Classify each of the detected relations in the previous step. This a multi-label classification problem where the input is the input text and the named entities for which a relation was detected in step 2, and the output is a relation label.
 \end{enumerate}
-In this thesis we focus on step 3, assigning labels to detected relations. This is a difficult problem because of ambiguity. As an example, consider the sentence \textit{Susan left JFK}. Imagine that we have want to design a relation extraction system that can detect the relations \textit{Physical(person, location): a person has a physical relation to a location} and \textit{Personal-Social(person, person): two persons have a social relation}. Both can reasonably be assigned the previous sentence, depending on whether \textit{JFK} refers to the airport near New York, or the former American president.
+In this thesis we focus on step 3, assigning labels to detected relations. This is a difficult problem because of ambiguity. As an example, consider the sentence \textit{Susan left JFK}. Imagine that we want to design a relation extraction system that can detect the relations \textit{Physical(person, location): a person has a physical relation to a location} and \textit{Personal-Social(person, person): two persons have a social relation}. Both can reasonably be assigned the previous sentence, depending on whether \textit{JFK} refers to the airport near New York, or the former American president.
 \\\\
 Relation extraction is often framed as a sentence classification problem, where the input to the relation extraction system is a sentence, and the output is a relation present in that sentence, if any.
 
@@ -56,15 +60,13 @@ Information extraction systems are often evaluated empirically by applying them 
 \end{center}
 Where for example $tp$ is the number of true positives produced for class $c$.
 \\\\
-The distribution of labels used in both named entity recognition and relation extraction is often highly imbalanced. Consider for example the BIO labelling scheme for named entity recognition in figure \ref{bio}. Most words will be outside a mention of a named entity, and will have the label \texttt{O}. Using simple accuracy $\frac{tp + tn}{tp + tn + fn + fp}$ as a performance metric is therefore not very informative, since a useless system which labels all tokens with \texttt{O} would achieve high performance.
-
-\textbf{Precision} and \textbf{recall} are more appropriate performance metrics for this reason. Precision $\frac{tp}{tp + fp}$ is the fraction of true named entities or relations of all named entities or relations that were extracted by the system. This is equal to 0 when none of the information extracted by the system was correct and 1 when all of it was correct. 
-
-Recall $\frac{tp}{tp + fn}$ is the fraction of true named entities or relations that were extracted by the system. This is 0 when none of the extracted information was correct, and 1 when all of the extracted information was correct, and no true named entities or relations were incorrectly labeled.
-
-To get a single number that summarizes the performance, precision $p$ and recall $r$ are often combined into a single metric, the $F1$ measure, defined as the harmonic mean of precision and recall $\frac{2pr}{p + r}$.
+The distribution of labels used in both named entity recognition and relation extraction is often highly imbalanced. Consider for example the BIO labelling scheme for named entity recognition in figure \ref{bio}. Most words will be outside a mention of a named entity, and will have the label \texttt{O}. Using simple accuracy $\frac{tp + tn}{tp + tn + fn + fp}$ as a performance metric for a system that outputs bio labels for each token in the text is therefore not very informative, since a useless system which labels all tokens with \texttt{O} would achieve high performance.
 \\\\
-In a multi-class classification problem, we are forced to decide how to average these metrics across classes. Specifically, there are two ways of averaging an accuracy measure across $C$ classes: micro and macro averaging \citep{sokolova2009}. In macro averaging, an accuracy measure is computed for each class $c$ separately, and then averaged across all $C$ classes. For example macro-precision $p_{M}$:
+\textbf{Precision} and \textbf{recall} are more appropriate performance metrics for this reason. Precision $\frac{tp}{tp + fp}$ is the fraction of correct information items extracted by the system. This is equal to 0 when none of the information extracted by the system was correct and 1 when all of it was correct. 
+
+Recall $\frac{tp}{tp + fn}$ is the fraction of information items in the corpora that the system correctly extracted. This is 0 when none of the extracted information was correct, and 1 when all of the extracted information was correct, and no item was incorrectly labeled by the system.
+\\\\
+In a multi-class classification problem we are forced to decide how to average these metrics across classes. Specifically, there are two ways of averaging an accuracy measure across $C$ classes: micro and macro averaging \citep{sokolova2009}. In macro averaging, an accuracy measure is computed for each class $c$ separately, and then averaged across all $C$ classes. For example macro-precision $p_{M}$:
 $$
 p_{M} = \frac{1}{C}\sum_{c=1}^C p_c
 $$
@@ -75,3 +77,5 @@ $$
 Where for example $tp_c$ is the true positives a system produces for class $c$.
 \\\\
 The main difference between macro and micro averages of accuracy measures is that micro averaging gives more weight to more frequent classes. In other words, micro averaging encodes the bias that infrequent classes are unimportant, and a misclassification of an example of such a class should not penalise the accuracy measure as much as a misclassification of a more frequent class. Whether on not this a reasonable bias depends on the problem.
+\\\\
+To get a single number that summarizes the performance, precision $p$ and recall $r$ are often combined into a single metric, the $F1$ measure defined as the harmonic mean of precision and recall $\frac{2pr}{p + r}$. Variations that use the micro and macro versions of precision and recall can naturally be computed as the harmonic mean of the micro or macro precision and recall respectively.

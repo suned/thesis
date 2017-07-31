@@ -4,7 +4,7 @@ import math
 import random
 
 import numpy
-
+import itertools
 
 from .. import config
 from ..io import arguments
@@ -28,11 +28,11 @@ log_line = """{0:<10d} {1:<20} {2:<15.4f} {3:<1.4f} {4}"""
 
 def init_metrics():
     return {
-            "precision": [],
-            "recall": [],
-            "f1": [],
-            "targetFraction": [],
-            "auxFraction": []
+        "precision": [],
+        "recall": [],
+        "f1": [],
+        "targetFraction": [],
+        "auxFraction": []
     }
 
 
@@ -71,22 +71,28 @@ def load_fractions():
     metrics_path = os.path.join(root, "metrics.csv")
     if os.path.exists(root):
         metrics_frame = pandas.read_csv(metrics_path)
-        max_aux_fraction = metrics_frame.auxFraction.max()
-        max_target_fraction = metrics_frame[
-            metrics_frame.auxFraction == max_aux_fraction
-        ].targetFraction.max()
-        target_fractions = numpy.arange(max_target_fraction, 1.1, .2)
-        auxiliary_fractions = (
-            numpy.arange(max_aux_fraction, 1.1, .2)
-            if arguments.auxiliary_tasks != "none"
-            else [0.0]
-        )
-        return target_fractions, auxiliary_fractions
+        metrics_frame.targetFraction = metrics_frame.targetFraction.astype(str)
+        metrics_frame.auxFraction = metrics_frame.auxFraction.astype(str)
+        fraction_counts = (metrics_frame
+                           .groupby(["targetFraction", "auxFraction"])
+                           .count()
+                           )
+        missing_fractions = []
+        for target_fraction in config.fractions:
+            for auxiliary_fraction in config.fractions:
+                was_started = (str(target_fraction),
+                               str(auxiliary_fraction)) in fraction_counts.index
+                if was_started and fraction_counts.ix[
+                    str(target_fraction),
+                    str(auxiliary_fraction)
+                ]['f1'] < arguments.k_folds * arguments.iterations:
+                    missing_fractions.append((target_fraction, auxiliary_fraction))
+                elif not was_started:
+                    missing_fractions.append((target_fraction, auxiliary_fraction))
+        return missing_fractions
     else:
-        auxiliary_fractions = (config.fractions
-                               if arguments.auxiliary_tasks != "none"
-                               else [0.0])
-        return config.fractions, auxiliary_fractions
+        fractions = list(itertools.product(config.fractions, config.fractions))
+        return fractions
 
 
 def find_start_iteration():
@@ -99,9 +105,9 @@ def find_start_iteration():
             metrics_frame.auxFraction == max_aux_fraction
             ].targetFraction.max()
         folds = len(metrics_frame[
-            (metrics_frame.targetFraction == max_target_fraction) &
-            (metrics_frame.auxFraction == max_aux_fraction)
-        ])
+                        (metrics_frame.targetFraction == max_target_fraction) &
+                        (metrics_frame.auxFraction == max_aux_fraction)
+                        ])
         start_iteration = (folds % arguments.k_folds) - 1
         return start_iteration
     else:
@@ -111,43 +117,43 @@ def find_start_iteration():
 def interleaved():
     global metrics
     if arguments.learning_surface:
-        target_fractions, auxiliary_fractions = load_fractions()
+        fractions = load_fractions()
     else:
-        target_fractions = auxiliary_fractions = [1.0]
-    start_iteration = find_start_iteration()
-    for auxiliary_fraction in auxiliary_fractions:
+        fractions = [(1.0, 1.0)]
+    start_iteration = 1
+    for target_fraction, auxiliary_fraction in fractions:
         log.info("Starting auxiliary fraction %f", auxiliary_fraction)
-        for target_fraction in target_fractions:
-            log.info("Starting target fraction %f", target_fraction)
-            reduce_aux_data(auxiliary_fraction)
-            for iteration in range(start_iteration,
-                                   arguments.iterations + 1):
+        log.info("Starting target fraction %f", target_fraction)
+        reduce_aux_data(auxiliary_fraction)
+        for iteration in range(start_iteration,
+                               arguments.iterations + 1):
+            log.info(
+                "Starting iteration %i of %i",
+                iteration,
+                arguments.iterations
+            )
+            iterator = KFold(n_splits=arguments.k_folds)
+            k = 1
+            for train_indices, test_indices in iterator.split(
+                    target_task.relations
+            ):
                 log.info(
-                    "Starting iteration %i of %i",
-                    iteration,
-                    arguments.iterations
+                    "Starting fold %i of %i",
+                    k,
+                    arguments.k_folds
                 )
-                iterator = KFold(n_splits=arguments.k_folds)
-                k = 1
-                for train_indices, test_indices in iterator.split(
-                        target_task.relations
-                ):
-                    log.info(
-                        "Starting fold %i of %i",
-                        k,
-                        arguments.k_folds
-                    )
-                    target_task.split(train_indices, test_indices)
-                    target_task.reduce_train_data(target_fraction)
-                    early_stopping(
-                        target_fraction,
-                        auxiliary_fraction
-                    )
-                    k += 1
-                    init_weights()
-                    save_metrics()
-                    metrics = init_metrics()
-            start_iteration = 1
+                target_task.split(train_indices, test_indices)
+                target_task.reduce_train_data(target_fraction)
+                early_stopping(
+                    target_fraction,
+                    auxiliary_fraction
+                )
+                k += 1
+                init_weights()
+                save_metrics()
+                metrics = init_metrics()
+        start_iteration = 1
+log.info("Done!!")
 
 
 def reduce_aux_data(auxiliary_fraction):
@@ -180,6 +186,8 @@ def early_stopping(target_fraction, auxiliary_fraction):
      early_stopping_labels) = target_task.early_stopping_set()
     log.info(log_header)
     epoch = 1
+    import ipdb
+    ipdb.sset_trace()
     while epoch <= arguments.epochs:
         task = random.choice(experiment_tasks)
         batch_input, batch_labels = task.get_batch()

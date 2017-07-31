@@ -76,7 +76,7 @@ def plot_gradient_steps(path):
     plt.figure(figsize=figure_size())
     plt.xlabel(r"$x$")
     plt.ylabel(r"$y$")
-    plt.plot(x_train, y_train, "o", label=r"$\mathcal{D}_{train}$")
+    plt.plot(x_train, y_train, "o", label=r"$\mathcal{D}$")
     step = 0
     for w0, w1, color in weights:
         label = r"$y = \mathbf{w}_" + str(step) + r"^T\tilde{\mathbf{x}}$"
@@ -90,7 +90,7 @@ def plot_gradient_steps(path):
             c=color
         )
         step += 1
-    plt.legend(loc="upper left")
+    plt.legend(borderaxespad=2.)
     format_ticks()
     file_name = os.path.join(path, "d_train.pgf")
     move_spines_to_zero()

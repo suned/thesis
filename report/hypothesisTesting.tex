@@ -1,1 +1,61 @@
 \section{Hypothesis Testing}
+In section we compare the learning curves of single-task and multi-task learning. Specifically, for each fraction of target data in our experiment, we compare the mean F1 $\mu_{F1}$ of single-task learning to the mean F1 of multi-task learning using all the auxiliary data for each of the auxiliary tasks.
+\vspace{3cm}
+\begin{figure}[h]
+	\hspace*{-3cm}\textbf{ACE 2005 Relations}
+	\\\\
+	\centering
+	\begin{tabular}{r | l | l | l | l | l | l}
+		\textbf{Fraction of target data} & .0 & .2 & .4 & .6 & .8 & 1.0 \\  \hline
+		$\mu_{F1}$ \textbf{Single task} & 0 & 0 & 0 & 0 & 0 & 0\\
+		$\sigma_{F1}$ \textbf{Single task} & 0 & 0 & 0 & 0 & 0 & 0\\
+		$\mu_{F1}$ \textbf{Multi-Task} & 0 & 0 & 0 & 0 & 0 & 0\\
+		$\sigma_{F1}$ \textbf{Multi-Task} & 0 & 0 & 0 & 0 & 0 & 0\\
+		$p$\textbf{-value} & 0 & 0 & 0 & 0 & 0 & 0
+	\end{tabular}
+	\caption{Significance test for difference between SemEval 2010 Task 8 learned as a single task and learned simultaneously with CONL2000 Chunk}
+\end{figure}
+\begin{figure}[h]
+	\hspace*{-3cm}\textbf{CONLL2000 Chunk}
+	\\\\
+	\centering
+	\begin{tabular}{r | l | l | l | l | l | l}
+		\textbf{Fraction of target data} & .0 & .2 & .4 & .6 & .8 & 1.0 \\  \hline
+		$\mu_{F1}$ \textbf{Single task} & 0 & 0 & 0 & 0 & 0 & 0\\
+		$\sigma_{F1}$ \textbf{Single task} & 0 & 0 & 0 & 0 & 0 & 0\\
+		$\mu_{F1}$ \textbf{Multi-Task} & 0 & 0 & 0 & 0 & 0 & 0\\
+		$\sigma_{F1}$ \textbf{Multi-Task} & 0 & 0 & 0 & 0 & 0 & 0\\
+		$p$\textbf{-value} & 0 & 0 & 0 & 0 & 0 & 0
+	\end{tabular}
+	\caption{Significance test for difference between SemEval 2010 Task 8 learned as a single task and learned simultaneously with CONL2000 Chunk}
+\end{figure}
+\newpage
+\vspace*{5.2cm}
+\begin{figure}[h]
+	\hspace*{-3cm}\textbf{CONLL2000 Part-of-speech}
+	\\\\
+	\centering
+	\begin{tabular}{r | l | l | l | l | l | l}
+		\textbf{Fraction of target data} & .0 & .2 & .4 & .6 & .8 & 1.0 \\  \hline
+		$\mu_{F1}$ \textbf{Single task} & 0 & 0 & 0 & 0 & 0 & 0\\
+		$\sigma_{F1}$ \textbf{Single task} & 0 & 0 & 0 & 0 & 0 & 0\\
+		$\mu_{F1}$ \textbf{Multi-Task} & 0 & 0 & 0 & 0 & 0 & 0\\
+		$\sigma_{F1}$ \textbf{Multi-Task} & 0 & 0 & 0 & 0 & 0 & 0\\
+		$p$\textbf{-value} & 0 & 0 & 0 & 0 & 0 & 0
+	\end{tabular}
+	\caption{Significance test for difference between SemEval 2010 Task 8 learned as a single task and learned simultaneously with CONL2000 Chunk}
+\end{figure}
+\begin{figure}[h]
+	\hspace*{-3cm}\textbf{GMB Named Entity Recognition}
+	\\\\
+	\centering
+	\begin{tabular}{r | l | l | l | l | l | l}
+		\textbf{Fraction of target data} & .0 & .2 & .4 & .6 & .8 & 1.0 \\  \hline
+		$\mu_{F1}$ \textbf{Single task} & 0 & 0 & 0 & 0 & 0 & 0\\
+		$\sigma_{F1}$ \textbf{Single task} & 0 & 0 & 0 & 0 & 0 & 0\\
+		$\mu_{F1}$ \textbf{Multi-Task} & 0 & 0 & 0 & 0 & 0 & 0\\
+		$\sigma_{F1}$ \textbf{Multi-Task} & 0 & 0 & 0 & 0 & 0 & 0\\
+		$p$\textbf{-value} & 0 & 0 & 0 & 0 & 0 & 0
+	\end{tabular}
+	\caption{Significance test for difference between SemEval 2010 Task 8 learned as a single task and learned simultaneously with CONL2000 Chunk}
+\end{figure}

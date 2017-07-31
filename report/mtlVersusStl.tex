@@ -1,14 +1,17 @@
 \section{Multi-Task and Single-Task Learning}
 \label{multiTaskAndSingleTaskLearning}
 
-In our description of supervised machine learning so far, we have assumed that the input for the learning system was an annotated dataset $\mathcal{D}$, in which all samples $(\vector{x}_i, \vector{y}_i) \in \mathcal{D}$ belong to the same input/output space $\mathcal{X}$ and $\mathcal{Y}$, and are drawn independently from the same distribution $P(\vector{x}, \vector{y})$.
-
-In the real world however, it's often possible to combine data from disparate sources if we relax one or more of these assumptions: We may have access to a set $\data_M$ of $M$ datasets $\data_m \in \data_M$, drawn from a set $\mathcal{P}$ of $M$ different distributions $P_m(\vector{x}, \vector{y}) \in \mathcal{P}$. Since we are dealing with more than one probability distribution, it becomes useful to think of generalization error with respect to a particular distribution, thus we extend our notation for generalization error from $E$ to $E_m$ to mean:
+In our description of supervised machine learning so far we have assumed that the input for the learning system was an annotated dataset $\mathcal{D}$ in which all samples $(\vector{x}_i, \vector{y}_i) \in \mathcal{D}$ are drawn independently from the same distribution $P(\vector{x}, \vector{y})$. In the real world however, it's often possible to combine data from disparate sources if we relax this assumption: We may have access to a set $\data_M$ of $M$ datasets $\data_m \in \data_M$, drawn from a set $\mathcal{P}$ of $M$ different distributions $P_m(\vector{x}, \vector{y}) \in \mathcal{P}$. Since creating new labels for a machine learning task is often both cumbersome and costly, it would be desirable if re-using previously labeled data could reduce the need for data annotation
+\\\\
+In many cases, we are not interested in implementing a learning system that performs well on all $M$ learning tasks. We really only care about one \textbf{target} task defined by a distribution $P_t \in \mathcal{P}$ and $\data_t \in \data_M$ in which case we consider the other datasets $\data_A = \{\data_m \mid \data_m \in \data_M, m \neq t\}$ to be \textbf{auxiliary}. Since we are dealing with more than one probability distribution, it becomes useful to think of generalization error with respect to a particular distribution. Thus, we extend our notation for generalization error from $E$ to $E_m$ to mean:
 $$
 E_m(h) = \mathbb{E}_{(\vector{x},\vector{y}) \sim P_m(\vector{x},\vector{y})}[e(h(\vector{x}),\vector{y})]
 $$
-In many cases, we are not interested in implementing a learning system that performs well on all $M$ learning tasks, but really only care about one \textbf{target} task, defined by a distribution $P_t \in \mathcal{P}$ and $\data_t \in \data_M$, in which case we consider the other datasets $\data_A = \{\data_m \mid \data_m \in \data_M, m \neq t\}$ to be \textbf{auxiliary}. We can speculate that if $\mathcal{D}_t$ and $\data_A$ are related somehow, and if the learning system is able to share what is learnt between the learning tasks, learning the tasks simultaneously may improve generalization for the target task relative to learning from $\data_t$ in isolation \citep{caruana1997}.
-
-To distinguish the two approaches, the traditional approach to supervised machine learning as described in section \ref{supervised_machine_learning} is called \textbf{single-task learning}, and the new approach, which learns from all of $\data_M$ is called \textbf{multi-task learning}.
+\noindent
+We can speculate that if $\mathcal{D}_t$ and $\data_A$ are related somehow, and if the learning system is able to share what is learnt between the learning tasks, learning the tasks simultaneously may improve generalization for the target task relative to learning from $\data_t$ in isolation \citep{caruana1997}. To distinguish the two approaches, the traditional approach to supervised machine learning as described in section \ref{supervised_machine_learning} is called \textbf{single-task learning}, and the new approach, which learns from all of $\data_M$ is called \textbf{multi-task learning}.
 \\\\
 In the following sections we introduce contributions from statistical learning theory that shed some light on when and how learning from $\data_M$ is beneficial.
+
+
+
+

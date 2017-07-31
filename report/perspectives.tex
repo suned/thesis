@@ -1,1 +1,60 @@
 \chapter{Perspectives}
+In this section we reflect on the points highlighted in the previous section. We focus on suggesting multi-task learning strategies for relation classification that we believe still needs to be explored in order to determine if multi-task learning can be an effective tool for relation classification tasks. We begin by exploring alternative neural network architectures that remove the weight sharing limitations of the architecture proposed by \citet{nguyen2015}. We then turn to suggestions for other possible auxiliary tasks. We end the section with a discussion of the the pros and cons of multi-task learning vs. feature engineering.
+
+\section{Alternative Neural Network Architectures}
+As discussed, the architecture suggested by \citet{nguyen2015} puts limitations on how neural network weights can be shared in practice. In this section, provide basic outlines for how to construct a neural network architecture that removes these limitations.
+
+\subsection{Convolutional Neural Network with Argument Markers}
+\label{marker_strategy}
+It is generally accepted that a successful relation classification system needs as input some representation of which words of the input sentence constitute the relation arguments \citep{nguyen2015, zhang2015, jiang2009}. The solution proposed by \citet{nguyen2015} is to augment the sentence matrix formed from the concatenated word vectors pertaining to the input with position vectors that encode distances to the relation arguments. 
+
+This has the unfortunate effect of hindering weight sharing of the convolutional filter weights between the relation classification network and sequence classification networks in practice, since it induces a mismatch of the dimensionality of the respective convolutional filter matrices.
+\\\\
+Other researchers have found that it's possible to remove the position features completely if each sentence is pruned such that the first and last word constitute the first and last relation argument words \citep{santos2015}. This suggests that the specific representation of relation argument positions is unimportant.
+\\\\
+One strategy for equalizing the sentence matrix dimensionality is therefore to adapt a relation argument position representation that does away with the position embedding. The pruning strategy of \citep{santos2015} is one path forward. We speculate that simply marking the relation arguments with special beginning and end tokens would also work. By equalizing the dimensionality of the sentence matrix for the relation classification network and the sequence prediction networks sharing the convolutional filter weights is made possible, which may lead to better results than we have reported here.
+
+\subsection{Multi-Channel Convolutional Neural Network}
+\label{multi-channel}
+\citet{kim2014} introduces the idea of using multiple "channels" in convolutional neural networks for sentence classification. The idea of a channel in this context is similar to a color channel in a digital image. An image is often represented as a stack of three matrices where each matrix component denotes color intensity in a color channel.
+
+Similarly, we can construct a stack of sentence matrices by using more than one word embedding matrix. A number of sentence matrices are produced by concatenating the word vectors of each word in each word embedding matrix with each other such that each word embedding induces a sentence matrix.
+\\\\
+We can use the idea of multi-channel convolutional neural networks to modify the architecture proposed by \citet{nguyen2015} to accommodate sharing convolutional filter weights between the relation classification network and the sequence classification networks. Specifically, we can add another word embedding matrix to the architecture that forms a sentence matrix for an input sentence which is not augmented with the position vectors. This word embedding and convolutional filters on the sentence matrix matrix induced by it can then be readily shared with the sequence classification networks.
+
+\subsection{Recurrent Neural Network}
+\citet{zhang2015} describes a recurrent neural network architecture for relation classification that can also be used for a multi-task learning. In this architecture, the word vector for each word is fed into a bi-directional recurrent network layer. This produces a sequence of feature vectors that are the concatenation of the output of each application of the recurrent layer in both directions. \citet{zhang2015} apply max-pooling on the components of these feature vectors, and feed the resulting vector into a logistic regression layer. The relation arguments are marked simply by adding special tokens before and after each argument.
+\\\\
+It's possible to share the weights of the recurrent layer with a sequence classification model by adding an output layer to each feature vector produced by the bidirectional recurrent layer as is done in for example \citet{bingel2017}. Since the dimensionality of the weight matrices depend only on the dimensionality of the word embedding matrix, this does away the limitation induced by the position features in the architecture proposed by \citet{nguyen2015}.
+
+\section{Alternative Auxiliary Tasks}
+In this section we investigate other auxiliary natural language processing tasks that have the potential for improving relation classification generalization which were not tested in our experiment. We discuss the goal of each task and investigate neural network architectures that permit hard parameter sharing with a relation classification network.
+
+\subsection{Semantic Role Labeling}
+The goal of relation classification is ultimately to produce a compact representation of the semantic roles of words in text when those roles relate to specific relations of interest. \textbf{Semantic role labeling} can be seen as a generalization of this problem. The goal in semantic role labeling is to label the arguments for so called predicates in a sentence. The term \textit{predicate} stems from logic and roughly means a function that performs a logical test on its arguments, i.e maps it to a truth value. 
+\\\\
+In natural language processing, the term predicate is often used to refer to words, often nouns, that expect certain arguments so to speak. A particular example of this is the idea of transitive and intransitive verbs. A transitive verb has a direct and possibly an indirect object, for example \textit{brought} in \textit{he brought her a glass of water} where \textit{her} is the indirect object and \textit{a glass of water} is the direct object. Intransitive verbs takes no objects, such as \textit{laughs} in \textit{she laughs}. We can express the transitivity of these verbs by representing them as predicates that take a fixed number of arguments, for example \textit{brought(her, a glass of water} and \textit{laughs(she)}.
+\\\\
+The goal of semantic role labeling is to predict the predicate arguments given a sentence and a predicate in that sentence \citep{jurafsky09}. PropBank and FrameNet are two datasets frequently used for this task \citep{kingsbury2002, baker1998}. See figure \ref{framenet} for an example.
+
+\begin{figure}[h]
+	\centering
+	\begin{tabular}{l l l l}
+		[The San Fransisco Examiner] & issued & [a special edition] & yesterday \\
+		ARG1 & PREDICATE & ARG2 &
+	\end{tabular}
+	\caption{Example predicate labeling derived from PropBank.}
+	\label{framenet}
+\end{figure}
+\noindent
+Semantic role labeling tasks can be solved with neural networks. \citet{collobert2011} describe a convolutional architecture very similar to the architecture of \citet{nguyen2015}. Specifically, they approach semantic role labeling as a sequence labeling task where the goal is to assign BIO labels indicating whether a token is a the beginning, inside or outside of a predicate argument. To indicate which word is the predicate, they augment the window matrix formed by the word vectors of the window with position features that encode the distance to the predicate. It's possible to share the convolutional filters of this architecture by using the multi-channel or argument marker strategy described in section \ref{multi-channel} and \ref{marker_strategy}.
+\\\\
+As discussed, semantic role labeling and relation classification are highly related tasks.
+\subsection{Dependency Parsing}
+
+\section{Pipelining Vs. Multi-Task Learning}
+In this thesis we have investigated the possibility of re-using labeled data by using it to automatically learn a representation that improves generalization for a target task when data for this task is limited. In truth, labeled natural language data for auxiliary tasks can be re-used for this purpose in a different manner: by training a system that predicts labels for target task data. These predictions can be used as input features to the system for the target task. For example, we could use the CONLL2000 data to train the chunk and part-of-speech tags for the SemEval data, and then use these tags as input to the relation classification network.
+\\\\
+The approach described above is in fact the standard mode of operation for natural language practitioners. Using all of the linguistic knowledge available to us to manually produce a good representation may let us use a smaller hypothesis space for the target task without penalizing the training error. Vapnik-Chervonkis analysis gives us confidence that learning with a smaller hypothesis space reduces the need for training data. Therefore, using the auxiliary data not as output information used to automatically find a good representation, but as input information, by manually creating a \textbf{pipeline} of natural language processing systems that produces a good representation for the target task, we may be able to use the auxiliary data to learn with a small hypothesis space and thereby reduce the need for labeled training data for the target task.
+\\\\
+The main issue with such a pipeline method is \textbf{error propagation}, where classification errors early in the pipeline lead to classification errors on the target task \citep{collobert2011}. Whether multi-task learning is preferable to pipelining in the context of relation classification is a question that, with our current understanding, may only be investigated empirically. Such a comparative study would be a significant undertaking, and we therefore suggest it as a possible future experiment that may improve our understanding of, not only when pipelining is preferable to multi-task learning, but also what makes an auxiliary task beneficial.
