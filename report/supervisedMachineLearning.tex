@@ -1,13 +1,13 @@
 \section{Supervised Machine Learning}
 \label{supervised_machine_learning}
 
-Most modern solutions to the information extraction problems in \ref{information_extraction} are based on supervised machine learning techniques. In this setting a system learns to recognize the named entities or relations between them from examples provided by a human annotator. In this section we formally describe this approach and introduce important theoretical tools for understanding supervised machine learning.
+Most modern solutions to the information extraction problems in \ref{information_extraction} are based on supervised machine learning techniques. In this setting a system learns to recognize the named entities or relations between them from examples provided by a human annotator. In this section we formally describe this approach and introduce important theoretical tools.
 
 \subsection{The Supervised Learning Problem}
 \label{the_supervised_learning_problem}
 A training set $\mathcal{D}$ of $N$ examples $(\mathbf{x}_i, \mathbf{y}_i)$ of inputs $\mathbf{x}_i$ and corresponding labels $\mathbf{y}_i$ is created by a human annotator. Each $\mathbf{x}_i$ belongs to an input space $\mathcal{X}$, for example the set of all english sentences. Each $\mathbf{y}_i$ belongs to an output space $\mathcal{Y}$ of labels, for example the set of all sequences of BIO tags. As designers of the learning system we specify a set of functions $h: \mathcal{X} \mapsto \mathcal{Y}$, the so called \textbf{hypothesis space} $\mathcal{H}$. We want to find a function $h \in \mathcal{H}$, sometimes called a \textbf{model} or \textbf{hypothesis}, that can automatically assign labels to a new set of un-labeled inputs $\mathcal{D}_{test} = \{ \mathbf{x}_i \mid \mathbf{x}_i \in \mathcal{X}\}$ at some point in the future. 
 
-Supervised machine learning is the science of how to use an algorithm to find a function $h$ using $\mathcal{D}$ that performs well on $\mathcal{D}_{test}$, as measured by some performance measure $e$. In classification problems such as named entity recognition or relation extraction where $\mathcal{Y}$ is discrete, we typically use binary error $e(\mathbf{y}_1, \mathbf{y_2}) = \mathbb{I}[\mathbf{y}_1 \neq \mathbf{y}_2]$. Importantly, we are only interested in the performance of $h$ on $\mathcal{D}$ to the extent that it's informative of how the system will perform on future data \citep{yaser12}.
+Supervised machine learning is the science of how to use an algorithm to find a function $h$ using $\mathcal{D}$ that performs well on $\mathcal{D}_{test}$ as measured by some performance measure $e$. In theoretical analyses of classification problems such as named entity recognition or relation extraction where $\mathcal{Y}$ is discrete, we typically use binary error $e(\mathbf{y}_1, \mathbf{y_2}) = \mathbb{I}[\mathbf{y}_1 \neq \mathbf{y}_2]$. Importantly, we are only interested in the performance of $h$ on $\mathcal{D}$ to the extent that it informs us how the system will perform on future data \citep{yaser12}.
 \\\\
 We can formalize the preference for functions $h$ that perform well on examples outside of the training set with a quantity known as \textbf{generalization error}.
 
@@ -17,7 +17,8 @@ We can formalize the preference for functions $h$ that perform well on examples 
 		E(h) = \mathbb{E}_{\mathbf{x},\mathbf{y}\sim P(\mathbf{x}, \mathbf{y})}[e(h(\mathbf{x}), \mathbf{y})]
 	$$
 \end{definition}
-Formally, the objective of supervised machine learning is to find a function $h^*$ in a space of functions $\mathcal{H}$ that minimizes $E(h)$. We see the process generating the data as random, but with a behavior describable by a distribution $P(\mathbf{x}, \mathbf{y})$. Unfortunately, this distribution is unknown, which makes $E$ unknown. However, we can use sampled data $\mathcal{S} = \{(\mathbf{x}, \mathbf{y}) \mid \mathbf{x}, \mathbf{y} \sim P(\mathbf{x}, \mathbf{y})\}$ to estimate $E(h)$ with a quantity known as \textbf{empirical error}:
+\noindent
+Formally, the objective of supervised machine learning is to find a function $h^*$ in a space of functions $\mathcal{H}$ that minimizes $E(h)$. We see the process generating the data as random, but with a behavior describable by a distribution $P(\mathbf{x}, \mathbf{y})$. Unfortunately, this distribution is unknown which makes $E$ unknown. However, we can use sampled data $\mathcal{S} = \{(\mathbf{x}, \mathbf{y}) \mid \mathbf{x}, \mathbf{y} \sim P(\mathbf{x}, \mathbf{y})\}$ to estimate $E(h)$ with a quantity known as \textbf{empirical error}:
 
 \begin{definition}[empirical error] \label{empirical_error}
 	Let $\mathcal{S}$ be a set of $N$ examples $\{(\mathbf{x}_i, \mathbf{y}_i) \mid \mathbf{x}_i, \mathbf{y}_i \sim P(\mathbf{x}, \mathbf{y})\}$. Then the empirical error $\hat{E}$ is defined as:
@@ -27,10 +28,12 @@ Formally, the objective of supervised machine learning is to find a function $h^
 \end{definition}
 
 Because $\mathcal{S}$ is a random quantity, it's dangerous to use $\hat{E}$ to estimate $E$. We risk that the samples are not representative of $P(\mathbf{x}, \mathbf{y})$, leading us to believe that $h$ is great, when in fact it's terrible. We can bound the probability that $\hat{E}$ is a bad estimate of $E$ if we make two assumptions:
-
-Firstly, we assume that the samples in $\mathcal{S}$ are drawn independently from $P(\mathbf{x}, \mathbf{y})$, that is observing any one sample did not change the probability of observing any other sample.
-
-Secondly, we assume that $h$ is independent of $\mathcal{S}$, in other words, that $h$ was not specifically chosen based on the sample. These assumptions enable us to apply \textbf{Hoeffding's inequality} to bound the probability that $\hat{E}$ is far away from $E$:
+\begin{enumerate}
+	\item The samples in $\mathcal{S}$ are drawn independently from $P(\mathbf{x}, \mathbf{y})$. In other words, observing any one sample did not change the probability of observing any other sample.
+	\item $h$ is independent of $\mathcal{S}$. In other words, $h$ was not specifically chosen based on the sample.
+\end{enumerate}
+\noindent
+These assumptions enable us to apply \textbf{Hoeffding's inequality} to bound the probability that $\hat{E}$ is far away from $E$:
 
 \begin{theorem}[Hoeffding's inequality]
 	let $E(h)$ be defined as in definition \ref{generalisation_error}, and let $E(h, \mathcal{S})$ be defined as in definition \ref{empirical_error}. Then:
@@ -41,21 +44,21 @@ Secondly, we assume that $h$ is independent of $\mathcal{S}$, in other words, th
 
 The inequality tells us that the probability that $E$ is more than $\epsilon$ away from $\hat{E}$ decreases exponentially in $\epsilon$ and $N$. In other words, the more samples in $\mathcal{S}$, the less likely it is that $E$ will be misleading. Estimating $E$ with a sample that's independent of $h$ is a technique called \textbf{validation} and will be discussed in section \ref{validation}
 \\\\
-Because $\mathcal{D}$ is used to select $h$, it cannot be used to estimate $E$ by Hoeffding's inequality, and we need more sophisticated techniques to understand the relationship between $\mathcal{D}$ and $E$. The central question in supervised machine learning is \textit{how can we best define $\mathcal{H}$ and use $\mathcal{D}$ to make $E$ small?} Answering this question is the objective of a field of research known as \textbf{statistical learning theory}.
+Because $\mathcal{D}$ is used to select $h$, it cannot be used to estimate $E$ by Hoeffding's inequality, and we need more sophisticated techniques to understand the relationship between $\mathcal{D}$ and $E$. The central question in supervised machine learning is: \textit{how can we best define $\mathcal{H}$ and use $\mathcal{D}$ to make $E$ small?} Answering this question is the objective of a field of research known as \textbf{statistical learning theory}.
 
 \subsection{Statistical Learning Theory}
 \label{statistical_learning_theory}
-We would like to know how best to define $\mathcal{H}$ and use $\mathcal{D}$ in order to make $E$ small. $\mathcal{D}$ is the only information we have about $P(\mathbf{x}, \mathbf{y})$, and therefore also the only information we have about $E$. A straight-forward idea would be to find a function $g \in \mathcal{H}$ that minimizes the \textbf{training error} $\hat{E}(h, \mathcal{D})$ in the hope that $g$ will also minimize $E$. 
+$\mathcal{D}$ is the only information we have about $P(\mathbf{x}, \mathbf{y})$, and therefore also the only information we have about $E$. If our goal is to minimize $E$, a straight-forward idea would be to find a function $g \in \mathcal{H}$ that minimizes the \textbf{training error} $\hat{E}(h, \mathcal{D})$ in the hope that $g$ will also minimize $E$. 
 
 As we argued in section \ref{supervised_machine_learning}, using $\hat{E}$ to estimate $E$ can be misleading. Moreover, because $D$ is used to specifically choose $g$ that makes $\hat{E}$ small, the guarantees provided by Hoeffding's inequality no longer holds, and therefore it may be possible to select $g$ such that $\hat{E}(g, \mathcal{D})$ is small and $E(g)$ is large, even when we have a large number of training examples.
 
-The phenomena where training error is small but generalization error is large is known as \textbf{overfitting}. As the name implies, it's caused by harmful idiosyncrasies of $\mathcal{D}$ that, when used to minimize $\hat{E}(h, \mathcal{D})$, leads us to a $g$ with a larger $E$ than other functions in $\mathcal{H}$. These idiosyncrasies of $\mathcal{D}$ are ultimately the product of \textbf{noise}.
+The phenomena where training error is small but generalization error is large is known as \textbf{overfitting}. As the name implies, it's caused by harmful idiosyncrasies of $\mathcal{D}$ that causes us to select a $g$ with a larger $E$ than other functions in $\mathcal{H}$. These idiosyncrasies of $\mathcal{D}$ are ultimately the product of \textbf{noise}.
 \\\\
-In general, noise comes in two forms. The first form is known as \textbf{stochastic noise}. This type of noise is introduced by variation in the relationship between $\mathbf{x}$ and $\mathbf{y}$ that is irrelevant to the problem we are trying to solve. For example, human error is a common source of stochastic noise in information extraction where an annotator incorrectly labels a piece of text. Selecting a $g$ that repeats this error is a case of overfitting, because $g$ will have lower training error but larger generalization error than another $h$ that doesn't predict the incorrect annotation, since presumably the error is the exception to the rule.
+In general, noise comes in two forms. The first form is known as \textbf{stochastic noise}. This type of noise is introduced by variation in the relationship between $\mathbf{x}$ and $\mathbf{y}$ that is irrelevant to the problem we are trying to solve. For example, human error where a human annotator incorrectly labels a piece of text is a common source of stochastic noise in information extraction. Selecting a $g$ that repeats this error is a case of overfitting, because $g$ will have lower training error but larger generalization error than another $h$ that doesn't predict the incorrect annotation.
 \\\\
 The second type of noise is called \textbf{deterministic noise}. This type of noise may be introduced when the relationship between $\mathbf{x}$ and $\mathbf{y}$ is deterministic, but $\mathcal{H}$ doesn't have the capacity to represent this relationship exactly.
 
-To understand deterministic noise, imagine that even $h^*$ can't represent the deterministic relationship $\mathbf{y} = f(\mathbf{x})$ exactly. Suppose that we get a $\mathcal{D}$ that contains a sample $(\mathbf{x}_i, \mathbf{y}_i)$ that falls outside the capacity of $h^*$, that is, $h^*(\mathbf{x}_i) \neq \mathbf{y}_i$. Now further imagine that in order to minimize $\hat{E}$, we select a $g$ that predicts this sample, such that $g(\mathbf{x}_i) = \mathbf{y}_i$. This is a case of overfitting since we know that there is at least one function in $\mathcal{H}$ with lower generalization error than $g$, namely $h^*$.
+To understand deterministic noise, imagine that even $h^*$ can't represent the deterministic relationship $\mathbf{y} = f(\mathbf{x})$ exactly. Suppose that we get a $\mathcal{D}$ that contains a sample $(\mathbf{x}_i, \mathbf{y}_i)$ that falls outside the capacity of $h^*$, that is, $h^*(\mathbf{x}_i) \neq \mathbf{y}_i$. Now further imagine that, in order to minimize $\hat{E}$, we select a $g$ that predicts this sample, such that $g(\mathbf{x}_i) = \mathbf{y}_i$. This is a case of overfitting since we know that there is at least one function in $\mathcal{H}$ with lower generalization error than $g$, namely $h^*$.
 \\\\
 The risk of overfitting is linked to the diversity of $\mathcal{H}$. When we say that $\mathcal{H}$ is diverse, we roughly mean that the functions $h \in \mathcal{H}$ are very different from each other. The more diverse $\mathcal{H}$ is, the greater the risk that there exists a $h \in \mathcal{H}$ that will overfit $\mathcal{D}$.
 
@@ -93,26 +96,26 @@ The growth function allows us to account for redundancy in $\mathcal{H}$. If two
 
 If $\mathcal{H}$ is infinite, the number of redundant functions in $\mathcal{H}$ will also be infinite since the number of dichotomies on $N$ points is finite. If $m(N, \mathcal{H})$ is much smaller than $2^N$, the number of redundant functions in $\mathcal{H}$ will be so large as to make the probability that $\hat{E}$ is far away from $E$ very small.
 \\\\
- This line of reasoning is the basis of the Vapnik-Chervonenkis bound, which bounds $E(h)$ in terms of $\hat{E}(h, \mathcal{D})$:
+ This line of reasoning is the basis of the Vapnik-Chervonenkis bound which bounds $E(h)$ in terms of $\hat{E}(h, \mathcal{D})$ \citep{vapnik1971}:
 
 \begin{theorem}[Vapnik-Chervonenkis bound]
 	\label{vc_bound}
-	Let $m(N, \mathcal{H})$ be defined as in definition \ref{growth_function}, $E(h)$ as \ref{generalisation_error}, and $\hat{E}(h, \mathcal{D})$ as in \ref{empirical_error}. Then, with probability $1 - \delta$:
+	Let $m(N, \mathcal{H})$ be defined as in definition \ref{growth_function}, $E(h)$ as in \ref{generalisation_error}, and $\hat{E}(h, \mathcal{D})$ as in \ref{empirical_error}. Then, with probability $1 - \delta$:
 	$$
 	E(h) \leq \hat{E}(h, \mathcal{D}) + \sqrt{\frac{8}{N}\ln \frac{4m(2N, \mathcal{H})}{\delta}}
 	$$
 \end{theorem}
+\noindent
 The bound tells us that $E(h)$ will be close to $\hat{E}(h, \mathcal{D})$ if $m(N, \mathcal{H})$ is small and $N$ is large. Intuitively, this tells us that a set $\mathcal{H}$ that contains "simple" functions will make it easier to choose $g$ such that generalization error will be close to training error, where simple means: functions that realize a small number of dichotomies.
 
 On the other hand, having a set $\mathcal{H}$ that can realize a large number of dichotomies on $N$ points, will make it easier to find a function that will make $\hat{E}(h, \mathcal{D})$ small. Using a $\mathcal{H}$ with functions that are too simple is called \textbf{underfitting}. It occurs when we search for a function in the set of functions $\mathcal{H}$, when there is another, more diverse set of functions $\mathcal{G}$ which contain a function with lower generalization error.
 \\\\
-This analysis tells us that an optimally diverse $\mathcal{H}$ balances the tradeoff between the risk of overfitting, represented in the bound by $m$, and the risk of underfitting, represented by $\hat{E}$. In practice, underfitting is less of a problem than overfitting, since modern supervised machine learning algorithms search in extremely diverse spaces of functions $\mathcal{H}$. In fact, most $\mathcal{H}$ are so diverse that steps must be taken to avoid using all of $\mathcal{H}$ when learning from it. These techniques are known as \textbf{regularization}, which we will see an instance of in section \ref{regularisation}.
+This analysis tells us that an optimally diverse $\mathcal{H}$ balances the tradeoff between the risk of overfitting, represented in the bound by $m$, and the risk of underfitting, represented by $\hat{E}$. In practice, underfitting is less of a problem than overfitting since modern supervised machine learning algorithms search in extremely diverse spaces of functions $\mathcal{H}$. In fact, most $\mathcal{H}$ are so diverse that steps must be taken to avoid using all of $\mathcal{H}$ when learning from it. These techniques are known as \textbf{regularization}, which we will see an instance of in section \ref{regularisation}.
 \\\\
-A simple rewrite of theorem \ref{vc_bound} leads to a very popular equivalent formulation: a \textbf{sample complexity} bound. Sample complexity denotes the number of training examples required for a certain generalization performance. Exercising a bit of algebra on the Vapnik-Chervonenkis bound leads to the insight that in order for $E$ to be no more than $\epsilon$ away from $\hat{E}$ with probability $1 - \delta$, it requires:
+A simple rewrite of theorem \ref{vc_bound} leads to a very popular equivalent formulation: a \textbf{sample complexity} bound. Sample complexity denotes the number of training examples required for a certain level of generalization performance. Exercising a bit of algebra on the Vapnik-Chervonenkis bound leads to the insight that in order for $E$ to be no more than $\epsilon$ away from $\hat{E}$ with probability $1 - \delta$, it requires:
 $$
 N \geq \frac{1}{\epsilon^2}\ln \frac{4m(2N, \hypspace)}{\delta}
 $$
-We will see several statements of this type throughout this thesis, since the sample complexity when learning multiple tasks is precisely our main concern.
 \subsection{Validation}
 \label{validation}
 Statistical learning theory tells us how to design $\mathcal{H}$ given a dataset by revealing the relationship between $\emperror{\mathcal{D}}{h}$ and $E(h)$. While Vapnik-Chervonenkis analysis gives us a theoretical bound on $E(h)$, we may be interested in getting a concrete empirical estimate of $E$, for example in order to decide whether a system is good enough to be put in to production.
@@ -127,11 +130,11 @@ E(g^-) \leq \valerror{g^-} + O(\frac{1}{\sqrt{V}})
 $$
 The inequality tells us that $V$ should be large in order for $\valerror{g^-}$ to be close to $E(g^-)$. This presents a problem since increasing the size of $V$ decreases the number of examples available for training. Though hard to prove theoretically, it's empirically well documented that more training data lead to lower generalization error \citep{yaser12}. In other words, making $V$ large will lead to a very accurate estimate of a very poor hypothesis.
 \\\\
-\textbf{Cross validation} is a technique that may be used to overcome this dilemma. In this setting, $\mathcal{D}$ is split into $K$ parts called \textbf{folds} each containing $\frac{N}{K}$ samples. $\dtrain$ is then composed of $K - 1$ folds, and the remaining fold is used as $\dval$. This leads to $K$ iterations of the learning procedure, yielding $K$ hypotheses $g^-_k$, and $K$ estimates of generalization error $e_k = \valerror{g^-_k}$. We can then define the cross-validation error as the average of these estimates:
+\textbf{Cross validation} is a technique that may be used to overcome this dilemma. In this setting, $\mathcal{D}$ is split into $K$ parts called \textbf{folds} each containing $\frac{N}{K}$ samples each. $\dtrain$ is then composed of $K - 1$ folds, and the remaining fold is used as $\dval$. This leads to $K$ iterations of the learning procedure yielding $K$ hypotheses $g^-_k$ and $K$ estimates of generalization error $e_k = \valerror{g^-_k}$. We define the cross-validation error as the average of these estimates:
 $$
 E_{cv} = \frac{1}{K}\sum\limits_{k=1}^K e_k
 $$
-We want to know $E$, but it would be almost as useful to know the expected $E$ of our learning system when trained on any dataset $\mathcal{D}$ of size $N$. For this purpose, we can define 
+We want to know $E$, but it would be almost as useful to know the expected $E$ of our learning system when trained on any dataset $\mathcal{D}$ drawn from $P(\vector{x}, \vector{y})$ of size $N$. For this purpose, we can define 
 $$
 \tilde{E}(N) = \mathbb{E}_{\mathcal{D}}[E(g)]
 $$
@@ -141,4 +144,4 @@ $$
 $$
 Since the equality holds for a single estimate, it also holds for the average $E_{cv}$ \citep{yaser12}.
 
-In words, the cross validation error estimates the expected generalization error of the learning system when trained on $N - \frac{N}{K}$ samples. We can control the number of samples available for finding each function $g^-_k$ by increasing $K$, at no cost of estimation accuracy. Increasing $K$ increases computation time however, since we have to search the hypothesis space $K$ times.
+In words, the cross validation error estimates the expected generalization error of the learning system when trained on $N - \frac{N}{K}$ samples. We can control the number of samples available for finding each function $g^-_k$ by increasing $K$, at no cost of estimation accuracy. However, increasing $K$ increases computation time since we have to search the hypothesis space $K$ times.

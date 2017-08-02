@@ -1,12 +1,12 @@
 \section{Learning Algorithm}
 \label{learningAlgorithm}
-Finding a function $h \in \mathcal{H}$ that maximises the likelihood of $\mathcal{D}$ is an optimization problem. Optimization is solved by answering the question: \textit{how does $\hat{E}$ change when we change $h$?} We answer questions of this type with differential calculus. Sadly, there is no known method for finding the $h$ which maximizes the likelihood by analytical differentiation. Neural network optimization is therefore solved using an iterative algorithm called \textbf{gradient descent}, which we describe in this section. We go on to explore an algorithm for computing the gradient of $\hat{E}$ called \textbf{backpropagation}. Finally, we look into \textbf{regularization} which are tools for constraining the learning algorithm in order to avoid overfitting. Lastly, we describe a specific learning algorithm called \textbf{Adam}, an efficient variation on gradient descent.
+Finding a function $h \in \mathcal{H}$ that maximizes the likelihood of $\mathcal{D}$ is an optimization problem. Optimization is solved by answering the question: \textit{how does $\hat{E}$ change when we change $h$?} We answer questions of this type with differential calculus. Sadly, there is no known method for finding the $h$ which maximizes the likelihood by analytical differentiation. Neural network optimization is therefore solved using an iterative algorithm called \textbf{gradient descent}, which we describe in this section. We go on to explore an algorithm for computing the gradient of $\hat{E}$ called \textbf{backpropagation}. Finally, we look into \textbf{regularization} which are tools for constraining the learning algorithm in order to avoid overfitting. Lastly, we describe a specific learning algorithm called \textbf{Adam}, an efficient variation on gradient descent.
 
 \subsection{Gradient Descent}
 \label{gradient_descent}
-We want to find a $h \in \mathcal{H}$ that minimises $\hat{E}$ as described in section \ref{objectiveFunction}. Each $h$ is defined exactly by the weight vector $\mathbf{w}$. $\hat{E}$ can't be minimised analytically, since its derivative with respect to $\mathbf{w}$ is a system of non-linear equations, which in general does not have an analytical solution. We therefore look for $h$ by choosing an initial weight vector $\mathbf{w}_0$, and iteratively reduce $\hat{E}$: In iteration $i$, the weight vector $\mathbf{w}_i$ is found by taking a small step $\eta$ in a direction given by a vector $\mathbf{v}$, or more formally: $\mathbf{w}_i = \mathbf{w}_{i-1} + \eta\mathbf{v}$. The main question is, which direction should we choose? 
+We want to find a $h \in \mathcal{H}$ that minimizes $\hat{E}$ as described in section \ref{objectiveFunction}. Each $h$ is defined exactly by the weight vector $\mathbf{w}$. $\hat{E}$ can't be minimized analytically since its derivative with respect to $\mathbf{w}$ is a system of non-linear equations, which in general does not have an analytical solution \citep{goodfellow16}. We therefore look for $h$ by choosing an initial weight vector $\mathbf{w}_0$, and iteratively reduce $\hat{E}$: In iteration $i$, the weight vector $\mathbf{w}_i$ is found by taking a small step $\eta$ in a direction given by a vector $\mathbf{v}$, or more formally: $\mathbf{w}_i = \mathbf{w}_{i-1} + \eta\mathbf{v}$. The main question is: which direction should we choose? 
 \\\\ 
-$\hat{E}$'s direction of steepest descent at each $\mathbf{w}_i$ is given by the gradient $\nabla\hat{E}$. $\nabla \hat{E}$ is a vector where each component is a partial derivative $\frac{\partial}{\partial w}\hat{E}$ with respect to a weight $w \in \mathbf{w}$:
+$\hat{E}$'s direction of steepest descent at each $\mathbf{w}_i$ is given by the gradient $\nabla\hat{E}$ \citep{yaser12}. $\nabla \hat{E}$ is a vector where each component is a partial derivative $\frac{\partial}{\partial w}\hat{E}$ with respect to a weight $w \in \mathbf{w}$:
 
 \begin{definition}[gradient]
 	\label{gradient}
@@ -15,9 +15,12 @@ $\hat{E}$'s direction of steepest descent at each $\mathbf{w}_i$ is given by the
 	\nabla \hat{E} = \begin{bmatrix} \frac{\partial}{\partial w^{(1)}_{ij}\hat{E}} \\ \\ \vdots \\ \\ \frac{\partial}{\partial w^{(L)}_{ij}}\hat{E}\end{bmatrix}
 	$$
 \end{definition}
-The gradient can be used for computing the rate of change of $\hat{E}$ in the direction of a unit vector $\mathbf{u}$ by taking the dot product $\mathbf{u}^T\nabla \hat{E}$. We would like to know in which direction $\mathbf{u}$ we should change $\mathbf{w}_i$ in order to make $\hat{E}$ as small as possible. The dot product of $\mathbf{u}^T\nabla \hat{E}$ is equal to $|\nabla \hat{E}||\mathbf{u}|\cos \theta$ where $\theta$ is the angle between $\nabla \hat{E}$ and $\mathbf{u}$. The direction $\mathbf{u}$ with the greatest positive rate of change of $\hat{E}$ is the direction in which $\theta = 0\degree$, in other words, the same direction as $\nabla \hat{E}$. The direction with the greatest negative rate of change of $\hat{E}$ is the direction in which $\theta = 180\degree$, in other words, the direction $-\nabla \hat{E}$. This means that we can make $\hat{E}$ smaller by taking a small step $\eta$ in the direction $-\nabla \hat{E}$, such that $\mathbf{w}_i = \mathbf{w}_{i-1} - \eta\nabla\hat{E}$. A small example is given in figure \ref{gradient_descent_example_a} and \ref{gradient_descent_example_b}.
+\noindent
+The gradient can be used for computing the rate of change of $\hat{E}$ in the direction of a unit vector $\mathbf{u}$ by taking the dot product $\mathbf{u}^T\nabla \hat{E}$. We would like to know in which direction $\mathbf{u}$ we should change $\mathbf{w}_i$ in order to make $\hat{E}$ as small as possible. The dot product of $\mathbf{u}^T\nabla \hat{E}$ is equal to $|\nabla \hat{E}||\mathbf{u}|\cos \theta$ where $\theta$ is the angle between $\nabla \hat{E}$ and $\mathbf{u}$. The direction $\mathbf{u}$ with the greatest positive rate of change of $\hat{E}$ is the direction in which $\theta = 0\degree$, in other words, the same direction as $\nabla \hat{E}$. The direction with the greatest negative rate of change of $\hat{E}$ is the direction in which $\theta = 180\degree$, in other words, the direction $-\nabla \hat{E}$. This means that we can make $\hat{E}$ smaller by taking a small step $\eta$ in the direction $-\nabla \hat{E}$ such that $\mathbf{w}_i = \mathbf{w}_{i-1} - \eta\nabla\hat{E}$. A small example is given in figure \ref{gradient_descent_example_a} and \ref{gradient_descent_example_b}.
 \\\\
-One challenge of gradient descent is that $\nabla \hat{E} = \frac{1}{N}\sum_{i=1}^N\nabla e(h(\mathbf{x}_i), \mathbf{y}_i)$ is based on all the examples in $\mathcal{D}$. This means that computing $\nabla \hat{E}$ requires one full iteration over the training set. If the training set is large, this means that every update to the weights $\mathbf{w}$ takes a long time which makes learning slow. \textbf{Stochastic gradient descent} is a common variation on gradient descent which addresses this problem. In stochastic gradient descent, a single training example $(\mathbf{x}_i, \mathbf{y}_i)$ is sampled from $\mathcal{D}$. Instead of updating $\mathbf{w}_i$ by the gradient $-\nabla \hat{E}$ over all the training examples, we update the weights based on the gradient of a single example $\mathbf{w}_i = \mathbf{w}_{i-1}-\eta\nabla e(h(\mathbf{x}_i), \mathbf{y}_i)$. Since each sample in $\mathcal{D}$ can be drawn with probability $\frac{1}{N}$, stochastic gradient descent is identical to gradient descent in expectation:
+One challenge of gradient descent is that $\nabla \hat{E} = \frac{1}{N}\sum_{i=1}^N\nabla e(h(\mathbf{x}_i), \mathbf{y}_i)$ is based on all the examples in $\mathcal{D}$. This means that computing $\nabla \hat{E}$ requires one full iteration over the training set. If the training set is large, this means that every update to the weights $\mathbf{w}$ takes a long time which makes learning slow. \textbf{Stochastic gradient descent} is a common variation on gradient descent which addresses this problem \citep{yaser12}. 
+
+In stochastic gradient descent, a single training example $(\mathbf{x}_i, \mathbf{y}_i)$ is sampled from $\mathcal{D}$. Instead of updating $\mathbf{w}_i$ by the gradient $-\nabla \hat{E}$ over all the training examples, we update the weights based on the gradient of a single example $\mathbf{w}_i = \mathbf{w}_{i-1}-\eta\nabla e(h(\mathbf{x}_i), \mathbf{y}_i)$. Since each sample in $\mathcal{D}$ can be drawn with probability $\frac{1}{N}$, stochastic gradient descent is identical to gradient descent in expectation:
 $$
 \mathbb{E}(-\nabla e(h(\mathbf{x}_i), \mathbf{y}_i)) = \frac{1}{N}\sum\limits_{i=1}^N -\nabla e(h(\mathbf{x}_i), \mathbf{y}_i) = -\nabla\hat{E}
 $$
@@ -32,17 +35,19 @@ $$
 	\label{gradient_descent_example_b}
 \end{figure}
 \noindent
-In traditional gradient descent, $\nabla \hat{E}$ approaches $\vector{0}$ when $\vector{w}_i$ approaches a local or global minimum for $\hat{E}$. This prevents the algorithm from stepping far away from this minimum once it's close to a solution. When using stochastic gradient descent however, each update to the weights is based on just a single example and is therefore noisy, which means that $\nabla e(h(\mathbf{x}_i, \mathbf{y}_i)$ may be large, even if $\vector{w}_i$ is close to a value that minimizes $\hat{E}$. To reduce the noise in the gradient estimate, its common to sample a small mini-batch from $\data$ and perform gradient descent on that. In addition, its common to shrink the learning rate $\eta$ as the algorithm progresses. We will see a strategy for shrinking $\eta$ systematically in the next section.
+In traditional gradient descent, $\nabla \hat{E}$ approaches $\vector{0}$ when $\vector{w}_i$ approaches a local or global minimum for $\hat{E}$. This prevents the algorithm from stepping far away from this minimum once it's close to a solution. When using stochastic gradient descent however, each update to the weights is based on just a single example and is therefore noisy which means that $\nabla e(h(\mathbf{x}_i, \mathbf{y}_i)$ may be large even if $\vector{w}_i$ is close to a value that minimizes $\hat{E}$. 
+
+To reduce the noise in the gradient estimate, it's common to sample a small mini-batch from $\data$ and perform gradient descent on that. In addition, its common to shrink the learning rate $\eta$ as the algorithm progresses to avoid stepping away from a minimum due to the noise in the gradient estimate. We will see a strategy for shrinking $\eta$ systematically in the next section.
 
 \subsection{Adam}
 \label{adam}
-The Adam algorithm is a variation on stochastic gradient descent that attempts to shrink the learning rate $\eta$ automatically in each iteration. Since the learning rate varies from iteration to iteration, we will denote the learning rate in iteration $i$ as $\eta_i$. Moreover, Adam adapts the learning rate for each parameter $w$ individually, by using a learning rate vector $\boldsymbol{\eta}$ instead of a scalar in the update rule, such that $\mathbf{w}_i = \mathbf{w}_{i-1} - \boldsymbol{\eta}_i\nabla e(h(\mathbf{x}_i), \mathbf{y}_i)$
+The Adam algorithm is a variation on stochastic gradient descent that attempts to shrink the learning rate $\eta$ automatically in each iteration \citep{kingma2014}. Since the learning rate varies from iteration to iteration, we will denote the learning rate in iteration $i$ as $\eta_i$. Moreover, Adam adapts the learning rate for each parameter $w$ individually by using a learning rate vector $\boldsymbol{\eta}$ instead of a scalar in the update rule, such that $\mathbf{w}_i = \mathbf{w}_{i-1} - \boldsymbol{\eta}_i\nabla e(h(\mathbf{x}_i), \mathbf{y}_i)$
 \\\\
 Adam uses the following heuristic: the learning rate for parameters $w$ for which $\pderiv{}{w} e(h(\mathbf{x}_i), \mathbf{y}_i)$ is frequently large should decrease more quickly than parameters that consistently have small derivatives. To achieve this, Adam scales $\eta$ by $\vector{v}_i$ such that:
 $$ 
 \vector{v}_i = \beta_1 \vector{v}_{i - 1} + (1 - \beta_1)(\nabla e(h(\mathbf{x}_i, \mathbf{y}_i))^2
 $$
-Where $\vector{v}_0 = \vector{0}$. In words, $\vector{v}_i$ is an exponentially decaying average of past squared gradients, where $\beta_1$ is the decay rate, usually set to a value near $.9$. To cancel the bias introduced by initialising $\vector{v}_i$ to $\vector{0}$, a bias corrected value $\hat{\vector{v}}_i = \vector{v}_i / (1 - \beta_1^i)$ is computed. The learning rate is then computed as:
+Where $\vector{v}_0 = \vector{0}$. In words, $\vector{v}_i$ is an exponentially decaying average of past squared gradients where $\beta_1$ is the decay rate usually set to a value near $.9$. To cancel the bias introduced by initialising $\vector{v}_i$ to $\vector{0}$, a bias corrected value $\hat{\vector{v}}_i = \vector{v}_i / (1 - \beta_1^i)$ is computed. The learning rate is then computed as:
 $$
 \boldsymbol{\eta}_i = \frac{\eta}{\sqrt{{\vector{\hat{v}}_i}} + \epsilon}
 $$
@@ -59,37 +64,37 @@ The full update rule for Adam is thus:
 $$
 \vector{w}_i = \vector{w}_{i - 1} - \frac{\eta}{\sqrt{\vector{\hat{v}}_i} + \epsilon} \vector{\hat{m}}_i
 $$
-Gradient descent gives us an algorithm for minimising $\hat{E}$ using $\nabla\hat{E}$. In the next section we explore an algorithm for computing $\nabla\hat{E}$ called backpropagation.
+Gradient descent and Adam gives us an algorithm for minimizing $\hat{E}$ using $\nabla\hat{E}$. In the next section we explore an algorithm for computing $\nabla\hat{E}$ called backpropagation.
 
 \subsection{Backpropagation}
 We want to compute $\nabla\hat{E}$ in order to use gradient descent to make $\hat{E}$ small. Because of the sum and product rules of differential calculus, we can simplify our analysis by computing $\nabla\hat{E}$ of a single example $(\mathbf{x}, \mathbf{y})$:
 $$
 \nabla \hat{E} = \nabla \frac{1}{N}\sum e(h(\mathbf{x}_i), \mathbf{y}_i) = \frac{1}{N}\sum \nabla e(h(\mathbf{x}_i), \mathbf{y}_i)
 $$
-In our explanation we will use the cross-entropy error $e(h(\mathbf{x}), \mathbf{y}) = -\sum_{c=1}^Cy_c \ln h(\mathbf{x})_c$ as an example. 
+In our explanation, we consider a neural network $h$ that uses soft-max activation in its output layer and the cross-entropy error $e(h(\mathbf{x}), \mathbf{y}) = -\sum_{c=1}^Cy_c \ln h(\mathbf{x})_c$ as an example. 
 \\\\
-If we can derive a generic formula for a single component $\frac{\partial e}{\partial w^{(l)}_{ij}}$ of $\nabla e$, we can compute all of $\nabla e$. The partial derivative is asking the question \textit{how does $e$ change if we change $w^{(l)}_{ij}$?} The weight $w^{(l)}_{ij}$ influences $e$ only through the activation $a^{(l)}_{j}$. We can therefore decompose the derivative using the chain rule of calculus:
+If we can derive a generic formula for a single component $\frac{\partial e}{\partial w^{(l)}_{ij}}$ of $\nabla e$, we can compute all of $\nabla e$. The partial derivative is asking the question \textit{how does $e$ change if we change $w^{(l)}_{ij}$?} The weight $w^{(l)}_{ij}$ influences $e$ only through the activation $a^{(l)}_{j}$. We can therefore decompose the derivative using the chain rule of calculus \citep{yaser12}:
 $$
 \frac{\partial e}{\partial w^{(l)}_{ij}} = \frac{\partial e}{\partial a^{(l)}_j} \frac{\partial a^{(l)}_j}{\partial w^{(l)}_{ij}}
 $$
-The term $\frac{\partial a^{(l)}_j}{\partial w^{(l)}_{ij}}$ is easy to compute, because $a^{(l)}_{j}$ depends directly on $w^{(l)}_{ij}$ in a simple sum:
+The term $\frac{\partial a^{(l)}_j}{\partial w^{(l)}_{ij}}$ is easy to compute because $a^{(l)}_{j}$ depends directly on $w^{(l)}_{ij}$ in a simple sum:
 $$
 \frac{\partial a^{(l)}_j}{\partial w^{(l)}_{ij}} = \frac{\partial}{\partial w^{(l)}_{ij}} \sum\limits_{k=0}^{d^{(l-1)}} w^{(l)}_{kj} x^{(l-1)}_{k} = x^{l-1}_{i}
 $$
 \\\\
 The term $\frac{\partial e}{\partial a^{(l)}_j}$ is more involved since $a^{(l)}_j$ influences $e$ through units in layers $m > l$ that directly or indirectly receives input from unit $j$ in layer $l$. Computing $\frac{\partial e}{\partial a^{(l)}_j}$ therefore requires a number of applications of the chain rule that depend on the number of layers between $a^{(l)}_j$ and the output. The backpropagation algorithm solves this problem by defining $\delta^{(l)}_j = \frac{\partial e}{\partial a^{(l)}_j}$, and deriving a recursive formula for $\delta^{(l)}_{j}$ that relates it to $\delta^{(l-1)}_j$.
 
-We start by computing $\delta^{(L)}_j$, since the activation in the output layer $a^{(L)}_j$ influences $e$ directly and can therefore be used as a base case for the recursion, that doesn't depend on any other $\delta^{(l)}_j$
+We start by computing $\delta^{(L)}_j$ since the activation in the output layer $a^{(L)}_j$ influences $e$ directly and can therefore be used as a base case for the recursion that doesn't depend on any other $\delta^{(l)}_j$
 \\\\
 Lets start by rewriting $e$ in terms of the output of layer $L$:
 $$
 e(h(\mathbf{x}), \mathbf{y}) = - \sum\limits_{c=0}^C y_c \ln x^{(L)}_c
 $$
-Where $x^{(L)}_c$ is the output of unit $c$ in the output layer. When using soft-max activation in the output layer would mean that $x^{(L)}_c = \sigma(\mathbf{a}^{(L)})_c = \frac{\me^{a^{(l)}_c}}{\sum_{i=1}^C\me^{a^{(l)}_i}}$.
+Where $x^{(L)}_c$ is the output of unit $c$ in the output layer. Using soft-max activation in the output layer would mean that $x^{(L)}_c = \sigma(\mathbf{a}^{(L)})_c = \frac{\me^{a^{(l)}_c}}{\sum_{i=1}^C\me^{a^{(l)}_i}}$.
 \\\\
 Since $a^{(L)}_j$ affects $e$ through the soft-max activation, we will need to compute the derivative of the soft-max activation with respect to the activation $\frac{\partial x^{(L)}_i}{\partial a^{(L)}_j}$ in order to compute $\delta^{(L)}_j$. This derivative is different depending on which output $x^{(L)}_i$, and which activation $a^{(L)}_j$ we consider.
 
-If $i = j$, that is, we are taking the derivative of the output of a unit with respect to its activation, we get:
+If $i = j$, that is: we are taking the derivative of the output of a unit with respect to its activation, we get:
 \begin{align*}
 	\frac{\partial x^{(L)}_i}{\partial a^{(L)}_i} &= \frac{\partial}{\partial a^{(L)}_i} \frac{\me^{a^{(L)}_i}}{\sum\limits_{c=1}^C \me^{a^{(L)}_c}}
 	= \frac{\me^{a^{(L)}_i}\sum\limits_{c=1}^C \me^{a^{(L)}_c} - \me^{a^{(L)}_i}\me^{a^{(L)}_i}}{\left( \sum\limits_{c=1}^C \me^{a^{(L)}_c} \right)^2}
@@ -117,7 +122,7 @@ Armed with $\frac{\partial x^{(L)}_i}{\partial a^{(L)}_j}$, we can go on to comp
 \end{align*}
 Finally, we see that the derivative of the error with respect to the activation of unit $j$ in the output layer is simply $x^{(L)}_j - y_j$.
 \\\\
-Having derived a formula for $\delta^{(L)}_j$, we can go on to recursively derive $\delta^{(l-1)}_i$. Since $e$ depends on $a^{(l-1)}_i$ only through $x^{(l-1)}_i$, we can use the chain rule to decompose $\delta^{(l-1)}_i$:
+Having derived a formula for $\delta^{(L)}_j$ we can go on to recursively derive $\delta^{(l-1)}_i$. Since $e$ depends on $a^{(l-1)}_i$ only through $x^{(l-1)}_i$, we can use the chain rule to decompose $\delta^{(l-1)}_i$:
 $$
 \delta^{(l-1)}_i = \frac{\partial e}{\partial a^{(l-1)}_i} = \frac{\partial e}{\partial x^{(l-1)}_i} \frac{\partial x^{(l-1)}_i}{\partial a^{(l-1)}_i}
 $$
@@ -140,14 +145,17 @@ To summarize, we now have a recursive formula for every weight component of the 
 $$
 \pderiv{e}{w^{(l)}_{ij}} = x^{(l-1)}_i \delta^{(l)}_j,\quad \delta^{(l)}_j = \sigma'(a^{(l)}_i) \sum\limits_{i=1}^{d^{(l+1)}} w^{(l+1)}_{ij} \delta^{(l+1)}_j
 $$
+This allows us to compute $\nabla\hat{E}$ and use to search $\mathcal{H}$ iteratively for a function $h$ that minimizes $\hat{E}$. In the next section, we consider regularization techniques that restrict gradient descent in ways the prevent overfitting.
 
 \subsection{Regularization}
 \label{regularisation}
-In section \ref{statistical_learning_theory} we saw that the distance between $E$ and $\hat{E}(h, \mathcal{D})$ is bounded by, among other things, a function of the diversity of $\mathcal{H}$. In this section we discuss techniques for restricting the learning algorithm to search only in subsets of $\mathcal{H}$, with the aim of reducing $E$. These techniques are collectively known as regularization.
+In section \ref{statistical_learning_theory} we saw that the distance between $E$ and $\hat{E}(h, \mathcal{D})$ is bounded by, among other things, a function of the diversity of $\mathcal{H}$. In this section we discuss techniques for restricting the learning algorithm to search only in a subset of $\mathcal{H}$ with the aim of reducing $E$. These techniques are collectively known as regularization.
 \\\\
-For a $\mathcal{H}$ thats parameterized by a weight vector $\mathbf{w}$ such as the hypothesis space given by a particular neural network architecture, we can limit the region of weight space that our learning algorithm is allowed to consider by imposing the constraint that the norm of $\mathbf{w}$ must be smaller than some constant $C$. This has the effect that the weights can be selected only from a limited spherical region around the origin. This reduces the effective number of different hypotheses available during learning, and the Vapnik-Chervonenkis bound gives us confidence that this should improve generalisation.
+For a $\mathcal{H}$ thats parameterized by a weight vector $\mathbf{w}$ such as the hypothesis space given by a particular neural network architecture, we can limit the region of weight space that our learning algorithm is allowed to consider by imposing the constraint that the norm of $\mathbf{w}$ must be smaller than some constant $C$. This has the effect that the weights can be selected only from a limited spherical region around the origin. This reduces the effective number of different hypotheses available during learning, and the Vapnik-Chervonenkis bound gives us confidence that this should improve generalization.
 \\\\
-If the weights $\mathbf{w}^*$ that minimises the unconstrained training error $\hat{E}(\mathbf{w}, \mathcal{D}_{train})$ lie outside this ball, then the weights $\bar{\mathbf{w}}$ that minimises $\hat{E}$ while still satisfying the constraint $\bar{\mathbf{w}}^T\bar{\mathbf{w}} \leq C$, must have norm equal to $C$, in other words lie on the surface of the sphere with radius $C$. The normal vector to this surface at any $\mathbf{w}$ is $\mathbf{w}$ itself. At $\bar{\mathbf{w}}$, the normal vector must point in the exact opposite direction of $\nabla \hat{E}$, since otherwise $\nabla \hat{E}$ would have a component along the border of the constraint sphere, and we could decrease $\hat{E}$ by moving along the border of the sphere in the direction of $\nabla \hat{E}$ and still satisfy the constraint. In other words, the following equality holds for $\bar{\mathbf{w}}$:
+If the weights $\mathbf{w}^*$ that minimizes the unconstrained training error $\hat{E}(\mathbf{w}, \mathcal{D}_{train})$ lie outside this ball, then the weights $\bar{\mathbf{w}}$ that minimizes $\hat{E}$ while still satisfying the constraint $\bar{\mathbf{w}}^T\bar{\mathbf{w}} \leq C$ must have norm equal to $C$. In other words, these weights lie on the surface of the sphere with radius $C$. The normal vector to this surface at any $\mathbf{w}$ is $\mathbf{w}$ itself. At $\bar{\mathbf{w}}$ the normal vector must point in the exact opposite direction of $\nabla \hat{E}$, since otherwise $\nabla \hat{E}$ would have a component along the border of the constraint sphere, and we could decrease $\hat{E}$ by moving along the border of the sphere in the direction of $\nabla \hat{E}$ and still satisfy the constraint \citep{yaser12}. 
+
+In other words, the following equality holds for $\bar{\mathbf{w}}$:
 $$
 \nabla \trerror{\bar{\vector{w}}} = -2\lambda\bar{\mathbf{w}}
 $$
@@ -165,11 +173,11 @@ This particular form of regularization where a penalty on the norm of the weight
 $$
 \vector{w}_i = \vector{w}_{i-1} - \eta \nabla \augerror = \vector{w}_{i-1}(1 - 2\eta\lambda) - \eta \nabla \trerror{\vector{w}_{i-1}}	
 $$
-In words, the added norm penalty of $\augerror$ has the effect of pulling the vector $\vector{w}_i$ towards $\vector{0}$, by multiplying by $1 - 2\eta\lambda$ in each iteration. In this way, weight decay is limiting the region that gradient descent can explore in a finite number of iterations, and is therefore limiting the diversity of $\hypspace$.
+In words, the added norm penalty of $\augerror$ has the effect of pulling the vector $\vector{w}_i$ towards $\vector{0}$ by multiplying by $1 - 2\eta\lambda$ in each iteration. In this way, weight decay is limiting the region that gradient descent can explore in a finite number of iterations, and is therefore limiting the effective diversity of $\hypspace$.
 \\\\
-\textbf{Early stopping} is a form of regularization for iterative optimization methods that is particularly straight-forward to implement, and as an added bonus gives a reasonable stopping criterion for gradient descent. It works very similarly to weight decay, by limiting the region of $\hypspace$ that can be explored in a finite number of iterations.
+\textbf{Early stopping} is a form of regularization for iterative optimization methods that is particularly straight-forward to implement, and as an added bonus gives a reasonable stopping criterion for gradient descent. It works very similarly to weight decay:q by limiting the region of $\hypspace$ that can be explored in a finite number of iterations.
 
-For a single iteration $i$ of gradient descent with step size $\eta$, gradient descent explores all weights in a radius of $\eta$ around $\vector{w}_i$, since a step in the direction of the negative gradient minimizes $\trerror{\vector{w}}$ among all weights with $||\vector{w} - \vector{w}_i|| \leq \eta$. In other words, we can think of an effective hypothesis space $\hypspace_i$ for each iteration thats limited by $\eta$:
+For a single iteration $i$ of gradient descent with step size $\eta$, gradient descent explores all weights in a radius of $\eta$ around $\vector{w}_i$ since a step in the direction of the negative gradient minimizes $\trerror{\vector{w}}$ among all weights with $||\vector{w} - \vector{w}_i|| \leq \eta$ \citep{yaser12}. In other words, we can think of an effective hypothesis space $\hypspace_i$ for each iteration thats limited by $\eta$:
 $$
 \hypspace_i = \{\vector{w} \mid ||\vector{w} - \vector{w}_i|| \leq \eta\}
 $$
@@ -178,12 +186,13 @@ $$
 \hypspace = \bigcup\limits_{i = 1}^I \hypspace_i
 $$
 \\\\
-As $I$ increases, $\hypspace$ becomes more diverse, and Vapnik-Chervonenkis theory tells us that the risk of selecting $\vector{w} \in \hypspace$ that fits the noise in $\data$ increases. In practice, it is consistently observed that both $E(\vector{w_i})$ and $\trerror{\vector{w}_i}$ is decreased as a function of $i$, until a certain point $i^*$, after which only $\trerror{\vector{w}_i}$ is decreased, as a consequence of fitting the noise in $\data$, which causes $E(\vector{w}_i)$ to increase. See figure \ref{early_stopping} for a visualization.
+As $I$ increases, $\hypspace$ becomes more diverse, and Vapnik-Chervonenkis theory tells us that the risk of selecting $\vector{w} \in \hypspace$ that fits the noise in $\data$ increases. In practice, it is consistently observed that both $E(\vector{w_i})$ and $\trerror{\vector{w}_i}$ is decreased as a function of $i$ until a certain point $i^*$ after which only $\trerror{\vector{w}_i}$ is decreased as a consequence of fitting the noise in $\data$ which causes $E(\vector{w}_i)$ to increase. See figure \ref{early_stopping} for a visualization.
+\\\\
 \begin{figure}
 	\input{img/early_stopping.pgf}
 	\caption{Typical behavior of $E$ and $\hat{E}$ as a function of the number of iterations $i$ of gradient descent. Both errors are reduced until a point $i^*$ beyond which the training error is reduced, but generalization error increases.}
 	\label{early_stopping}
 \end{figure}
-When using early stopping, we treat $i^*$ the optimal number of iterations of gradient descent as a parameter we want to estimate. This is done through validation, as described in section \ref{validation}. Specifically, after each gradient descent iteration, $\hat{E}(\vector{w}_i, \data_{val})$ is computed as an estimate of $E$. When this quantity is no longer improving, gradient descent is halted, and the the parameters $\vector{w}_{i^*}$ are returned.
-\\\\
+When using early stopping, we treat the optimal number of iterations of gradient descent $i^*$ as a parameter we want to estimate. This is done through validation as described in section \ref{validation}. Specifically, after each gradient descent iteration $\hat{E}(\vector{w}_i, \data_{val})$ is computed as an estimate of $E$. When this quantity is no longer improving, gradient descent is halted and the the parameters $\vector{w}_{i^*}$ are returned.
+
 When using stochastic gradient descent, $\hat{E}(\vector{w}_i, \data_{val})$ may vary slightly from iteration to iteration due to the noise introduced by the stochastic gradient. This means that the simple heuristic stopping criterion described above may fail when using stochastic gradient descent. A so called \textbf{patience} parameter is a simple solution to this problem. When using patience $p$, stochastic gradient descent is only halted when no improvement on $\hat{E}(\vector{w}_i, \data_{val})$ has been observed for $p$ iterations.

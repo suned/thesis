@@ -1,6 +1,6 @@
 \section{Deep Multi-Task Learning}
 \label{deep_multi-task_learning}
-Neural networks have the advantage of being easy to adapt from single-task learning to multi-task learning. The simplest way of turning two single task learning problems into a multi-task learning problem is by hard weight sharing of the weights of layers of a neural network architecture between learning tasks and learning them simultaneously \citep{caruana1997}. As an example, consider figure \ref{no_weight_sharing} and \ref{weight_sharing}.
+Neural networks have the advantage of being easy to adapt from single-task learning to multi-task learning. The simplest way of turning two single task learning problems into a multi-task learning problem using neural networks is by hard weight sharing of a subset of the weights of the networks for the learning tasks and learning them simultaneously \citep{caruana1997}. As an example, consider figure \ref{no_weight_sharing} and \ref{weight_sharing}.
 \\\\
 \begin{figure}[h]
 	\centering
@@ -96,7 +96,7 @@ Neural networks have the advantage of being easy to adapt from single-task learn
 			\draw (sigma2) edge (out2);
 			\draw (sigma3) edge (out2);
 	\end{tikzpicture}
-	\caption{Visual representation multi-task learning with neural networks. The weights of the first layer is shared between the two tasks.}
+	\caption{Visual representation multi-task learning with neural networks. The weights of the hidden layer is shared between the two tasks.}
 	\label{weight_sharing}
 \end{figure}
 \noindent
@@ -142,4 +142,4 @@ Recall that the goal in bias learning is to select a vector $\vector{h}$ of M hy
 $$
 N \geq O\left( \frac{1}{\epsilon^2}\left( \frac{W}{M} + d^{(2)} + 1\right)\log \frac{1}{\epsilon} + \frac{1}{M}\log\frac{1}{\delta} \right)
 $$
-Ignoring the confidence parameters $\epsilon$ and $\delta$, the sample complexity bound tells us that learning complicated neural network representations where $d^{(1)}$ and $d^{(2)}$ and therefore also $W$ are large, is harder than learning simple representations in the sense that it requires more samples to succeed. The benefit gained by multi-task learning is that we can reduce $N$ by increasing $M$, an option we don't have in the single task learning setting. This means we can afford to learn more complicated representations in the hope that this can lead to lower training error and still have high confidence that generalization is possible by increasing $M$.
+Ignoring the confidence parameters $\epsilon$ and $\delta$, the sample complexity bound tells us that learning complicated neural network representations where $d^{(1)}$ and $d^{(2)}$ and therefore also $W$ are large, is harder than learning simple representations in the sense that it requires more samples to succeed. The benefit gained by multi-task learning is that we can reduce $N$ by increasing $M$, an option we don't have in the single task learning setting. This means we can afford to learn more complicated representations in the hope that this can lead to lower training error for one or more tasks and still have high confidence that generalization is possible by increasing $M$.

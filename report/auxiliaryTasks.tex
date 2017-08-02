@@ -1,13 +1,13 @@
 \section{Auxiliary Tasks}
 \label{auxiliary_tasks}
-Here we describe each of the datasets used as auxiliary tasks in our multi-task learning experiment. We focus on auxiliary tasks for which there exists standard neural network architectures that don't require bespoke components which may make weights sharing impractical. We describe the goal of each task in some detail in order to reason about its potential benefit as an auxiliary task for SemEval 2010 Task 8.
+Here we describe each of the datasets used as auxiliary tasks in our multi-task learning experiment. We focus on auxiliary tasks for which there exists well documented neural network architectures that don't require bespoke components which may make deep multi-task learning by hard weight sharing impractical. We describe the goal of each task in some detail in order to reason about its potential benefit as an auxiliary task for SemEval 2010 Task 8.
 
 \subsection{ACE 2005 Relations}
 Intuitively, we expect that a feature transformation in the early layers of a neural network that's useful for one relation classification task should also be useful to another, assuming the relations of interest in one task are semantically related to the relations in another.
 
-We therefore test the usefulness of incorporating an auxiliary relation extraction task, as measured by generalization error on the SemEval dataset. Next to SemEval, the ACE 2005 relation classification dataset is the most widely used in contemporary literature  \citep{walker2006}. Unlike the SemEval 2010 dataset, the ACE 2005 relation classification task is concerned with identifying relations between named entities. Specifically, the relations in the ACE 2005 dataset are defined between the entity types: person, organization, location, facility, weapon, vehicle and geo-political entity. Unlike the SemEval annotation process however, the annotation guide for ACE 2005  contains no restrictions on the complexity of the sentences in terms of dependence on discourse knowledge or sentential clauses.
+We therefore test the usefulness of incorporating an auxiliary relation extraction task as measured by generalization error on the SemEval dataset. Next to SemEval, the ACE 2005 relation classification dataset is the most widely used in contemporary literature  \citep{walker2006}. Unlike the SemEval 2010 dataset, the stated goal of the ACE 2005 relation classification task is to identify relations between named entities. Specifically, the relations in the ACE 2005 dataset are defined between the entity types: person, organization, location, facility, weapon, vehicle and geo-political entity. Unlike the SemEval annotation process however, the annotation guide for ACE 2005  contains no restrictions on the complexity of the sentences in terms of dependence on discourse knowledge or sentential clauses.
 \\\\
-The ACE 2005 dataset contains 8,365 english sentences collected from various sources such as transcribed news broadcasts and phone conversations, as well as Usenet discussion forums and Newswire. Each sentence is annotated with exactly one of the following relations:
+The ACE 2005 relation classification dataset contains 8,365 english sentences collected from various sources such as transcribed news broadcasts and phone conversations, as well as Usenet discussion forums and Newswire. Each sentence is annotated with exactly one of the following relations:
 \begin{labeling}{Physical}
 	\item \textbf{Physical} Two entities are physically related. Example: \textit{[Donald Trump] lives in [The White House].}
 	\item \textbf{Part-Whole} One entity constitutes part of another. Example: \textit{[Gibraltar] is territory of the [UK].}
@@ -18,14 +18,12 @@ The ACE 2005 dataset contains 8,365 english sentences collected from various sou
 \end{labeling}
 In truth, each of the relations above are further sub-categorized in the ACE 2005 corpus. For example, the \textit{Person-Social} relation is further subcategorized into \textit{Family}, \textit{Business} and \textit{Lasting-Personal} relations. For simplicity, we pursue the task of prediction only the top level relation classes enumerated above.
 \\\\
-There is clear semantic overlap between the relation categories of the SemEval dataset and the ACE dataset, for example for the categories \textit{Agent-Artifact} and \textit{Physical} in the ACE corpus and \textit{Agent-Artifact} and \textit{Entity-Origin} in the SemEval corpus. We can speculate that a neural network representation that's useful for one task may be useful for the other which may lead to improved generalization error on the target task. 
-
-Specifically, the first layer of a neural network for a natural language processing task is usually a word embedding layer which maps words into word-vectors that encode semantic similarities between words. We can speculate that if a word is highly informative for predicting the \textit{Agent-Artifact} relation in the ACE corpus, this will be encoded in the word embedding or a neural unit on top of the word embedding through neural network training, and can eventually benefit the SemEval task if this representation is shared between them.
+There is clear semantic overlap between the relation categories of the SemEval dataset and the ACE dataset, for example for the categories \textit{Agent-Artifact} and \textit{Physical} in the ACE corpus and \textit{Instrument-Agency} and \textit{Entity-Origin} in the SemEval corpus. We can speculate that a neural network representation that's useful for one task may be useful for the other which may lead to improved generalization error on the target task.
 
 \subsection{CONLL2000 Part-of-Speech}
 Part-of-speech tagging is the task of assigning part-of-speech tags such as noun, verb etc. to word tokens \citep{jurafsky09}. Part-of-speech tags are known to be a useful input feature for a number of other supervised machine learning systems for natural language processing tasks, here-among named entity recognition and relation extraction. This is believed to be the case since word classes are highly informative of a word's semantic role in a sentence \citep{jurafsky09}.
 \\\\
-Several part-of-speech tagging schemes exists. The universal tag set is a simple and commonly used scheme which contains 12 different tags:
+Several part-of-speech tagging schemes exists. The universal tag-set is a simple and commonly used scheme which contains 12 different tags:
 \begin{description}[labelindent=4em,leftmargin=4em]
 	\item [VERB] Verbs (all tenses and modes)
 	\item [NOUN] Nouns (common and proper)
@@ -41,7 +39,8 @@ Several part-of-speech tagging schemes exists. The universal tag set is a simple
 	\item [.] Punctuation
 \end{description}
 \noindent
-Part-of-speech tagging can be seen as sequence labeling problem. The goal is to assign a tag to each token in a sentence. For example:
+Part-of-speech tagging can be seen as sequence labeling problem. The goal is to assign a tag to each token in a sentence. See for example figure \ref{pos}.
+\\\\
 \begin{figure}[h!]
 	\begin{center}
 		\begin{tabular}{c c c c c c c c}
@@ -52,20 +51,19 @@ Part-of-speech tagging can be seen as sequence labeling problem. The goal is to 
 	\caption{A sentence tagged with universal part-of-speech tags.}
 	\label{pos}
 \end{figure}
-\\\\
 The CONLL2000 dataset was produced as a shared task for the year 2000 Conference on Computational Natural Language Learning \citep{kimsang2000}. It contains 10,948 sentences with 259,104 tokens from the Wall Street Journal section of the Penn Treebank \citep{marcus1999}. The part-of-speech tag for each token is supplied not by a human annotator, but from an automatic tagging system called the Brill tagger \citep{brill1992}.
 \\\\
-We speculate that a neural network representation that's useful for part-of-speech tagging will also be useful for relation classification. In particular, if word vectors or neural network features encode information about part-speech-tags it may help to resolve ambiguity for words that are crucial for identifying semantic relations, such as  words that are verbs in some contexts but nouns in others.
+We speculate that a neural network representation that's useful for part-of-speech tagging will also be useful for relation classification. In particular, if word vectors or neural network features encode information about part-of-speech-tags it may help to resolve ambiguity for words that are crucial for identifying semantic relations, such as  words that are verbs in some contexts but nouns in others.
 
 \subsection{CONLL2000 Chunking}
 Assigning structure to a sentence is generally known as parsing. Syntactic parsing is a fundamental task in natural language processing which involves segmenting a sentence into a hierarchical structure that captures its syntactic elements \citep{jurafsky09}. Consider figure \ref{parse_tree} as an example.
 \begin{figure}[h]
 	\Tree [.S [.NP [.PRON \textit{I} ] ] [.VP [.V \textit{shot} ] [.NP [.DET \textit{an} ] [.NOUN \textit{elephant} ] ] \qroof{in my pajamas}.PP ] ]
-	\caption{Syntactic parse tree for the sentence: \emph{I shot an elephant in my pajamas.}}
+	\caption{Syntactic parse tree for the sentence: \emph{I shot an elephant in my pajamas.} The parse tree captures the fact that the sentence is composed from a noun phrase (NP) followed by a verb phrase (VP) followed by a prepositional phrase (PP).}
 	\label{parse_tree}
 \end{figure}
 \\\\
-Many practical applications do not require full syntactic parses. \textbf{Chunking} is a simpler partial parsing technique that can often be used as an alternative. The goal of chunking is to identify the flat, non-overlapping parts of a sentence that constitute its major non-recursive phrase structures. Se for example figure \ref{chunking}.
+Many practical applications do not require full syntactic parses. \textbf{Chunking} is a simpler partial parsing technique that can often be used as an alternative \citep{jurafsky09}. The goal of chunking is to identify the flat, non-overlapping parts of a sentence that constitute its major non-recursive phrase structures. Se for example figure \ref{chunking}.
 \begin{figure}
 	\centering
 	\begin{tabular}{c c c c c c c c}
@@ -78,10 +76,14 @@ Many practical applications do not require full syntactic parses. \textbf{Chunki
 \\\\
 The CONLL2000 dataset is annotated with chunking information in the BIO-labelling scheme introduced in section \ref{named_entity_recognition} in addition to part-of-speech tags.
 \\\\
-A neural network representation that's useful for predicting syntactic chunks may benefit a relation classification task since the syntactic structure of a sentence is highly informative for how nominals, including named entities, are semantically related to each other. For example, in order to determine whether the relationship between \textit{The Ford Motor Company} and \textit{Dearborn, Michigan} in the sentence \textit{The Ford Motor Company produces cars in Dearborn, Michigan} is \textit{Entity-Origin} and not for example \textit{Product-Producer}, it's useful to know that \textit{cars} is a noun-phrase where as \textit{Dearborn, Michigan} is prepositional phrase, and therefore not the object of \textit{produces}.
+A neural network representation that's useful for predicting syntactic chunks may benefit a relation classification task since the syntactic structure of a sentence is highly informative for how nominals, including named entities, are semantically related to each other. For example, in order to determine whether the relationship between \textit{The Ford Motor Company} and \textit{Dearborn, Michigan} in the sentence 
+\begin{quote}
+\textit{The Ford Motor Company produces cars in Dearborn, Michigan}	
+\end{quote}
+is \textit{Entity-Origin} and not for example \textit{Product-Producer}, it's useful to know that \textit{cars} is a noun-phrase whereas \textit{Dearborn, Michigan} is a prepositional phrase, and therefore not the object of \textit{produces}.
 
 \subsection{GMB Named Entity Recognition}
-We described the named entity recognition problem in section \ref{named_entity_recognition}. Groningen Meaning Bank is a corpus annotated with various semantic information such as named entity information, developed at University of Groningen \citep{basile2012}. The corpus contains 62,010 sentences annotated with the following named entity types:
+We described the named entity recognition problem in section \ref{named_entity_recognition}. Groningen Meaning Bank is a corpus annotated with various semantic information such as named entity information developed at University of Groningen \citep{basile2012}. The corpus contains 62,010 sentences annotated with the following named entity types:
 
 \begin{description}[labelindent=4em, leftmargin=4em]
 	\item [Person] Individuals that are human or have human characteristics, such as divine entities.
@@ -94,4 +96,8 @@ We described the named entity recognition problem in section \ref{named_entity_r
 	\item [Time] References to certain temporal entities that have a name, such as the days of the week and months of a year.
 \end{description}
 \noindent
-Even though SemEval 2010 Task 8 is not explicitly concerned with classifying relationships between named entities, we can speculate that neural network features that are useful for predicting named entity types is also useful for predicting semantic relations for the SemEval task. For example, a representation that predicts that \textit{forest} is more likely to be a location than a person in the sentence \textit{there are many trees in the forest} is likely to be useful by increasing confidence for appropriate relation types for locations.
+Even though SemEval 2010 Task 8 is not explicitly concerned with classifying relationships between named entities, we can speculate that neural network features that are useful for predicting named entity types is also useful for predicting semantic relations for the SemEval task. For example, a representation that predicts that \textit{forest} is more likely to be a location than a person in the sentence
+\begin{quote}
+\textit{there are many trees in the forest}	
+\end{quote}
+is likely to be useful by increasing confidence for appropriate relation types for locations.

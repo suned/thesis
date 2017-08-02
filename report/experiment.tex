@@ -1,7 +1,9 @@
 \chapter{Experiment}
-In this section we explain our experimentation with multi-task learning for relation classification. We begin by describing related work on deep multi-task learning for natural language processing tasks and relation extraction. Our focus is to investigate the impact of multi-task learning on generalization error on a target task introduced in the first section. We continue by describing each auxiliary task. Finally, we describe the neural network architecture and algorithm used for generating empirical data.
+In this section we explain our experimentation with multi-task learning for relation classification. We begin by describing related work on deep multi-task learning for natural language processing tasks and relation extraction. We focus on papers that have had a direct impact on architectural and algorithmic choices in our own experimentation. We then describe in some detail the benchmark relation classification dataset which will act as our target task. We continue by describing each auxiliary task used in our experiments. Finally, we describe the target and auxiliary neural network architecture and algorithm used to jointly train and test them.
 \input{relatedWork}
 \input{targetTask}
 \input{auxiliaryTasks}
 \input{networkArchitecture}
 \input{algorithm}
+
+\section{Summary}

@@ -12,9 +12,9 @@ In practical applications involving computers, $f$ and $k$ are discrete, and the
 $$
 (f * k)(x) = \sum\limits_{y=-\infty}^\infty f(y)k(x - y)
 $$
-Most functions in practical applications of convolutions represent signals such as images, sound or text, which are only defined over a limited range of indices $x$. In these cases it's assumed that whenever $x$ is beyond the domain of $f$ or $k$, the output of either function is 0.
+Most functions in practical applications of convolutions represent signals such as images, sound or text, which are only defined over a limited range of indices $x$. In these cases, it's assumed that whenever $x$ is beyond the domain of $f$ or $k$ the output of either function is 0.
 \\\\
-We can think of a convolution as a weighted sum of the output of $f$ where the output of $k$ acts as the weights. This view of convolution is used heavily in signal processing applications where $k$ is chosen to produce certain properties in the convolution output, such as reducing noise in $f$. In this setting $k$ is often referred to as a \textbf{kernel}. As an example consider the noisy signal convolved with a gaussian kernel in figure \ref{gaussian_convolution}.
+We can think of a convolution as a weighted sum of the output of $f$ where the output of $k$ acts as the weights. This view of convolution is used heavily in signal processing applications where $k$ is chosen to produce certain properties in the convolution output such as reducing noise in $f$. In this setting $k$ is often referred to as a \textbf{kernel}. As an example, consider the noisy signal convolved with a gaussian kernel in figure \ref{gaussian_convolution}.
 
 \begin{figure}
 	\centering
@@ -32,7 +32,7 @@ We can think of a convolution as a weighted sum of the output of $f$ where the o
 
 The kernel $k$ can also act as a \textbf{feature detector}. When the output of $f$ is closely correlated with the output of $k$, the output of the convolution spikes. See for example figure \ref{feature_detector}.
 \\\\
-\textbf{Convolutional neural networks} are neural networks that take advantage of convolutions as feature detectors. By arranging the layers and weights in the network in specific ways, we can construct a network such that the output of each layer $l$ is the output of layer $l - 1$ convolved with a kernel $k$, where the weights of $k$ are exactly the neural network weights connecting the units in layer $l$ and $l - 1$.
+\textbf{Convolutional neural networks} are neural networks that take advantage of convolutions as feature detectors \citep{lecun1989}. By arranging the layers and weights in the network in specific ways, we can construct a network such that the output of each layer $l$ is the output of layer $l - 1$ convolved with a kernel $k$, where the weights of $k$ are exactly the neural network weights connecting the units in layer $l$ and $l - 1$.
 
 Specifically, the weights connecting layers $l$ and $l - 1$ in a convolutional neural network should be arranged such that they are:
 
@@ -41,7 +41,7 @@ Specifically, the weights connecting layers $l$ and $l - 1$ in a convolutional n
 	\item [\textbf{shared}] the weights connecting units in layer $l$ and $l - 1$ are shared across the layer, in the same way that the same kernel weights are re-used around every index of $f$. See figure \ref{convolutional_network}.
 \end{labeling}
 
-These restrictions on the network architecture reduces the number of unique weights of the model. This has the effect of reducing both the memory requirements of storing the network, but also limits the number of operations required to compute the output of the network for a given input.
+These restrictions on the network architecture reduces the number of unique weights of the model. This improves the statistical efficiency of these types of models, i.e reduces the complexity of the induced hypothesis space \citep{goodfellow16}. Moreover, the reduction in the effective number of parameters has the effect of reducing both the memory requirements of storing the network, but also limits the number of operations required to compute the output of the network for a given input.
 \\\\
 Intuitively, the output at each unit $u$ in $l$ in a convolutional layer indicates how strongly the feature detected by the kernel given by its connecting weights is present in the output of units that $u$ connects to in layer $l - 1$. Since the weights are learned by gradient descent, the feature detected by units in layer $l$ is learnt as well.
 
