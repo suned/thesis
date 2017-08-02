@@ -1,4 +1,5 @@
 import os
+
 os.environ["KERAS_BACKEND"] = "theano"
 
 from .io import arguments
@@ -15,9 +16,11 @@ def run():
             models,
             report,
             embeddings,
+            convolutions,
             log
         )
         embeddings.make_shared_embeddings()
+        convolutions.make_shared_convolutions()
         nlp.glove_vectors = None
         log.info("Garbage collecting")
         gc.collect()

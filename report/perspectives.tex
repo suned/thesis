@@ -49,8 +49,34 @@ The goal of semantic role labeling is to predict the predicate arguments given a
 \noindent
 Semantic role labeling tasks can be solved with neural networks. \citet{collobert2011} describe a convolutional architecture very similar to the architecture of \citet{nguyen2015}. Specifically, they approach semantic role labeling as a sequence labeling task where the goal is to assign BIO labels indicating whether a token is a the beginning, inside or outside of a predicate argument. To indicate which word is the predicate, they augment the window matrix formed by the word vectors of the window with position features that encode the distance to the predicate. It's possible to share the convolutional filters of this architecture by using the multi-channel or argument marker strategy described in section \ref{multi-channel} and \ref{marker_strategy}.
 \\\\
-As discussed, semantic role labeling and relation classification are highly related tasks.
-\subsection{Dependency Parsing}
+As discussed, semantic role labelling and relation classification are highly related tasks. We speculate that a representation that is useful for predicting the roles of words with respect to predicates in the sentence will also be good for predicting semantic relations.
+
+\subsection{Typed Dependency Parsing}
+The objective in typed dependency parsing is to predict and label binary grammatical relations that hold among words in a sentence such as the subject or object of the verb \citep{jurafsky09}. This can be expressed using a tree structure where the words of the sentence are the nodes and the grammatical relations among them are the edges. See figure \ref{dependency} for an example.
+
+\begin{figure}[h]
+\centering
+\begin{dependency}[theme = simple]
+   \begin{deptext}[column sep=1em]
+   I \& prefer \& the \& morning \& flight \& through \& Denver \\
+   \end{deptext}
+   \deproot{2}{ROOT}
+   \depedge{2}{1}{NSUBJ}
+   \depedge{2}{5}{DOBJ}
+   \depedge{5}{3}{DET}
+   \depedge{5}{4}{NMOD}
+   \depedge{5}{7}{NMOD}
+   \depedge{7}{6}{CASE}
+\end{dependency}
+\caption{A typed dependency parse tree using the Universal Dependency Set \citep{demarneffe2014}.}
+\label{dependency}
+\end{figure}
+\noindent
+A directed edge is added from a so called head word to another token if the morphology of the token is directly dependent on the head word. For example, the verb-subject relationship between the verb \textit{prefer} and \textit{I} determines that the form of the nominal subject should be \textit{I} and not \textit{me} for example.
+\\\\
+The advantage of typed dependency parses is that they give approximations to the semantic relationships between predicates and their arguments, such as transitive verbs and their subject and objects. This makes dependency parse trees highly useful features for information extraction systems \citep{jurafsky09}.
+\\\\
+Typed dependency parsers can be implemented as neural networks. Recently, \citet{kiperwasser2016} demonstrated that word vectors and bidirectional recurrent neural network features could be trained jointly with a structured prediction objective that predicts the dependency graph. The word embedding and bidirectional recurrent neural network weights could be shared with the model proposed by \citet{zhang2015} to empirically investigate the usefulness of typed dependency parsing as an auxiliary task.
 
 \section{Pipelining Vs. Multi-Task Learning}
 In this thesis we have investigated the possibility of re-using labeled data by using it to automatically learn a representation that improves generalization for a target task when data for this task is limited. In truth, labeled natural language data for auxiliary tasks can be re-used for this purpose in a different manner: by training a system that predicts labels for target task data. These predictions can be used as input features to the system for the target task. For example, we could use the CONLL2000 data to train the chunk and part-of-speech tags for the SemEval data, and then use these tags as input to the relation classification network.

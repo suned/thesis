@@ -39,7 +39,7 @@ logger = colorlog.getLogger()
 logger.setLevel(
     arguments.log_level
     if arguments.log_level is not None
-    else logging.DEBUG
+    else logging.INFO
 )
 logger.addHandler(handler)
 

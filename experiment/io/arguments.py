@@ -155,7 +155,8 @@ _parser.add_argument(
 )
 _parser.add_argument(
     "--share-filters",
-    help="share convolution filters between sentence models",
+    help="share convolution filters between sentence models. "
+         "Ignored unless --auxiliary-tasks=ACE",
     action="store_true"
 )
 _parser.add_argument(

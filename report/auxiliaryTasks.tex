@@ -1,6 +1,6 @@
 \section{Auxiliary Tasks}
 \label{auxiliary_tasks}
-Here we describe each of the datasets used as auxiliary tasks in our multi-task learning experiment. We describe the goal of each task in some detail in order to reason about its potential benefit as an auxiliary task for SemEval 2010 Task 8.
+Here we describe each of the datasets used as auxiliary tasks in our multi-task learning experiment. We focus on auxiliary tasks for which there exists standard neural network architectures that don't require bespoke components which may make weights sharing impractical. We describe the goal of each task in some detail in order to reason about its potential benefit as an auxiliary task for SemEval 2010 Task 8.
 
 \subsection{ACE 2005 Relations}
 Intuitively, we expect that a feature transformation in the early layers of a neural network that's useful for one relation classification task should also be useful to another, assuming the relations of interest in one task are semantically related to the relations in another.
@@ -16,7 +16,7 @@ The ACE 2005 dataset contains 8,365 english sentences collected from various sou
 	\item \textbf{Agent-Artifact} An entity is the agent of an artifact. Example: \textit{[James Bond] drives an [Aston Martin DB5].}
 	\item \textbf{Gen-Affiliation} General affiliation between two entities. Example: \textit{[Mitt Romney] is a member of [the Mormon church]}.
 \end{labeling}
-In truth, each of the relations above are further sub-categorized in the ACE 2005 corpus. For example, 
+In truth, each of the relations above are further sub-categorized in the ACE 2005 corpus. For example, the \textit{Person-Social} relation is further subcategorized into \textit{Family}, \textit{Business} and \textit{Lasting-Personal} relations. For simplicity, we pursue the task of prediction only the top level relation classes enumerated above.
 \\\\
 There is clear semantic overlap between the relation categories of the SemEval dataset and the ACE dataset, for example for the categories \textit{Agent-Artifact} and \textit{Physical} in the ACE corpus and \textit{Agent-Artifact} and \textit{Entity-Origin} in the SemEval corpus. We can speculate that a neural network representation that's useful for one task may be useful for the other which may lead to improved generalization error on the target task. 
 

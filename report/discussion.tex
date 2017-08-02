@@ -19,9 +19,49 @@ In \citet{collobert2008} the vocabulary overlap is maximal since all annotations
 \end{figure}
 \FloatBarrier
 
-\section{Why is ACE not a Useful Auxiliary task?}
-The reasoning in the previous section does not explain why there is no observable improvement when sharing both the word embeddings and the convolutional filters between between the hypotheses for SemEval 2010 Task 8 and the ACE 2005 relation classification task.
-\section{Are the Sequence Classification Tasks Useful?}
-In the absence of a full fledged theory of how tasks should be related and neural network weights be shared in order for multi-task learning to improve generalization, the most reliable way to investigate the theses dynamics for a specific application is trial and error. In other words, there is no real way of knowing whether our informal reasoning on why the auxiliary tasks should benefit a target relation classification task may be totally wrong.
+\section{Semantic Relations are Inconsistently Defined}
+The reasoning in the previous section does not explain why there is no observable improvement when sharing both the word embeddings, position embeddings and the convolutional filters between the hypotheses for SemEval 2010 Task 8 and the ACE 2005 relation classification task. If the tasks were truly related in the sense that a good representation for the latter could be used to improve generalization on the former, it should be detectable in this setting. When no such improvement is detected, we can conclude that ACE 2005 is not a good auxiliary task for SemEval 2010 Task 8.
+\\\\
+This result is surprising given that, superficially, there is a clear semantic overlap between some of the relations in the two tasks as argued in section \ref{target_task}. However, as pointed out in \citet{handschuh2016}, the objective of relation classification is ill-defined in the sense that the restrictions on what constitutes a valid relation varies from dataset to dataset. This leads to some important general differences between the relations found in the two datasets.
+\\\\
+We have already discussed the definition of a valid relation enforced during the annotation process of the SemEval dataset in section \ref{target_task}. To reiterate, they were:
+\begin{itemize}
+	\item Relation arguments cannot depend on discourse knowledge (e.g they can't be pronouns).
+	\item Relation arguments cannot appear in separate sentential clauses.
+	\item Relation arguments can only be noun phrases.
+\end{itemize}
+This overlaps only with the ACE 2005 annotation guidelines in that these require that the annotated relation should be between named entities. ACE 2005 entities can very well rely on discourse knowledge however and therefore also be pronouns.
+\\\\
+These differences between annotation guidelines lead to significant differences between the types of relations that appear in the two datasets. The sentence: \textit{The fifty essays collected in this volume testify to most of the prominent themes from Professor Quispel's scholarly career}
+is a canonical example of \textit{Member-Collection(essays, volume)} taken from the SemEval dataset. As specified in the annotation guidelines, the arguments belong are noun phrases and neither of them are pronouns. The arguments belong to different noun phrases: \textit{the fifty essays} and \textit{this volume} and are separated by words that are informative of the \textit{Member-Collection} relation, namely \textit{collected in}.
+\\\\
+Contrast this with the following canonical example of the \textit{Personal-Social(his, father-in-law)} relation from the ACE 2005 dataset: \textit{The fact that this guy was such an idiot to go back and let his father-in-law kill him shows he wasn't the most stable of people}. Here, the arguments belong to the same noun phrase \textit{his father-in-law}. It's unlikely that features used to detect the canonical ACE 2005 relation is useful to detect canonical SemEval relations.
+\\\\
+If this syntactic pattern mismatch between the relations in the two datasets occur frequently enough, we can speculate that this can explain why learning the ACE 2005 relation task simultaneously with SemEval 2010 Task 8 does not yield any significant gains in generalization error.
 
-Something about tests...
+We can estimate the frequency of this syntactic pattern as follows: Construct a syntactic parse tree for the sentence in which $relation(arg1,arg2)$ occurs. Traverse the tree bottom-up from the leaves corresponding to $arg1$ and $arg2$ in turn. Record the first noun phrase node encountered between the leaves and the root. Denote this node as the nearest-ancestor noun phrase of the argument. Let the predicate $sameNP(arg1, arg2)$ be a logical predicate on the arguments of the relation that is true when they share a nearest-ancestor noun phrase. Count the examples in each dataset for which $sameNP(arg1, arg2)$ is true. See figure \ref{syntactic_pattern} for an example.
+\\\\
+We have counted the number of samples for which $sameNP(arg1,arg2)$ is true for both the SemEval dataset and the ACE 2005 dataset using the Stanford PCFG parser \citep{klein2003}. In addition, we have counted the number of relations in which one of the arguments is a pronoun denoted by the predicate $pronoun(arg1,arg2)$. The results can be seen in figure \ref{same_noun_phrase}. Specifically we see that more than half of the samples in the ACE 2005 dataset are made up of sentences in which the relation arguments share a nearest-ancestor noun phrase node. In the SemEval dataset, there are hardly any samples of this sort.
+\\\\
+This leads to the following conclusion: the inconsistent requirements for what constitutes a valid relation in the two datasets as expressed by the annotation guidelines lead to samples in which the syntactic and semantic indicators are very different. This inconsistency is not conductive for multi-task learning, since it makes it unlikely that the features that are useful for one task is also useful for the other. We have identified only two major differences in the general syntactic patterns of the relations between the two datasets. We speculate that a more thorough analysis would lead to more.
+\newpage
+\begin{figure}[h!]
+	\centering
+	\input{img/ace_syntactic_analysis.pgf}
+	
+	\vspace{1cm}
+	
+	\input{img/semeval_syntactic_analysis.pgf}
+	\caption{Venn diagram of relations where the relation arguments are part the same noun phrase or one relation is a pronoun for the ACE 2005 dataset and the SemEval 2010 Task 8 dataset.}
+	\label{same_noun_phrase}
+\end{figure}
+
+\section{The Need for A Unifying Theory of Multi-Task Learning}
+In the absence of a full fledged theory of how tasks should be related and neural network weights be shared in order for multi-task learning to improve generalization, the most reliable way to investigate these dynamics for a specific application is empirically as we have done in this thesis. The lack of theoretical understanding presents us with a problem however: When a deep multi-task learning experiment leads to a negative result it may be due to unfit auxiliary tasks, an unfit neural network architecture or both.
+\\\\
+In the previous section we have argued that although they superficially appear related, the ACE 2005 relation classification task is likely not a useful auxiliary task for SemEval 2010 Task 8.
+
+For the sequence classification tasks however, we have argued that our neural network architecture is a significant reason their inclusion as auxiliary tasks don't lead to improved generalization error on the target task. Whether or not changing the neural network architecture can yield generalization gains by multi-task learning remains to be seen. The major question is: how much energy should we spend on experimenting with this and that architecture before we conclude that two tasks are unrelated? Or, if we do see generalization improvements on the target task, how can we know that our network architecture really takes advantage of all the useful information in the auxiliary tasks, and that further gains are not possible still?
+\\\\
+We believe a unified theory of multi-task learning that can provide answers to these types of questions is an important goal for future research. In particular, such a theory should provide us with statistical tests that can be applied to two tasks and indicate whether generalization gains should be possible by learning them simultaneously. This is an ambitious goal since it involves make predictions about the neural network features induced by a particular dataset. Nonetheless, we believe the potential for quick development of multi-task learning systems with high performance that such a theory would make possible would be extremely valuable in both business and research.
+

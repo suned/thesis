@@ -96,12 +96,9 @@ class SequenceCNN(SequenceTask):
         )
 
         pooling_layers = []
-        if arguments.share_filters:
-            convolution_layers = convolutions.shared_convolutions
-        else:
-            convolution_layers = convolutions.make_convolution_layers(
-                prefix=self.name + "_"
-            )
+        convolution_layers = convolutions.make_convolution_layers(
+            prefix=self.name + "_"
+        )
         for convolution in convolution_layers:
             convolution_layer = convolution(
                 word_embedding

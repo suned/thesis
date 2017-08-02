@@ -1,6 +1,7 @@
 import numpy
 
 from . import nlp
+from spacy.tokens import Doc
 
 
 class BadTokenizationError(Exception):
@@ -30,15 +31,31 @@ class Relation:
             e1_offset,
             e2_offset,
             relation,
-            relation_args):
+            relation_args,
+            tokenized=False):
         self.sentence_id = sentence_id
-        self.sentence = nlp.tokenize(sentence)
-        self.e1 = self._offset_to_index(e1_offset)
-        self.e2 = self._offset_to_index(e2_offset)
         self.relation = (
             relation
             + format_arguments(relation_args)
         )
+        if not tokenized:
+            self.sentence = nlp.tokenize(sentence)
+            self.e1 = self._offset_to_index(e1_offset)
+            self.e2 = self._offset_to_index(e2_offset)
+        else:
+            self.sentence = Doc(nlp._nlp.vocab, words=sentence)
+            self.e1 = e1_offset
+            self.e2 = e2_offset
+
+    def __repr__(self):
+        tokens = [str(token) for token in self.sentence]
+        e1_start, e1_end = self.e1
+        e2_start, e2_end = self.e2
+        tokens.insert(e1_start, "<e1>")
+        tokens.insert(e1_end + 1, "<e1/>")
+        tokens.insert(e2_start + 2, "<e2>")
+        tokens.insert(e2_end + 3, "<e2/>")
+        return " ".join(tokens)
 
     def _offset_to_index(self, e1_offset):
         start_char, end_char = e1_offset

@@ -2,7 +2,7 @@ import os
 
 from ..io import arguments
 from .. import config
-from ..io import ace_parser
+from ..io import ace_json_parser as ace_parser
 from .task import (
     get_labels,
     split

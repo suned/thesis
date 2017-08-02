@@ -186,8 +186,6 @@ def early_stopping(target_fraction, auxiliary_fraction):
      early_stopping_labels) = target_task.early_stopping_set()
     log.info(log_header)
     epoch = 1
-    import ipdb
-    ipdb.sset_trace()
     while epoch <= arguments.epochs:
         task = random.choice(experiment_tasks)
         batch_input, batch_labels = task.get_batch()
