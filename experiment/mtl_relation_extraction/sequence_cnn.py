@@ -88,13 +88,19 @@ class SequenceCNN(SequenceTask):
         return input, output
 
     def compile_model(self):
+        if arguments.multi_channel:
+            model = self.compile_multi_channel_model()
+        else:
+            model = self.compile_shared_embedding_model()
+        self.model = model
+
+    def compile_multi_channel_model(self):
         word_input = inputs.make_word_input(
             input_length=self.window_size
         )
         word_embedding = embeddings.shared_word_embedding(
             word_input
         )
-
         pooling_layers = []
         convolution_layers = convolutions.shared_convolutions
         for convolution in convolution_layers:
@@ -121,4 +127,41 @@ class SequenceCNN(SequenceTask):
             optimizer=config.optimizer,
             loss=self.loss
         )
-        self.model = model
+        return model
+
+    def compile_shared_embedding_model(self):
+        word_input = inputs.make_word_input(
+            input_length=self.window_size
+        )
+        word_embedding = embeddings.shared_word_embedding(
+            word_input
+        )
+        pooling_layers = []
+        convolution_layers = convolutions.make_convolution_layers(
+            prefix=self.name + "_"
+        )
+        for convolution in convolution_layers:
+            convolution_layer = convolution(
+                word_embedding
+            )
+            pooling_layer = layers.GlobalMaxPool1D()(
+                convolution_layer
+            )
+            pooling_layers.append(pooling_layer)
+        pooling_concat = layers.concatenate(
+            pooling_layers
+        )
+        output = layers.Dense(
+            units=self.num_classes,
+            activation="relu",
+            name=self.name + "_output"
+        )(pooling_concat)
+        model = models.Model(
+            inputs=word_input,
+            outputs=output
+        )
+        model.compile(
+            optimizer=config.optimizer,
+            loss=self.loss
+        )
+        return model

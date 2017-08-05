@@ -25,6 +25,7 @@ k_folds = None
 iterations = None
 window_size = None
 learning_surface = None
+multi_channel = None
 
 
 _log_levels = [
@@ -156,7 +157,7 @@ _parser.add_argument(
 _parser.add_argument(
     "--share-filters",
     help="share convolution filters between sentence models. "
-         "Ignored unless --auxiliary-tasks=ACE",
+         "Only compatible with --auxiliary-tasks=ACE",
     action="store_true"
 )
 _parser.add_argument(
@@ -164,6 +165,11 @@ _parser.add_argument(
     help="number of folds in cross validation",
     type=int,
     default=5
+)
+_parser.add_argument(
+    "--multi-channel",
+    help="use a multi-channel strategy for weight sharing",
+    action="store_true"
 )
 _parser.add_argument(
     "--iterations",
@@ -192,6 +198,10 @@ def experiment_exists():
     return False
 
 
+class IncompatibleModelError(Exception):
+    pass
+
+
 def parse():
     arguments = sys.modules[__name__]
     _args = _parser.parse_args()
@@ -200,3 +210,5 @@ def parse():
             setattr(arguments, argument, value)
     if experiment_exists():
         raise ExperimentExistsError
+    if share_filters and auxiliary_tasks != ["ACE"]:
+        raise IncompatibleModelError

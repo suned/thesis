@@ -29,6 +29,9 @@ def run():
     except arguments.ExperimentExistsError:
         from .mtl_relation_extraction import log
         log.error("Experiment already exists!")
+    except arguments.IncompatibleModelError:
+        from .mtl_relation_extraction import log
+        log.error("--share-filters only compatible with --auxiliary-tasks=ACE")
 
 
 if __name__ == "__main__":
