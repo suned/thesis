@@ -1,7 +1,25 @@
 \chapter{Results}
-In this section we present the results obtained in the experiment detailed in the previous sections. We begin by visualizing the results across all our experiments using a visualization technique called learning surfaces. We then examine specific results in details using hypothesis testing.
+In this section we present the results obtained in the experiment detailed in the previous sections. We visualize the $F1$ scores obtained for each auxiliary task and weight sharing strategy described in section \ref{network_architecture}. Specifically, we plot the mean macro $F1$ over cross-validation folds of the target data as a function of the fraction $f$ when the target task is learnt in a single-task and multi-task setting. This leads to two so called \textbf{learning curves} for each experiment that indicates how generalization error as approximated by cross-validation varies with respect to target data set size and auxiliary task.
+\\\\
+Moreover, we perform a one-sided statistical significance test
 
 \section{Shared Embeddings}
 \section{Shared Side Channel Convolutional Filters}
+\begin{figure}
+	\input{img/shared_filters_ACE_learning_curve.pgf}
+\end{figure}
+\begin{figure}
+	\input{img/shared_filters_Conll2000POS_learning_curve.pgf}
+\end{figure}
+\begin{figure}
+	\input{img/shared_filters_Conll2000Chunk_learning_curve.pgf}
+\end{figure}
+\begin{figure}
+	\input{img/shared_filters_GMB-NER_learning_curve.pgf}
+\end{figure}
+\section{Shared Convolutional Filters}
+\begin{figure}
+	\input{img/shared_filters_ACE_share_all_filters_learning_curve.pgf}
+\end{figure}
 
 \section{Summary}
