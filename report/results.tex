@@ -1,25 +1,82 @@
 \chapter{Results}
-In this section we present the results obtained in the experiment detailed in the previous sections. We visualize the $F1$ scores obtained for each auxiliary task and weight sharing strategy described in section \ref{network_architecture}. Specifically, we plot the mean macro $F1$ over cross-validation folds of the target data as a function of the fraction $f$ when the target task is learnt in a single-task and multi-task setting. This leads to two so called \textbf{learning curves} for each experiment that indicates how generalization error as approximated by cross-validation varies with respect to target data set size and auxiliary task.
+In this section we present the results obtained in the experiment detailed in the previous sections. We visualize the effect of multi-task learning on generalization error estimated by cross-validation for each of the proposed weight sharing strategies. Specifically, we plot the mean macro F1 for each cross-validation experiment as a function of the fraction of target data available for training. This produces a so called \textbf{learning curve} that indicates how generalization error improves as the amount of training data is increased in both the single-task and multi-task setting.
 \\\\
-Moreover, we perform a one-sided statistical significance test
-
+Moreover, we perform statistical tests of significance using one sided t-testing on the data collected for each fraction $f$ of target data in order to determine if the observed differences between single-task and multi-task learning can be explained by variation due to random weight initialization and and stochastic gradient descent.
+\newpage
 \section{Shared Embeddings}
+\newpage
 \section{Shared Side Channel Convolutional Filters}
-\begin{figure}
+In this section we present the results obtained for SemEval 2010 Task 8 in a single-task and multi-task setting using the multi-channel weight sharing strategy discussed in section \ref{network_architecture}. Each plot contains two curves: one learning curve for SemEval 2010 Task 8 when learnt as a single task, and one when learnt simultaneously with an auxiliary task. In addition we present tables containing the $p$-value of one-sided t-tests between the macro $F1$ scores of multi-task and single-task experiments grouped by the fraction of target data $f$.
+\vspace{2cm}
+\begin{figure}[h]
+	\centering
 	\input{img/shared_filters_ACE_learning_curve.pgf}
+	
+	\vspace*{1cm}
+	
+	\begin{tabular}{r | l | l | l | l | l | l}
+		\textbf{Percentage of $\data_t$} & 0 & 20 & 40 & 60 & 80 & 100 \\  \hline
+		\textbf{Mean single-task macro $F1$} & .056 & .606 & .652 & .667 & .672 & .683\\
+		\textbf{Mean multi-task macro $F1$} & 0 & 0 & 0 & 0 & 0 & 0\\
+		$p$\textbf{-value} & 0 & 0 & 0 & 0 & 0 & 0
+	\end{tabular}
+	\caption{Learning curves and hypothesis tests for SemEval 2010 Task 8 trained as a single task and in a multi-task setting with ACE 2005. The learning curves indicate a slight improvement of multi-task learning over single-task learning in the 60-80\% range}
 \end{figure}
 \begin{figure}
+	\centering
 	\input{img/shared_filters_Conll2000POS_learning_curve.pgf}
+	\vspace*{1cm}
+	
+	\begin{tabular}{r | l | l | l | l | l | l}
+		\textbf{Percentage of $\data_t$} & 0 & 20 & 40 & 60 & 80 & 100 \\  \hline
+		\textbf{Mean single-task macro $F1$} & .056 & .606 & .652 & .667 & .672 & .683\\
+		\textbf{Mean multi-task macro $F1$} & 0 & 0 & 0 & 0 & 0 & 0\\
+		$p$\textbf{-value} & 0 & 0 & 0 & 0 & 0 & 0
+	\end{tabular}
+	\caption{Learning curves and hypothesis tests for SemEval 2010 Task 8 trained as a single task and in a multi-task setting with CONLL2000 part-of-speech. The learning curves indicate a slight improvement of multi-task learning over single-task learning in the 60-80\% range}
 \end{figure}
 \begin{figure}
+	\centering
 	\input{img/shared_filters_Conll2000Chunk_learning_curve.pgf}
+	\vspace*{1cm}
+	
+	\begin{tabular}{r | l | l | l | l | l | l}
+		\textbf{Percentage of $\data_t$} & 0 & 20 & 40 & 60 & 80 & 100 \\  \hline
+		\textbf{Mean single-task macro $F1$} & .056 & .606 & .652 & .667 & .672 & .683\\
+		\textbf{Mean multi-task macro $F1$} & 0 & 0 & 0 & 0 & 0 & 0\\
+		$p$\textbf{-value} & 0 & 0 & 0 & 0 & 0 & 0
+	\end{tabular}
+	\caption{Learning curves and hypothesis tests for SemEval 2010 Task 8 trained as a single task and in a multi-task setting with CONLL2000 Chunking. The learning curves indicate a slight improvement of multi-task learning over single-task learning in the 60-80\% range}
 \end{figure}
 \begin{figure}
+	\centering
 	\input{img/shared_filters_GMB-NER_learning_curve.pgf}
+	\vspace*{1cm}
+	
+	\begin{tabular}{r | l | l | l | l | l | l}
+		\textbf{Percentage of $\data_t$} & 0 & 20 & 40 & 60 & 80 & 100 \\  \hline
+		\textbf{Mean single-task macro $F1$} & .056 & .606 & .652 & .667 & .672 & .683\\
+		\textbf{Mean multi-task macro $F1$} & 0 & 0 & 0 & 0 & 0 & 0\\
+		$p$\textbf{-value} & 0 & 0 & 0 & 0 & 0 & 0
+	\end{tabular}
+	\caption{Learning curves and hypothesis tests for SemEval 2010 Task 8 trained as a single task and in a multi-task setting with GMB named entity recognition. The learning curves indicate a slight improvement of multi-task learning over single-task learning in the 60-80\% range}
 \end{figure}
+\newpage
 \section{Shared Convolutional Filters}
-\begin{figure}
+\begin{figure}[h]
+	\centering
 	\input{img/shared_filters_ACE_share_all_filters_learning_curve.pgf}
+		\vspace*{1cm}
+	
+	\begin{tabular}{r | l | l | l | l | l | l}
+		\textbf{Percentage of $\data_t$} & 0 & 20 & 40 & 60 & 80 & 100 \\  \hline
+		\textbf{Mean single-task macro $F1$} & .056 & .606 & .652 & .667 & .672 & .683\\
+		\textbf{Mean multi-task macro $F1$} & 0 & 0 & 0 & 0 & 0 & 0\\
+		$p$\textbf{-value} & 0 & 0 & 0 & 0 & 0 & 0
+	\end{tabular}
+	\caption{Learning curves and hypothesis tests for SemEval 2010 Task 8 trained as a single task and in a multi-task setting with ACE 2005. The learning curves indicate a general improvement across the entirety of the curves.}
 \end{figure}
+
+
 
 \section{Summary}
