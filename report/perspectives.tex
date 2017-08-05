@@ -14,14 +14,6 @@ Other researchers have found that it's possible to remove the position features 
 \\\\
 One strategy for equalizing the sentence matrix dimensionality is therefore to adapt a relation argument position representation that does away with the position embedding. The pruning strategy of \citep{santos2015} is one path forward. We speculate that simply marking the relation arguments with special beginning and end tokens would also work. By equalizing the dimensionality of the sentence matrix for the relation classification network and the sequence prediction networks sharing the convolutional filter weights is made possible, which may lead to better results than we have reported here.
 
-\subsection{Multi-Channel Convolutional Neural Network}
-\label{multi-channel}
-\citet{kim2014} introduces the idea of using multiple "channels" in convolutional neural networks for sentence classification. The idea of a channel in this context is similar to a color channel in a digital image. An image is often represented as a stack of three matrices where each matrix component denotes color intensity in a color channel.
-
-Similarly, we can construct a stack of sentence matrices by using more than one word embedding matrix. A number of sentence matrices are produced by concatenating the word vectors of each word in each word embedding matrix with each other such that each word embedding induces a sentence matrix.
-\\\\
-We can use the idea of multi-channel convolutional neural networks to modify the architecture proposed by \citet{nguyen2015} to accommodate sharing convolutional filter weights between the relation classification network and the sequence classification networks. Specifically, we can add another word embedding matrix to the architecture that forms a sentence matrix for an input sentence which is not augmented with the position vectors. This word embedding and convolutional filters on the sentence matrix matrix induced by it can then be readily shared with the sequence classification networks.
-
 \subsection{Recurrent Neural Network}
 \citet{zhang2015} describes a recurrent neural network architecture for relation classification that can also be used for a multi-task learning. In this architecture, the word vector for each word is fed into a bi-directional recurrent network layer. This produces a sequence of feature vectors that are the concatenation of the output of each application of the recurrent layer in both directions. \citet{zhang2015} apply max-pooling on the components of these feature vectors, and feed the resulting vector into a logistic regression layer. The relation arguments are marked simply by adding special tokens before and after each argument.
 \\\\

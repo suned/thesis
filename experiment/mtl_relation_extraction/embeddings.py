@@ -35,5 +35,7 @@ shared_position_embedding = None
 def make_shared_embeddings():
     global shared_word_embedding
     global shared_position_embedding
+    del shared_word_embedding
+    del shared_position_embedding
     shared_word_embedding = make_word_embedding()
     shared_position_embedding = make_position_embedding()

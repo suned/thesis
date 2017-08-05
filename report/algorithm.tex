@@ -9,36 +9,51 @@ This process is iterated until an early stopping criterion on the target trainin
 When the patience is exceeded we record the cross-validation macro-F1 on the target task test fold using the best recorded weights. Since neural network training is a random search procedure with respect to weight initialization and mini-batch sampling, we run this experiment for each combination of target and auxiliary fractional data 5 times, yielding a total of 25 random cross-validation splits for each combination. We have provided the algorithm used in our experiments as pseudocode in algorithm \ref{experiment_pseudocode}.
 \begin{algorithm}
 \begin{algorithmic}
-	\Require $miniBatchSize$: an integer giving the mini-batch size
-	\Require $targetData = \{(\vector{x}_{t1},\vector{y}_{t1}),\dots,(\vector{x}_{tN},\vector{y}_{tN})\}$
-	\Require $auxiliaryData = \{(\vector{x}_{a1},\vector{y}_{a1}),\dots,(\vector{x}_{aN},\vector{y}_{aN})\}$
-	\Require $sample(data, fraction)$: A routine that can sample $|set| \cdot fraction$ samples from the set $data$ uniformly.
-	\Require $crossValidation(data)$: A routine that returns a set of cross-validation folds over the set $data$.
-	\Require $initializeWeights()$: A routine that can initialize a neural network weight vector.
-	\Require $gradientDescent(data, w)$: A routine that performs gradient descent on the neural network weights $w$.
-	\Require $macroF1(w, data)$: A routine that computes the macro F1 score on $data$ using neural network weights $w$.
-	\Require $report(score, targetFraction, auxiliaryFraction)$: A reporting routine.
-	\State $fractions \gets \{\frac{0}{5}, \frac{1}{5}, \frac{2}{5}, \frac{3}{5}, \frac{4}{5}, 1\}$
-	\For{$iteration \in \{1,\dots,5\}$}
-		\For{$targetFraction \in fractions$}
-			\For{$auxiliaryFraction \in fractions$}
-				\State $targetFractionalData \gets sample(targetData, targetFraction)$
-				\State $auxiliaryFractionalData \gets sample(auxiliaryData, auxiliaryFraction)$
-				\State $earlyStoppingData \gets sample(targetFractionalData, \frac{1}{10})$
-				\State $targetTrainData = targetFractionalData \setminus earlyStoppingData$
-				\For{$trainFold, testFold \in crossValidation(targetTrainData)$}
-					\State $\vector{w} \gets initializeWeights()$
-					\While{\textit{patience not exceeded}}
-						\State $task \gets sample(\{trainFold, auxiliaryFractionalData\}, \frac{1}{2})$
-						\State $miniBatch \gets sample(task, \frac{|task|}{miniBatchSize})$
-						\State $\vector{w} \gets gradientDescent(miniBatch, \vector{w})$
-					\EndWhile
-					\State $score = macroF1(\vector{w}, testFold)$
-					\State $report(score, targetFraction, auxiliaryFraction)$
-				\EndFor
+	\Require Target dataset $\data_{target}$
+	\Require Auxiliary dataset $\data_{aux}$
+	\Require mini-batch size $b$
+	\Function{crossValidation}{$\data$}
+		\State \textbf{return} \textit{$K$ train and test cross validation folds.}
+	\EndFunction
+	\Function{sample}{set $S$ of size $N$, $f$}
+		\State \textbf{return} \textit{$N \times f$ samples from $S$ sampled uniformly}
+	\EndFunction
+	\Function{initializeWeights}{ }
+		\State \textbf{return} initialized neural network weight vector $\vector{w}$
+	\EndFunction
+	\Function{gradientDescent}{$\data$, $\vector{w}$}
+		\State \textbf{return} \textit{the weight vector $\vector{u}$ resulting from a single gradient descent step on $\data$ with the weights $\vector{w}$ using the Adam algorithm}
+	\EndFunction
+	\Function{macroF1}{$\vector{w}$,$\data$}
+		\State \textbf{return} \textit{Macro F1 of the neural network parameterized by $\vector{w}$ on $\data$}
+	\EndFunction
+	\Function{report}{$s$, $f$}
+		\State \textit{report score $s$ and fraction $f$ to user}
+	\EndFunction
+	\ForAll{\textit{5 iterations}}
+		\For{$f \in \{\frac{0}{5}, \frac{1}{5}, \frac{2}{5}, \frac{3}{5}, \frac{4}{5}, 1\}$}
+			\For{$\data_{trainFold}, \data_{val} \in$ \Call{crossValidation}{$\data_{target}$}}
+				\State $\data_{earlyStopping} \gets$ \Call{sample}{$\data_{trainFold}$, $\frac{1}{10}$}
+				\State $\data_{train} \gets \data_{trainFold} \setminus \data_{earlyStopping}$
+				\State $\data_{f} \gets $ \Call{sample}{$\data_{train}$, $f$}
+				\State $\vector{w}_0 \gets$ \Call{initializeWeights}{ }
+				\State $\vector{w}_{best} \gets \vector{w}_0$
+				\State $i \gets 1$
+				\While{\textit{patience not exceeded}}
+					\State $\mathcal{T} \gets$ \Call{sample}{$\{\data_f, \data_{aux}\}$, $\frac{1}{2}$}
+					\State $\mathcal{B} \gets$ \Call{sample}{$\mathcal{T}$, $\frac{|\mathcal{T}|}{b}$}
+					\State $\vector{w}_i \gets$ \Call{gradientDescent}{$\mathcal{B}$, $\vector{w}_{i-1}$}
+					\State $i \gets i + 1$
+					\If{\textit{$\hat{E}(\vector{w}_i, \data_{earlyStopping})$ was the best recorded}}
+						\State $\vector{w}_{best} \gets \vector{w}_i$
+					\EndIf
+				\EndWhile
+				\State $s \gets$ \Call{macroF1}{$\vector{w}_{best}$, $\data_{val}$}
+				\State \Call{report}{$s$,$f$}
 			\EndFor
 		\EndFor
 	\EndFor
 \end{algorithmic}
-\caption{Pseudocode for our deep multi-task learning experiment.}\label{experiment_pseudocode}
+\caption{Pseudocode for our deep multi-task learning experiment.}
+\label{experiment_pseudocode}
 \end{algorithm}

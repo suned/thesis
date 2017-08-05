@@ -20,7 +20,7 @@ In \citet{collobert2008} the vocabulary overlap is maximal since all annotations
 \FloatBarrier
 
 \section{Semantic Relations are Inconsistently Defined}
-The reasoning in the previous section does not explain why there is no observable improvement when sharing both the word embeddings, position embeddings and the convolutional filters between the hypotheses for SemEval 2010 Task 8 and the ACE 2005 relation classification task. If the tasks were truly related in the sense that a good representation for the latter could be used to improve generalization on the former, it should be detectable in this setting. When no such improvement is detected, we can conclude that ACE 2005 is not a good auxiliary task for SemEval 2010 Task 8.
+The reasoning in the previous section does not explain why there is no observable improvement when sharing both the word embeddings, position embeddings and the convolutional filters between the hypotheses for SemEval 2010 Task 8 and the ACE 2005 relation classification task. If the tasks were truly related in the sense that a good representation for the latter could be used to improve generalization on the former, it should be detectable in this setting. When no such improvement is detected, we can conclude that ACE 2005 is not a good auxiliary task for SemEval 2010 Task 8 using hard neural network weights sharing.
 \\\\
 This result is surprising given that, superficially, there is a clear semantic overlap between some of the relations in the two tasks as argued in section \ref{target_task}. However, as pointed out in \citet{handschuh2016}, the objective of relation classification is ill-defined in the sense that the restrictions on what constitutes a valid relation varies from dataset to dataset. This leads to some important general differences between the relations found in the ACE and SemEval datasets.
 \\\\
@@ -32,10 +32,18 @@ We have already discussed the definition of a valid relation enforced during the
 \end{itemize}
 This overlaps only with the ACE 2005 annotation guidelines in that these require that the annotated relation should be between named entities. ACE 2005 entities can very well rely on discourse knowledge however and therefore also be pronouns.
 \\\\
-These differences between annotation guidelines lead to significant differences between the types of relations that appear in the two datasets. The sentence: \textit{The fifty essays collected in this volume testify to most of the prominent themes from Professor Quispel's scholarly career}
+These differences between annotation guidelines lead to significant differences between the types of relations that appear in the two datasets. The sentence: 
+\begin{quote}
+\textit{The fifty essays collected in this volume testify to most of the prominent themes from Professor Quispel's scholarly career}	
+\end{quote}
+
 is a canonical example of \textit{Member-Collection(essays, volume)} taken from the SemEval dataset. As specified in the annotation guidelines, the arguments belong are noun phrases and neither of them are pronouns. The arguments belong to different noun phrases: \textit{the fifty essays} and \textit{this volume} and are separated by words that are informative of the \textit{Member-Collection} relation, namely \textit{collected in}.
 \\\\
-Contrast this with the following canonical example of the \textit{Personal-Social(his, father-in-law)} relation from the ACE 2005 dataset: \textit{The fact that this guy was such an idiot to go back and let his father-in-law kill him shows he wasn't the most stable of people}. Here, the arguments belong to the same noun phrase \textit{his father-in-law}. It's unlikely that features used to detect the canonical ACE 2005 relation is useful to detect canonical SemEval relations.
+Contrast this with the following canonical example of the \textit{Personal-Social(his, father-in-law)} relation from the ACE 2005 dataset: 
+\begin{quote}
+\textit{The fact that this guy was such an idiot to go back and let his father-in-law kill him shows he wasn't the most stable of people}.	
+\end{quote}
+ Here, the arguments belong to the same noun phrase \textit{his father-in-law}. It's unlikely that features used to detect the canonical ACE 2005 relation is useful to detect canonical SemEval relations.
 \\\\
 If this syntactic pattern mismatch between the relations in the two datasets occur frequently enough, we can speculate that this can explain why learning the ACE 2005 relation task simultaneously with SemEval 2010 Task 8 does not yield any significant gains in generalization error.
 

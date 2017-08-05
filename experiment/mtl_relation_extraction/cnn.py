@@ -30,20 +30,24 @@ class CNN(RelationTask):
             name="embeddings"
         )
         pooling_layers = []
-        if arguments.share_filters:
-            convolution_layers = convolutions.shared_convolutions
-        else:
-            convolution_layers = convolutions.make_convolution_layers(
-                prefix=self.name + "_"
-            )
+        shared_convolution_layers = convolutions.shared_convolutions
+        convolution_layers = convolutions.make_convolution_layers(
+            prefix=self.name + "_"
+        )
 
-        for convolution in convolution_layers:
-            convolution_layer = convolution(
-                embeddings_concatenation
+        for shared_convolution, convolution in zip(shared_convolution_layers,
+                                                   convolution_layers):
+            shared_convolution_layer = shared_convolution(
+                word_embedding
+            )
+            convolution_layer = convolution(embeddings_concatenation)
+            shared_pooling_layer = layers.GlobalMaxPool1D()(
+                shared_convolution_layer
             )
             pooling_layer = layers.GlobalMaxPool1D()(
                 convolution_layer
             )
+            pooling_layers.append(shared_pooling_layer)
             pooling_layers.append(pooling_layer)
         pooling_layers_concatenation = layers.concatenate(
             pooling_layers

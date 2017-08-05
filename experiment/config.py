@@ -7,7 +7,7 @@ out_path = "results"
 ace_path = "ace/json"
 max_len_buffer = 1
 keras_verbosity = 0
-optimizer = optimizers.Adam()
+optimizer = optimizers.Adam(lr=.0005)
 word_vector_path = "GloVe/glove.840B.300d.pkl"
 kbp37_train = "kbp37/train.clean.txt"
 kbp37_test = "kbp37/test.txt"

@@ -97,7 +97,7 @@ class SemEvalTask(CNN):
             self.validation_relations
         )
 
-    def validation_metrics(self):
+    def validation_metrics(self, averaging="micro"):
         validation_input, validation_labels = self.validation_set()
         one_hot_prediction = self.model.predict(validation_input)
         label_prediction = self.decode(one_hot_prediction)
@@ -105,17 +105,17 @@ class SemEvalTask(CNN):
             "f1": metrics.f1_score(
                 self.validation_labels,
                 label_prediction,
-                average="micro"
+                average=averaging
             ),
             "precision": metrics.precision_score(
                 self.validation_labels,
                 label_prediction,
-                average="micro"
+                average=averaging
             ),
             "recall": metrics.recall_score(
                 self.validation_labels,
                 label_prediction,
-                average="micro"
+                average=averaging
             )
         }
         return validation_metrics

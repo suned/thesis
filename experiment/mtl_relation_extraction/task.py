@@ -52,6 +52,7 @@ class Task:
         raise NotImplementedError()
 
     def init_weights(self):
+        del self.model
         self.compile_model()
 
     def get_batch(self, size=arguments.batch_size):

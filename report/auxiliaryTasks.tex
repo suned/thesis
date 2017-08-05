@@ -96,8 +96,8 @@ We described the named entity recognition problem in section \ref{named_entity_r
 	\item [Time] References to certain temporal entities that have a name, such as the days of the week and months of a year.
 \end{description}
 \noindent
-Even though SemEval 2010 Task 8 is not explicitly concerned with classifying relationships between named entities, we can speculate that neural network features that are useful for predicting named entity types is also useful for predicting semantic relations for the SemEval task. For example, a representation that predicts that \textit{forest} is more likely to be a location than a person in the sentence
+Even though SemEval 2010 Task 8 is not explicitly concerned with classifying relationships between named entities, we can speculate that neural network features that are useful for predicting named entity types is also useful for predicting semantic relations for the SemEval task. For example, learning a named entity task leads to neural network features that are useful for discriminating between people and locations. We can speculate that although \textit{forest} is not a named entity in the sentence:
 \begin{quote}
 \textit{there are many trees in the forest}	
 \end{quote}
-is likely to be useful by increasing confidence for appropriate relation types for locations.
+the features learned for a named entity task would non the less indicate that \textit{forest} is more likely to be a location than, say, a person. If the model is able to learn that locations are more likely arguments for \textit{Member-Collection} than, say, \textit{Component-Whole}, this may improve the target systems confidence for the correct relation.

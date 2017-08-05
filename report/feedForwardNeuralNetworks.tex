@@ -39,6 +39,8 @@ Keeping track of the indices $l$, $i$ and $j$ quickly becomes confusing. By coll
 \\\\
 By gathering the weights in matrices $\mathbf{W}^{(l)}$, we have simplified our view of $h$ into a composition of matrix-vector products and element-wise application of activation functions. Figure \ref{neural_network} shows the parallel views of neural networks as networks of units and matrix-vector operations.
 \\\\
+We can think of each neuron in a neural network as a feature detector of sorts: each neuron learns to detect the presence of a pattern implicitly defined by it's incoming weights \citep{goodfellow16}. In this view, each hidden layer is tasked with learning a \textbf{representation} thats useful for the task the neural network meant to learn. As we will see in section \ref{deep_multi-task_learning}, the intuition of neural networks as representation learners forms the foundation for their adaptation to multi-task learning.
+\\\\
 We now have all the components we need to specify $\mathcal{H}$ as a set of neural networks. The set is defined by the depth of the networks $L$, the number of units in each layer $d_l$ and the activation function $\sigma$.
 For a particular $L$, $d_l$, and $\sigma$, each $h \in \mathcal{H}$ corresponds exactly to a unique assignment of real numbers to all of its weights. We can make the dependence of $h$ on its weights explicit by defining a vector $\mathbf{w} = \begin{bmatrix} w^{(1)}_{ij} & \dots & w^{(L)}_{ij}\end{bmatrix}$ and writing $h(\mathbf{x}, \mathbf{w})$ which means \textit{the function $h$ parameterised by the weight vector $\mathbf{w}$}. In practice, it's common to use different activation functions at different layers of the network. In the next section we discuss how to choose these activation functions.
 \begin{figure}[h]
@@ -114,7 +116,7 @@ Having designed the output layer of $h$ so that we can interpret its output as a
 
 \subsection{Objective Function}
 \label{objectiveFunction}
-We would like a function that lets us compare functions in $\mathcal{H}$ in terms of how well they predict the samples in $\mathcal{D}$. Such a function is often called an objective function, borrowing terminology from the mathematical field of optimization.
+We would like a function that lets us compare functions in $\mathcal{H}$ in terms of how well they predict the samples in $\mathcal{D}$. Such a function is often called an \textbf{objective function} borrowing terminology from the mathematical field of optimization. Minimizing the straight-forward binary error function $\hat{E}(h, \data) = 1/N \sum_{i=1}^N[[h(\vector{x}_i) \neq \vector{y}_i]]$ unfortunately leads to an intractable minimization problem \citep{marcotte1992}. It's therefore common to use a \textbf{surrogate error function} that captures properties we are interested and approximates binary error \citep{goodfellow16}. In this section, we discuss how using the maximum likelihood framework leads to a useful surrogate error function for neural networks.
 \\\\
 In section \ref{activation_functions} we saw that the combination of one-hot encoding of the labels in $\mathcal{Y}$ and soft-max activation in the output layer of $h$ allows us to interpret $h(\mathbf{x})$ as a conditional probability distribution. In the following, we will use a convenient rewrite of the formula given in \ref{activation_functions}:
 $$

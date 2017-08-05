@@ -31,8 +31,7 @@ def init_metrics():
         "precision": [],
         "recall": [],
         "f1": [],
-        "targetFraction": [],
-        "auxFraction": []
+        "targetFraction": []
     }
 
 
@@ -45,6 +44,7 @@ def init_weights():
     convolutions.make_shared_convolutions()
     for task in experiment_tasks:
         task.init_weights()
+    gc.collect()
 
 
 def save_metrics():
@@ -72,27 +72,22 @@ def load_fractions():
     if os.path.exists(root):
         metrics_frame = pandas.read_csv(metrics_path)
         metrics_frame.targetFraction = metrics_frame.targetFraction.astype(str)
-        metrics_frame.auxFraction = metrics_frame.auxFraction.astype(str)
         fraction_counts = (metrics_frame
-                           .groupby(["targetFraction", "auxFraction"])
+                           .groupby(["targetFraction"])
                            .count()
                            )
         missing_fractions = []
         for target_fraction in config.fractions:
-            for auxiliary_fraction in config.fractions:
-                was_started = (str(target_fraction),
-                               str(auxiliary_fraction)) in fraction_counts.index
+                was_started = str(target_fraction) in fraction_counts.index
                 if was_started and fraction_counts.ix[
-                    str(target_fraction),
-                    str(auxiliary_fraction)
+                    str(target_fraction)
                 ]['f1'] < arguments.k_folds * arguments.iterations:
-                    missing_fractions.append((target_fraction, auxiliary_fraction))
+                    missing_fractions.append(target_fraction)
                 elif not was_started:
-                    missing_fractions.append((target_fraction, auxiliary_fraction))
+                    missing_fractions.append(target_fraction)
         return missing_fractions
     else:
-        fractions = list(itertools.product(config.fractions, config.fractions))
-        return fractions
+        return config.fractions
 
 
 def find_start_iteration():
@@ -116,15 +111,10 @@ def find_start_iteration():
 
 def interleaved():
     global metrics
-    if arguments.learning_surface:
-        fractions = load_fractions()
-    else:
-        fractions = [(1.0, 1.0)]
+    fractions = load_fractions()
     start_iteration = 1
-    for target_fraction, auxiliary_fraction in fractions:
-        log.info("Starting auxiliary fraction %f", auxiliary_fraction)
+    for target_fraction in fractions:
         log.info("Starting target fraction %f", target_fraction)
-        reduce_aux_data(auxiliary_fraction)
         for iteration in range(start_iteration,
                                arguments.iterations + 1):
             log.info(
@@ -145,8 +135,7 @@ def interleaved():
                 target_task.split(train_indices, test_indices)
                 target_task.reduce_train_data(target_fraction)
                 early_stopping(
-                    target_fraction,
-                    auxiliary_fraction
+                    target_fraction
                 )
                 k += 1
                 init_weights()
@@ -172,7 +161,7 @@ def is_empty(batch_input):
     return rows == 0
 
 
-def early_stopping(target_fraction, auxiliary_fraction):
+def early_stopping(target_fraction):
     best_early_stopping_loss = float("inf")
     best_weights = None
     log.info(
@@ -195,6 +184,7 @@ def early_stopping(target_fraction, auxiliary_fraction):
             epochs=1,
             batch_size=arguments.batch_size,
             verbose=config.keras_verbosity
+            # initial_epoch=epoch
         )
         training_loss = (epoch_stats.history["loss"][0]
                          if "loss" in epoch_stats.history
@@ -206,8 +196,6 @@ def early_stopping(target_fraction, auxiliary_fraction):
         )
         if math.isnan(training_loss) or math.isnan(early_stopping_loss):
             log.error("Illegal loss detected, skipping fold")
-            import ipdb
-            ipdb.sset_trace()
             return
         if early_stopping_loss < best_early_stopping_loss:
             optimum = "*"
@@ -240,6 +228,5 @@ def early_stopping(target_fraction, auxiliary_fraction):
     target_task.model.set_weights(best_weights)
     validation_metrics = target_task.validation_metrics()
     validation_metrics["targetFraction"] = target_fraction
-    validation_metrics["auxFraction"] = auxiliary_fraction
     append(validation_metrics)
     log.info("Validation F1: %f", validation_metrics["f1"])

@@ -22,6 +22,7 @@ shared_convolutions = make_convolution_layers(
 
 def make_shared_convolutions():
     global shared_convolutions
+    del shared_convolutions
     shared_convolutions = make_convolution_layers(
         prefix="shared_"
     )
