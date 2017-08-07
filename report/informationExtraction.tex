@@ -48,7 +48,7 @@ In this thesis we focus on step 3: assigning labels to detected relations. This 
 \begin{quote}
 	\textit{Susan left JFK.}
 \end{quote}
-Imagine that we want to design a relation extraction system that can detect the relations \textit{Physical(person, location): a person has a physical relation to a location} and \textit{Personal-Social(person, person): two persons have a social relation}. Both can reasonably be assigned the previous sentence, depending on whether \textit{JFK} refers to the airport near New York, or the former American president. Just as in named entity recognition, providing the correct label in this situation depends on context information.
+Imagine that we want to design a relation extraction system that can detect the relations \textit{Physical(person, location): a person has a physical relation to a location} and \textit{Personal-Social(person, person): two persons have a social relation}. Both can reasonably be assigned to the previous sentence, depending on whether \textit{JFK} refers to the airport near New York, or the former American president. Just as in named entity recognition, providing the correct label in this situation depends on context information.
 \\\\
 Early relation extraction systems relied on hand-crafted lexical and syntactic rules for detecting relations. \citet{hearst1992} is perhaps the earliest example of this approach. She considers the following sentence:
 \begin{quote}
@@ -60,7 +60,7 @@ NP_1\text{ such as }NP_2
 $$
 implies the relation $Hyponym(NP_1, NP_2)$. By performing a syntactic parse of the input sentence we can try to extract hyponym relations between noun phrases using such manually created rules. Because of the huge amount of variation found in natural languages, this is of course a cumbersome yet brittle approach.
 \\\\
-More recent solutions rely on supervised machine learning techniques to solve relation extraction problems. In this setting, a system learns to recognize relations in the inventory from annotated examples. The earliest examples of such systems relied on hand-crafted features of words in the neighborhood of the relation arguments, for example: \textit{the words separating the relation arguments are "such as"} \citep{jurafsky09}. As we will see in part \ref{neural_networks}, the promise of avoiding complicated hand-crafted features of the sentence, but having the system learn useful lexico-syntactic features on its own is the major attraction of solutions based on deep learning.
+More recent solutions rely on supervised machine learning techniques to solve relation extraction problems. In this setting, a system learns to recognize relations in the inventory from annotated examples. The earliest examples of such systems relied on hand-crafted features of words in the neighborhood of the relation arguments, for example: \textit{the words separating the relation arguments are "such as"} \citep{jurafsky09}. As we will see in part \ref{neural_networks}, the major attraction of solutions based on deep learning is the promise of avoiding complicated hand-crafted features of the sentence, but having the system learn useful lexico-syntactic features on its own.
 
 \subsection{Accuracy Measures}
 Information extraction systems are often evaluated empirically by applying them to collections of text, so called corpora, in which $N$ mentions of named entities or relations are known. In these tests, accuracy measures for each class $c$ of information we wish to extract are usually defined in terms of how many times the system correctly predicted class $c$. Most metrics use the following terminology:
@@ -83,7 +83,7 @@ In a multi-class classification problem we are forced to decide how to average t
 $$
 p_{M} = \frac{1}{C}\sum_{c=1}^C p_c
 $$
-Where $p_c$ is the precision of the system for class $c$. Micro averaging on the other hand, averages an accuracy by accumulating $tp$, $tn$, $fp$ and $fn$ across all $C$ classes. For example micro-precision $p_{\mu}$:
+Where $p_c$ is the precision of the system for class $c$. Micro averaging on the other hand, averages an accuracy measure by accumulating $tp$, $tn$, $fp$ and $fn$ across all $C$ classes. For example micro-precision $p_{\mu}$:
 $$
 p_\mu = \frac{\sum\limits_{c=1}^C tp_c}{\sum\limits_{c=1}^C tp_c + fp_c}
 $$

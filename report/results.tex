@@ -1,7 +1,7 @@
 \chapter{Results}
 In this section we present the results obtained in the experiment detailed in the previous sections. We visualize the effect of multi-task learning on generalization error estimated by cross-validation for each of the proposed weight sharing strategies. Specifically, we plot the mean macro F1 for each cross-validation experiment as a function of the fraction of target data available for training. This produces a so called \textbf{learning curve} that indicates how generalization error improves as the amount of training data is increased in both the single-task and multi-task setting.
 \\\\
-Moreover, we perform statistical tests of significance using one sided t-testing on the data collected for each fraction $f$ of target data in order to determine if the observed differences between single-task and multi-task learning can be explained by variation due to random weight initialization and and stochastic gradient descent.
+Moreover, we perform statistical tests of significance using one sided t-testing on the cross-validation data collected for each fraction $f$ of target data in order to determine if the observed differences between single-task and multi-task learning can be explained by variation due to random weight initialization and and stochastic gradient descent.
 \section{Shared Embeddings}
 In this section we present the results obtained for SemEval 2010 Task 8 in a single-task and multi-task setting using the simple weight sharing strategy discussed in section \ref{network_architecture} in which only the word and position embedding matrices are shared between tasks. Each plot contains two curves: one learning curve for SemEval 2010 Task 8 when learnt as a single task, and one when learnt simultaneously with an auxiliary task. In addition we present tables containing the $p$-value of one-sided t-tests between the macro $F1$ scores of multi-task and single-task experiments grouped by the fraction of target data $f$.
 \begin{figure}[h]
@@ -42,18 +42,18 @@ In this section we present the results obtained for SemEval 2010 Task 8 in a sin
 		\textbf{Mean multi-task macro $F1$} & .050 & .608 & .655 & .674 & .686  & .686\\
 		$p$\textbf{-value} & .236  & .414 & .371 & .223 & .058 & .389
 	\end{tabular}
-	\caption{Learning curves and hypothesis tests for SemEval 2010 Task 8 trained as a single task and in a multi-task setting with the CONLL2000 chunking task. Here we also see no significant gains in generalization performance for the multi-task learning setting.}
+	\caption{Learning curves and hypothesis tests for SemEval 2010 Task 8 trained as a single task and in a multi-task setting with the CONLL2000 chunking task. Here we also see no statistically significant gains in generalization performance for the multi-task learning setting.}
 \end{figure}
 \begin{figure}[h]
 	\centering
-	\input{img/shared_embedding_GMB-NER_learning_curve.pgf}
+	\input{img/no_filter_sharing_GMB-NER_learning_curve.pgf}
 	\vspace*{1cm}
 	
 	\begin{tabular}{r | l | l | l | l | l | l}
 		\textbf{Percentage of $\data_t$} & 0 & 20 & 40 & 60 & 80 & 100 \\  \hline
 		\textbf{Mean single-task macro $F1$} & .056 & .606 & .652 & .667 & .672 & .683\\
-		\textbf{Mean multi-task macro $F1$} & .064 & .618 & .665 & .676 & .681 & .691\\
-		$p$\textbf{-value} & .231 & .097 & .101 & .154 & .146 & .145
+		\textbf{Mean multi-task macro $F1$} & .064 & .605 & .659 & .667 & .673 & .694\\
+		$p$\textbf{-value} & .237 & .455 & .242 & .487 & .452 & .113
 	\end{tabular}
 	\caption{Learning curves and hypothesis tests for SemEval 2010 Task 8 trained as a single task and in a multi-task setting with GMB named entity recognition. The differences in generalization performance between the two approaches are most likely due to the stochastic nature of the experiment.}
 \end{figure}
@@ -134,4 +134,4 @@ Here we present the results for the final weight sharing strategy: sharing the c
 
 
 \section{Summary}
-The results presented in this section are mixed: The weight sharing strategies in which just the position and word embedding matrices are shared do not in general lead to tangible improvements in generalization performance for multi-task learning. The only proposed weight sharing strategy that lead to significant improvements in generalization performance is the convolutional filter sharing approach in which the convolutional filters over the augmented sentence matrix are shared. This approach is unfortunately only practically feasible when sharing the weights with an auxiliary relation classification task.
+The results presented in this section are mixed: The weight sharing strategies in which just the position and word embedding matrices are shared do not in general lead to tangible improvements in generalization performance for multi-task learning. The only proposed weight sharing strategy that lead to significant improvements in generalization performance is the convolutional filter sharing approach in which the convolutional filters over the augmented sentence matrix are shared. This approach is unfortunately only practically feasible when sharing the weights with an auxiliary relation classification task. In the next section we provide an analysis of these results.

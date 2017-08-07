@@ -1,7 +1,7 @@
 \section{Supervised Machine Learning}
 \label{supervised_machine_learning}
 
-Most modern solutions to the information extraction problems in \ref{information_extraction} are based on supervised machine learning techniques. In this setting a system learns to recognize the named entities or relations between them from examples provided by a human annotator. In this section we formally describe this approach and introduce important theoretical tools for understanding the limitations of supervised machine learning.
+Most modern solutions to the information extraction problems in \ref{information_extraction} are based on supervised machine learning techniques. In this setting a system learns to recognize the named entities or relations between them from examples provided by a human annotator. In this section we formally describe this approach and introduce important theoretical tools for understanding it's limitations.
 
 \subsection{The Supervised Learning Problem}
 \label{the_supervised_learning_problem}
@@ -44,7 +44,7 @@ These assumptions enable us to apply \textbf{Hoeffding's inequality} to bound th
 
 The inequality tells us that the probability that $E$ is more than $\epsilon$ away from $\hat{E}$ decreases exponentially in $\epsilon$ and $N$. In other words, the more samples in $\mathcal{S}$, the less likely it is that $\hat{E}$ will be misleading. Estimating $E$ with a sample that's independent of $h$ is a technique called \textbf{validation} and will be discussed in section \ref{validation}
 \\\\
-Because $\mathcal{D}$ is used to select $h$ Hoeffding's inequality doesn't hold, and we need more sophisticated techniques to understand the relationship between $\hat{E}$ and $E$. The central question in supervised machine learning is: \textit{how can we best define $\mathcal{H}$ and use $\mathcal{D}$ to make $E$ small?} Answering this question is the objective of a field of research known as \textbf{statistical learning theory}.
+Because $\mathcal{D}$ is used to select $h$, Hoeffding's inequality doesn't hold and we need more sophisticated techniques to understand the relationship between $\hat{E}$ and $E$. The central question in supervised machine learning is: \textit{how can we best define $\mathcal{H}$ and use $\mathcal{D}$ to make $E$ small?} Answering this question is the objective of a field of research known as \textbf{statistical learning theory}.
 
 \subsection{Statistical Learning Theory}
 \label{statistical_learning_theory}
@@ -54,7 +54,7 @@ As we argued in section \ref{supervised_machine_learning}, using $\hat{E}$ to es
 
 The phenomena where training error is small but generalization error is large is known as \textbf{overfitting} \citep{yaser12}. As the name implies, it's caused by harmful idiosyncrasies of $\mathcal{D}$ that causes us to select a $g$ with a larger $E$ than other functions in $\mathcal{H}$. These idiosyncrasies of $\mathcal{D}$ are ultimately the product of \textbf{noise}.
 \\\\
-In general, noise comes in two forms. The first form is known as \textbf{stochastic noise}. This type of noise is introduced by variation in the relationship between $\mathbf{x}$ and $\mathbf{y}$ that is irrelevant to the problem we are trying to solve. For example, human error where a human annotator incorrectly labels a piece of text is a common source of stochastic noise in information extraction. Selecting a $g$ that repeats this error is a case of overfitting, because $g$ will have lower training error but larger generalization error than another $h$ that doesn't predict the incorrect annotation.
+In general, noise comes in two forms. The first form is known as \textbf{stochastic noise}. This type of noise is introduced by variation in the relationship between $\mathbf{x}$ and $\mathbf{y}$ that is irrelevant to the problem we are trying to solve. For example, human error where a human annotator incorrectly labels a piece of text is a common source of stochastic noise in information extraction. Selecting a $g$ that repeats this error is a case of overfitting because $g$ will have lower training error but larger generalization error than another $h$ that doesn't predict the incorrect annotation.
 \\\\
 The second type of noise is called \textbf{deterministic noise}. This type of noise may be introduced when the relationship between $\mathbf{x}$ and $\mathbf{y}$ is deterministic, but $\mathcal{H}$ doesn't have the capacity to represent this relationship exactly.
 

@@ -5,7 +5,7 @@ Here we describe each of the datasets used as auxiliary tasks in our multi-task 
 \subsection{ACE 2005 Relations}
 Intuitively, we expect that a feature transformation in the early layers of a neural network that's useful for one relation classification task should also be useful to another, assuming the relations of interest in one task are semantically related to the relations in another.
 
-We therefore test the usefulness of incorporating an auxiliary relation classification task as measured by generalization error on the SemEval dataset. Next to SemEval, the ACE 2005 relation classification dataset is the most widely used in contemporary literature  \citep{walker2006}. Unlike the SemEval 2010 dataset, the stated goal of the ACE 2005 relation classification task is to identify relations between named entities. Specifically, the relations in the ACE 2005 dataset are defined between the entity types: person, organization, location, facility, weapon, vehicle and geo-political entity. Unlike the SemEval annotation process however, the annotation guide for ACE 2005  contains no restrictions on the complexity of the sentences in terms of dependence on discourse knowledge or sentential clauses.
+We therefore test the usefulness of incorporating an auxiliary relation classification task as measured by generalization error on the SemEval dataset. Next to SemEval, the ACE 2005 relation classification dataset is the most widely used in contemporary literature  \citep{walker2006}. Unlike the SemEval 2010 dataset, the stated goal of the ACE 2005 relation classification task is to identify relations between named entities. Specifically, the relations in the ACE 2005 dataset are defined between the entity types: person, organization, location, facility, weapon, vehicle and geo-political entity. Unlike the SemEval annotation process, the annotation guide for ACE 2005  contains no restrictions on the complexity of the sentences in terms of dependence on discourse knowledge or sentential clauses.
 \\\\
 The ACE 2005 relation classification dataset contains 8,365 english sentences collected from various sources such as transcribed news broadcasts and phone conversations, as well as Usenet discussion forums and Newswire. Each sentence is annotated with exactly one of the following relations:
 \begin{labeling}{Physical}
@@ -77,7 +77,7 @@ Many practical applications do not require full syntactic parses. \textbf{Chunki
 \\\\
 The CONLL2000 dataset is annotated with chunking information in the BIO-labelling scheme introduced in section \ref{named_entity_recognition} in addition to part-of-speech tags.
 \\\\
-A neural network representation that's useful for predicting syntactic chunks may benefit a relation classification task since the syntactic structure of a sentence is highly informative for how nominals, including named entities, are semantically related to each other. For example, in order to determine whether the relationship between \textit{The Ford Motor Company} and \textit{Dearborn, Michigan} in the sentence 
+A neural network representation that's useful for predicting syntactic chunks may benefit a relation classification task since the syntactic structure of a sentence is highly informative for how nominals are semantically related to each other. For example, in order to determine whether the relationship between \textit{The Ford Motor Company} and \textit{Dearborn, Michigan} in the sentence 
 \begin{quote}
 \textit{The Ford Motor Company produces cars in Dearborn, Michigan}	
 \end{quote}

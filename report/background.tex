@@ -7,8 +7,10 @@ In this part we describe the information extraction problem and the challenges i
 \input{supervisedMachineLearning}
 
 \section{Summary}
-In this section we have seen that the purpose of named entity recognition is to identify mentions of entities such as people, organizations and places in natural language. The purpose of relation extraction systems is to identify relationships between them. 
+In this section we have seen that the purpose of named entity recognition is to identify mentions of entities such as people, organizations and places in natural language. The purpose of relation extraction systems is to identify relationships between them. We described how the ambiguity of natural language makes information extraction problems difficult.
 
-We have seen that simple accuracy is uninformative as an evaluation measure in information extraction. We have introduced precision and recall as alternative metrics that mitigate the problems of simple accuracy.
-
-We have described the formal setting of supervised machine learning. We have discussed concepts such as overfitting and noise, diversity of the set of functions $\mathcal{H}$ from which to choose $h$, and its impact on training and generalization error. Finally we have discussed validation as a technique for estimating $E$ empirically.
+We have seen that simple accuracy is uninformative as an evaluation measure in information extraction. We have introduced precision, recall and $F1$ as alternative metrics that mitigate the problems of simple accuracy.
+\\\\
+We have described the formal setting of supervised machine learning. We have discussed concepts such as overfitting and noise, diversity of the set of functions $\mathcal{H}$ from which to choose $h$, and its impact on training and generalization error. Finally we have discussed validation as a technique for estimating $E$ empirically, and cross-validation as a technique to overcome the dilemma of setting aside too much vs. too little data for validation. 
+\\\\
+In the coming sections we present a concrete hypothesis space that has some convenient properties for multi-task learning: neural networks.

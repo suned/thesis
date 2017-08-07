@@ -1,12 +1,12 @@
 \section{Learning Algorithm}
 \label{learningAlgorithm}
-Finding a function $h \in \mathcal{H}$ that maximizes the likelihood of $\mathcal{D}$ is an optimization problem. Optimization is solved by answering the question: \textit{how does $\hat{E}$ change when we change $\vector{w}$?} We answer questions of this type with differential calculus. Sadly, there is no known method for finding the $h$ which maximizes the likelihood by analytical differentiation. Neural network optimization is therefore solved using an iterative algorithm called \textbf{gradient descent}, which we describe in this section. We go on to explore an algorithm for computing the gradient of $\hat{E}$ called \textbf{backpropagation}. Finally, we look into \textbf{regularization} which are tools for constraining the learning algorithm in order to avoid overfitting. Lastly, we describe a specific learning algorithm called \textbf{Adam}, an efficient variation on gradient descent.
+Finding a function $h \in \mathcal{H}$ that maximizes the likelihood of $\mathcal{D}$ is an optimization problem. Optimization is solved by answering the question: \textit{how does $\hat{E}$ change when we change $\vector{w}$?} We answer questions of this type with differential calculus. Sadly, there is no known method for finding the $\vector{w}$ which maximizes the likelihood by analytical differentiation. Neural network optimization is therefore solved using an iterative algorithm called \textbf{gradient descent}, which we describe in this section. We go on to explore an algorithm for computing the gradient of $\hat{E}$ called \textbf{backpropagation}. Finally, we look into \textbf{regularization} which are tools for constraining the learning algorithm in order to avoid overfitting. Lastly, we describe a specific learning algorithm called \textbf{Adam}, an efficient variation on gradient descent.
 
 \subsection{Gradient Descent}
 \label{gradient_descent}
-We want to find a $h \in \mathcal{H}$ that minimizes $\hat{E}$ as described in section \ref{objectiveFunction}. Each $h$ is defined exactly by the weight vector $\mathbf{w}$. $\hat{E}$ can't be minimized analytically since its derivative with respect to $\mathbf{w}$ is a system of non-linear equations, which in general does not have an analytical solution \citep{goodfellow16}. We therefore look for $h$ by choosing an initial weight vector $\mathbf{w}_0$, and iteratively reduce $\hat{E}$: In iteration $i$, the weight vector $\mathbf{w}_i$ is found by taking a small step $\eta$ in a direction given by a vector $\mathbf{v}$, or more formally: $\mathbf{w}_i = \mathbf{w}_{i-1} + \eta\mathbf{v}$. The main question is: which direction should we choose? 
+We want to find a $h \in \mathcal{H}$ that minimizes $\hat{E}$ as described in section \ref{objectiveFunction}. Each $h$ is defined exactly by the weight vector $\mathbf{w}$. $\hat{E}$ can't be minimized analytically since its derivative with respect to $\mathbf{w}$ is a system of non-linear equations, which in general does not have an analytical solution \citep{goodfellow16}. We therefore look for $h$ by choosing an initial weight vector $\mathbf{w}_0$ close to the origin, and iteratively reduce $\hat{E}$: In iteration $i$, the weight vector $\mathbf{w}_i$ is found by taking a small step $\eta$ in a direction given by a vector $\mathbf{v}$, or more formally: $\mathbf{w}_i = \mathbf{w}_{i-1} + \eta\mathbf{v}$. The main question is: which direction should we choose? 
 \\\\ 
-$\hat{E}$'s direction of steepest descent at each $\mathbf{w}_i$ is given by the gradient $\nabla\hat{E}$ \citep{yaser12}. $\nabla \hat{E}$ is a vector where each component is a partial derivative $\frac{\partial}{\partial w}\hat{E}$ with respect to a weight $w \in \mathbf{w}$:
+$\hat{E}$'s direction of steepest ascent at each $\mathbf{w}_i$ is given by the gradient $\nabla\hat{E}$ \citep{yaser12}. $\nabla \hat{E}$ is a vector where each component is a partial derivative $\frac{\partial}{\partial w}\hat{E}$ with respect to a weight $w \in \mathbf{w}$:
 
 \begin{definition}[gradient]
 	\label{gradient}
@@ -20,7 +20,7 @@ The gradient can be used for computing the rate of change of $\hat{E}$ in the di
 \\\\
 One challenge of gradient descent is that $\nabla \hat{E} = \frac{1}{N}\sum_{i=1}^N\nabla e(h(\mathbf{x}_i), \mathbf{y}_i)$ is based on all the examples in $\mathcal{D}$. This means that computing $\nabla \hat{E}$ requires one full iteration over the training set. If the training set is large, this means that every update to the weights $\mathbf{w}$ takes a long time which makes learning slow. \textbf{Stochastic gradient descent} is a common variation on gradient descent which addresses this problem \citep{yaser12}. 
 
-In stochastic gradient descent, a single training example $(\mathbf{x}_i, \mathbf{y}_i)$ is sampled from $\mathcal{D}$. Instead of updating $\mathbf{w}_i$ by the gradient $-\nabla \hat{E}$ over all the training examples, we update the weights based on the gradient of a single example $\mathbf{w}_i = \mathbf{w}_{i-1}-\eta\nabla e(h(\mathbf{x}_i), \mathbf{y}_i)$. Since each sample in $\mathcal{D}$ can be drawn with probability $\frac{1}{N}$, stochastic gradient descent is identical to gradient descent in expectation:
+In stochastic gradient descent, a single training example $(\mathbf{x}_i, \mathbf{y}_i)$ is sampled uniformly from $\mathcal{D}$. Instead of updating $\mathbf{w}_i$ by the gradient $-\nabla \hat{E}$ over all the training examples, we update the weights based on the gradient of a single example $\mathbf{w}_i = \mathbf{w}_{i-1}-\eta\nabla e(h(\mathbf{x}_i), \mathbf{y}_i)$. Since each sample in $\mathcal{D}$ can be drawn with probability $\frac{1}{N}$, stochastic gradient descent is identical to gradient descent in expectation:
 $$
 \mathbb{E}(-\nabla e(h(\mathbf{x}_i), \mathbf{y}_i)) = \frac{1}{N}\sum\limits_{i=1}^N -\nabla e(h(\mathbf{x}_i), \mathbf{y}_i) = -\nabla\hat{E}
 $$
@@ -37,7 +37,7 @@ $$
 \noindent
 In traditional gradient descent, $\nabla \hat{E}$ approaches $\vector{0}$ when $\vector{w}_i$ approaches a local or global minimum for $\hat{E}$. This prevents the algorithm from stepping far away from this minimum once it's close to a solution. When using stochastic gradient descent however, each update to the weights is based on just a single example and is therefore noisy which means that $\nabla e(h(\mathbf{x}_i, \mathbf{y}_i)$ may be large even if $\vector{w}_i$ is close to a value that minimizes $\hat{E}$. 
 
-To reduce the noise in the gradient estimate, it's common to sample a small mini-batch from $\data$ and perform gradient descent on that. In addition, its common to shrink the learning rate $\eta$ as the algorithm progresses to avoid stepping away from a minimum due to the noise in the gradient estimate. We will see a strategy for shrinking $\eta$ systematically in the next section.
+To reduce the noise in the gradient estimate, it's common to sample a small mini-batch $\mathcal{B}$ of $b$ examples from $\data$ and perform gradient descent on that. In addition, its common to shrink the learning rate $\eta$ as the algorithm progresses to avoid stepping away from a minimum due to the noise in the gradient estimate. We will see a strategy for shrinking $\eta$ systematically in the next section.
 
 \subsection{Adam}
 \label{adam}
@@ -145,7 +145,7 @@ To summarize, we now have a recursive formula for every weight component of the 
 $$
 \pderiv{e}{w^{(l)}_{ij}} = x^{(l-1)}_i \delta^{(l)}_j,\quad \delta^{(l)}_j = \sigma'(a^{(l)}_i) \sum\limits_{i=1}^{d^{(l+1)}} w^{(l+1)}_{ij} \delta^{(l+1)}_j
 $$
-This allows us to compute $\nabla\hat{E}$ and use to search $\mathcal{H}$ iteratively for a function $h$ that minimizes $\hat{E}$. In the next section, we consider regularization techniques that restrict gradient descent in ways the prevent overfitting.
+This allows us to compute $\nabla\hat{E}$ and use it to search $\mathcal{H}$ iteratively for a function $h$ that minimizes $\hat{E}$. In the next section, we consider regularization techniques that restrict gradient descent in ways that prevent overfitting.
 
 \subsection{Regularization}
 \label{regularisation}
@@ -175,7 +175,7 @@ $$
 $$
 In words, the added norm penalty of $\augerror$ has the effect of pulling the vector $\vector{w}_i$ towards $\vector{0}$ by multiplying by $1 - 2\eta\lambda$ in each iteration. In this way, weight decay is limiting the region that gradient descent can explore in a finite number of iterations, and is therefore limiting the effective diversity of $\hypspace$.
 \\\\
-\textbf{Early stopping} is a form of regularization for iterative optimization methods that is particularly straight-forward to implement, and as an added bonus gives a reasonable stopping criterion for gradient descent. It works very similarly to weight decay:q by limiting the region of $\hypspace$ that can be explored in a finite number of iterations.
+\textbf{Early stopping} is a form of regularization for iterative optimization methods that is particularly straight-forward to implement, and as an added bonus gives a reasonable stopping criterion for gradient descent. It works very similarly to weight decay: by limiting the region of $\hypspace$ that can be explored in a finite number of iterations.
 
 For a single iteration $i$ of gradient descent with step size $\eta$, gradient descent explores all weights in a radius of $\eta$ around $\vector{w}_i$ since a step in the direction of the negative gradient minimizes $\trerror{\vector{w}}$ among all weights with $||\vector{w} - \vector{w}_i|| \leq \eta$ \citep{yaser12}. In other words, we can think of an effective hypothesis space $\hypspace_i$ for each iteration thats limited by $\eta$:
 $$

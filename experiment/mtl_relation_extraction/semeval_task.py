@@ -97,7 +97,7 @@ class SemEvalTask(CNN):
             self.validation_relations
         )
 
-    def validation_metrics(self, averaging="micro"):
+    def validation_metrics(self, averaging="macro"):
         validation_input, validation_labels = self.validation_set()
         one_hot_prediction = self.model.predict(validation_input)
         label_prediction = self.decode(one_hot_prediction)

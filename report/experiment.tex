@@ -1,4 +1,5 @@
 \chapter{Experiment}
+\label{experiment}
 In this section we explain our experimentation with deep multi-task learning for relation classification. We begin by describing related work on deep multi-task learning for natural language processing tasks and relation extraction. We focus on papers that have had a direct impact on architectural and algorithmic choices in our own experimentation. We then describe in some detail the benchmark relation classification dataset which will act as our target task. We continue by describing each auxiliary task used in our experiments. Finally, we describe the target and auxiliary neural network architecture and algorithm used to jointly train and probe generalization performance.
 \input{relatedWork}
 \input{targetTask}
@@ -7,4 +8,10 @@ In this section we explain our experimentation with deep multi-task learning for
 \input{algorithm}
 
 \section{Summary}
-In this section we have summarized the state of related work for deep multi-task learning for relation classification. We have described the SemEval 2010 Task 8 dataset which we use as a benchmark in our experiments. Moreover, we have described each auxiliary task for which we test the impact of hard neural network weight sharing on the target task. Finally, we have described the neural network architectures used, and how we adapt them to enable weight sharing, as well as the algorithm used to train this architecture.
+In this section we have summarized the state of related work for deep multi-task learning for relation classification. We found that no previous investigation of the usefulness of deep multi-task learning for relation classification exists. 
+\\\\
+We have described the SemEval 2010 Task 8 dataset which we use as a benchmark in our experiments. In this context, we discussed the need for a benchmark dataset that gives us confidence about the generality of an experiment that uses it. We have called into question whether the SemEval dataset has this quality. Nevertheless, we have decided to use it as a benchmark in our experiments because of its status as the de facto standard dataset for relation classification experiments.
+\\\\
+Moreover, we have described each auxiliary task for which we test the impact of hard neural network weight sharing on the target task. Finally, we have described the neural network architectures used, and how we adapt them to enable weight sharing, as well as the algorithm used to train this architecture.
+\\\\
+We continue by presenting the results obtained from our experiments.

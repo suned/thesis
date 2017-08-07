@@ -14,7 +14,7 @@ $$
 $$
 Many functions in practical applications of convolutions represent signals such as images, sound or text, which are only defined over a limited range of indices $x$. In these cases, it's assumed that whenever $x$ is beyond the domain of $f$ or $k$ the output of either function is 0.
 \\\\
-We can think of a convolution as a weighted sum of the output of $f$ where the output of $k$ acts as the weights. This view of convolution is used heavily in signal processing applications where $k$ is chosen to produce certain properties in the convolution output such as reducing noise in $f$. In this setting $k$ is often referred to as a \textbf{kernel}. As an example, consider the noisy signal convolved with a gaussian kernel in figure \ref{gaussian_convolution}.
+We can think of a convolution as a weighted sum of the output of $f$ where the output of $k$ acts as the weights. This view of convolution is used heavily in signal processing applications where $k$ is chosen to produce certain properties in the convolution output such as reducing noise in $f$. In this setting $k$ is often referred to as a \textbf{kernel} or \textbf{convolutional filter}. As an example, consider the noisy signal convolved with a gaussian kernel in figure \ref{gaussian_convolution}.
 
 \begin{figure}
 	\centering

@@ -1,11 +1,16 @@
 \chapter{Neural Networks}
 \label{neural_networks}
 
-In this part we describe how to define $\mathcal{H}$ using functions called \textbf{neural networks}. One advantage of these functions is that they're easy to adapt to multi-task learning. We begin by describing how to design $\mathcal{H}$ using neural networks. We then turn to the issue of how to use $\mathcal{D}$ to search this hypothesis space. We then cover regularization techniques, the purpose of which is to prevent overfitting. Lastly, we introduce convolutional neural networks which are specialized functions often used for text classification problems such as relation extraction.
+In this part we describe how to define $\mathcal{H}$ using functions called \textbf{neural networks}. One advantage of these functions is that they're easy to adapt to multi-task learning. We begin by describing how to design $\mathcal{H}$ using neural networks. We then turn to the issue of how to use $\mathcal{D}$ to search this hypothesis space. We then cover regularization techniques the purpose of which is to prevent overfitting. Lastly, we introduce convolutional neural networks which are specialized functions often used for text classification problems such as relation extraction.
 
 \input{feedForwardNeuralNetworks}
 \input{learningAlgorithm}
 \input{convolutionalNeuralNetworks}
+\input{RNNs}
 
 \section{Summary}
-In this section we have seen how to define $\mathcal{H}$ with neural networks, and we have seen how to search this space using backpropagation and gradient descent. Moreover, we have discussed regularization techniques that restrict the learning algorithm to a limited region of $\mathcal{H}$ in order to reduce the risk of overfitting. Finally, we have introduced convolutional neural networks that take advantage of convolutions as feature detectors.
+In this section we have seen how to define $\mathcal{H}$ with neural networks, and we have seen how to search this space using backpropagation and gradient descent. We have presented the Adam algorithm as a useful extension to stochastic gradient descent that incorporates ideas of learning rate scaling and momentum.
+\\\\
+ Moreover, we have discussed regularization techniques that restrict the learning algorithm to a limited region of $\mathcal{H}$ in order to reduce the risk of overfitting. In particular, we have presented early stopping as a simple yet effective regularization technique. Finally, we have introduced convolutional neural networks that take advantage of convolutions as feature detectors. As we will discuss in part \ref{experiment}, convolutional neural networks are often used to solve sentence classification problems such as relation classification.
+ \\\\
+ In the next part, we introduce the multi-task learning framework as an extension to Vapnik-Chervonenkis analysis presented in section \ref{statistical_learning_theory}.
