@@ -12,7 +12,7 @@ In practical applications involving computers, $f$ and $k$ are discrete, and the
 $$
 (f * k)(x) = \sum\limits_{y=-\infty}^\infty f(y)k(x - y)
 $$
-Most functions in practical applications of convolutions represent signals such as images, sound or text, which are only defined over a limited range of indices $x$. In these cases, it's assumed that whenever $x$ is beyond the domain of $f$ or $k$ the output of either function is 0.
+Many functions in practical applications of convolutions represent signals such as images, sound or text, which are only defined over a limited range of indices $x$. In these cases, it's assumed that whenever $x$ is beyond the domain of $f$ or $k$ the output of either function is 0.
 \\\\
 We can think of a convolution as a weighted sum of the output of $f$ where the output of $k$ acts as the weights. This view of convolution is used heavily in signal processing applications where $k$ is chosen to produce certain properties in the convolution output such as reducing noise in $f$. In this setting $k$ is often referred to as a \textbf{kernel}. As an example, consider the noisy signal convolved with a gaussian kernel in figure \ref{gaussian_convolution}.
 
@@ -45,7 +45,9 @@ These restrictions on the network architecture reduces the number of unique weig
 \\\\
 Intuitively, the output at each unit $u$ in $l$ in a convolutional layer indicates how strongly the feature detected by the kernel given by its connecting weights is present in the output of units that $u$ connects to in layer $l - 1$. Since the weights are learned by gradient descent, the feature detected by units in layer $l$ is learnt as well.
 
-Often, the simple presence or absence of a feature in the output of layer $l - 1$ is very informative for the classification task the convolutional network was built to solve. The exact position of a detected feature in layer $l - 1$ is often less informative however. For this reason, convolutional layers are often interleaved with so called \textbf{pooling layers}. The output of a pooling layer can be thought of as a summary how strongly a feature is detected in layer $l$, that discards information about the exact position at which the features was detected. Very commonly, max-pooling is used which simply outputs the maximum value over all outputs of units in layer $l$.
+Often, the simple presence or absence of a feature in the output of layer $l - 1$ is very informative for the classification task the convolutional network was built to solve. The exact position of a detected feature in layer $l - 1$ is often less informative however. For this reason, convolutional layers are often interleaved with so called \textbf{pooling layers}. A pooling layer performs an aggregation function over the output of a neural network layer $f^{(l)}$ such as taking the mean or max across the output units.
+
+The output of a pooling layer can be thought of as a summary how strongly a feature is detected in layer $l$, that discards information about the exact position at which the feature was detected. Very commonly, max-pooling is used which simply outputs the maximum value over all outputs of units in layer $l$.
 
 \begin{figure}[h]
 	\centering

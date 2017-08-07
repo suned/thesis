@@ -6,7 +6,7 @@ We proceed as follows: We vary the amount of data from the target task by a set 
 \\\\
 This process is iterated until an early stopping criterion on a target task validation set is met. Specifically, $1/10$ of target training data is set aside for early stopping validation. Training is halted when the cross-entropy error on the early stopping dataset has not improved for 200 iterations of mini-batch gradient descent. Finally, the model weights are reset to their best recorded value.
 
-When the patience is exceeded we record the cross-validation macro-F1 on the target task test fold using the best recorded weights. Since neural network training is a random search procedure with respect to weight initialization and mini-batch sampling, we run this experiment for each fraction $f$ 5 times, yielding a total of 25 random cross-validation splits. We have provided the algorithm used in our experiments as pseudocode in algorithm \ref{experiment_pseudocode}.
+When the patience is exceeded we record the cross-validation macro-F1 on the target task test fold using the best recorded weights. Since neural network training is a random search procedure with respect to weight initialization and mini-batch sampling, we run this experiment for each fraction $f$ 5 times, yielding a total of 25 random cross-validation splits. We have provided the algorithm used in our experiments as pseudocode in algorithm \ref{experiment_pseudocode}. The code can be downloaded at \texttt{github.com/suned/thesis}.
 \begin{algorithm}
 \begin{algorithmic}
 	\Require Target dataset $\data_{target}$

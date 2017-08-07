@@ -4,7 +4,7 @@ In natural language processing, information extraction is the problem of extract
 
 \subsection{Named Entity Recognition}
 \label{named_entity_recognition}
-A named entity is roughly anything that has a proper name. The goal of named entity recognition is to label mentions of entities such as people, organizations or places occurring in natural language. The list of things these systems are tasked with recognizing is often extended to include things that aren't technically named entities such as amounts of money or calendar dates.
+A named entity is roughly anything that has a proper name. The goal of named entity recognition (NER) is to label mentions of entities such as people, organizations or places occurring in natural language. The list of things these systems are tasked with recognizing is often extended to include things that aren't technically named entities such as amounts of money or calendar dates.
 
 As an example, consider the sentence: 
 $$
@@ -30,7 +30,7 @@ Named entity recognition can be framed as a sequence labeling problem. A common 
 
 \subsection{Relation Extraction}
 \label{relation_extract}
-The goal of relation extraction is to identify relationships such as \textit{Family} or \textit{Employment} in natural language. The set of relations we would like a relation extraction system to recognize is commonly referred to as the \textbf{inventory}. Most often, the inventory is limited to relations between named entities. In some relation extraction tasks however, the goal is to more generally recognize relations between nouns \citep{hendrickx2009}. In both cases, the words between which a relation exists are referred to as the \textbf{arguments} of the relation.
+The goal of relation extraction is to identify relationships such as \textit{Family} or \textit{Employment} in natural language. The set of relations we would like a relation extraction system to recognize is commonly referred to as the \textbf{inventory}. Most often, the inventory is limited to relations between named entities. In some relation extraction tasks however, the goal is to more generally recognize relations between nominal expressions that include nouns and pronouns. \citep{hendrickx2009}. In both cases, the words between which a relation exists are referred to as the \textbf{arguments} of the relation.
 \\\\
 As an example, consider the sentence: 
 $$
@@ -44,7 +44,11 @@ To simplify the relation extraction problem, it's often solved in three steps:
 	\item \textbf{Relation detection} \enspace For each pair of named entities in the input text, determine if a relation exists between them. This is a binary classification problem where the input is the text and the named entities detected in step 1, and the output is yes/no.
 	\item \textbf{Relation classification} \enspace Classify each of the detected relations in the previous step. This a multi-label classification problem where the input is the input text and the named entities for which a relation was detected in step 2, and the output is a relation label.
 \end{enumerate}
-In this thesis we focus on step 3: assigning labels to detected relations. This is a difficult problem because of ambiguity. As an example, consider the sentence \textit{Susan left JFK}. Imagine that we want to design a relation extraction system that can detect the relations \textit{Physical(person, location): a person has a physical relation to a location} and \textit{Personal-Social(person, person): two persons have a social relation}. Both can reasonably be assigned the previous sentence, depending on whether \textit{JFK} refers to the airport near New York, or the former American president. Just as in named entity recognition, providing the correct label in this situation depends on context information.
+In this thesis we focus on step 3: assigning labels to detected relations. This is a difficult problem because of the high degree of ambiguity of natural language. As an example, consider the sentence 
+\begin{quote}
+	\textit{Susan left JFK.}
+\end{quote}
+Imagine that we want to design a relation extraction system that can detect the relations \textit{Physical(person, location): a person has a physical relation to a location} and \textit{Personal-Social(person, person): two persons have a social relation}. Both can reasonably be assigned the previous sentence, depending on whether \textit{JFK} refers to the airport near New York, or the former American president. Just as in named entity recognition, providing the correct label in this situation depends on context information.
 \\\\
 Early relation extraction systems relied on hand-crafted lexical and syntactic rules for detecting relations. \citet{hearst1992} is perhaps the earliest example of this approach. She considers the following sentence:
 \begin{quote}
@@ -56,7 +60,7 @@ NP_1\text{ such as }NP_2
 $$
 implies the relation $Hyponym(NP_1, NP_2)$. By performing a syntactic parse of the input sentence we can try to extract hyponym relations between noun phrases using such manually created rules. Because of the huge amount of variation found in natural languages, this is of course a cumbersome yet brittle approach.
 \\\\
-More recent solutions rely on supervised machine learning techniques to solve relation extraction problems. In this setting, a system learns to recognize relations in the inventory from annotated examples. The earliest examples of such systems relied on hand-crafted features of words in the neighborhood of the relation arguments, for example: \textit{the words between the arguments are "such as"} \citep{jurafsky09}. As we will see in part \ref{neural_networks}, the promise of avoiding complicated hand-crafted features of the sentence, but having the system learn useful lexico-syntactic features on its own is the major attraction of solutions based on neural networks.
+More recent solutions rely on supervised machine learning techniques to solve relation extraction problems. In this setting, a system learns to recognize relations in the inventory from annotated examples. The earliest examples of such systems relied on hand-crafted features of words in the neighborhood of the relation arguments, for example: \textit{the words separating the relation arguments are "such as"} \citep{jurafsky09}. As we will see in part \ref{neural_networks}, the promise of avoiding complicated hand-crafted features of the sentence, but having the system learn useful lexico-syntactic features on its own is the major attraction of solutions based on deep learning.
 
 \subsection{Accuracy Measures}
 Information extraction systems are often evaluated empirically by applying them to collections of text, so called corpora, in which $N$ mentions of named entities or relations are known. In these tests, accuracy measures for each class $c$ of information we wish to extract are usually defined in terms of how many times the system correctly predicted class $c$. Most metrics use the following terminology:
@@ -85,6 +89,6 @@ p_\mu = \frac{\sum\limits_{c=1}^C tp_c}{\sum\limits_{c=1}^C tp_c + fp_c}
 $$
 Where for example $tp_c$ is the true positives a system produces for class $c$.
 \\\\
-The main difference between macro and micro averages of accuracy measures is that micro averaging gives more weight to more frequent classes. In other words, micro averaging encodes the bias that infrequent classes are unimportant, and a misclassification of an example of such a class should not penalise the accuracy measure as much as a misclassification of a more frequent class. Whether on not this a reasonable bias depends on the problem. In order to be agnostic about the frequency of semantic relations we use macro averaging for all our reporting in this thesis.
+The main difference between macro and micro averages of accuracy measures is that micro averaging gives more weight to more frequent classes. In other words, micro averaging encodes the bias that infrequent classes are unimportant, and a misclassification of an example of such a class should not penalize the accuracy measure as much as a misclassification of a more frequent class. Whether or not this a reasonable bias depends on the problem. In order to be agnostic about the frequency of semantic relations we use macro averaging for all our reporting in this thesis.
 \\\\
 To get a single number that summarizes the performance, precision $p$ and recall $r$ are often combined into a single metric: the $F1$ measure. $F1$ is defined as the harmonic mean of precision and recall $\frac{2pr}{p + r}$. Variations that use the micro and macro versions of precision and recall can naturally be computed as the harmonic mean of the micro or macro precision and recall respectively.

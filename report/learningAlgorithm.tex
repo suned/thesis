@@ -1,6 +1,6 @@
 \section{Learning Algorithm}
 \label{learningAlgorithm}
-Finding a function $h \in \mathcal{H}$ that maximizes the likelihood of $\mathcal{D}$ is an optimization problem. Optimization is solved by answering the question: \textit{how does $\hat{E}$ change when we change $h$?} We answer questions of this type with differential calculus. Sadly, there is no known method for finding the $h$ which maximizes the likelihood by analytical differentiation. Neural network optimization is therefore solved using an iterative algorithm called \textbf{gradient descent}, which we describe in this section. We go on to explore an algorithm for computing the gradient of $\hat{E}$ called \textbf{backpropagation}. Finally, we look into \textbf{regularization} which are tools for constraining the learning algorithm in order to avoid overfitting. Lastly, we describe a specific learning algorithm called \textbf{Adam}, an efficient variation on gradient descent.
+Finding a function $h \in \mathcal{H}$ that maximizes the likelihood of $\mathcal{D}$ is an optimization problem. Optimization is solved by answering the question: \textit{how does $\hat{E}$ change when we change $\vector{w}$?} We answer questions of this type with differential calculus. Sadly, there is no known method for finding the $h$ which maximizes the likelihood by analytical differentiation. Neural network optimization is therefore solved using an iterative algorithm called \textbf{gradient descent}, which we describe in this section. We go on to explore an algorithm for computing the gradient of $\hat{E}$ called \textbf{backpropagation}. Finally, we look into \textbf{regularization} which are tools for constraining the learning algorithm in order to avoid overfitting. Lastly, we describe a specific learning algorithm called \textbf{Adam}, an efficient variation on gradient descent.
 
 \subsection{Gradient Descent}
 \label{gradient_descent}
@@ -10,9 +10,9 @@ $\hat{E}$'s direction of steepest descent at each $\mathbf{w}_i$ is given by the
 
 \begin{definition}[gradient]
 	\label{gradient}
-	Let $w^{(l)}_{ij} \in \mathbf{w}$ be every weight in $h$, and let $\hat{E}$ be defined as in definition \ref{negative_log-likelihood}. Then the gradient $\nabla \hat{E}$ is:
+	Let $w^{(l)}_{ij} \in \mathbf{w}$ be every weight in $h$, and let $\hat{E}$ be defined as in definition \ref{negative_log-likelihood}. Then the gradient $\nabla \trerror{\vector{w}}$ is:
 	$$
-	\nabla \hat{E} = \begin{bmatrix} \frac{\partial}{\partial w^{(1)}_{ij}\hat{E}} \\ \\ \vdots \\ \\ \frac{\partial}{\partial w^{(L)}_{ij}}\hat{E}\end{bmatrix}
+	\nabla \trerror{\vector{w}} = \begin{bmatrix} \frac{\partial}{\partial w^{(1)}_{ij}}\trerror{\vector{w}} \\ \\ \vdots \\ \\ \frac{\partial}{\partial w^{(L)}_{ij}}\trerror{\vector{w}}\end{bmatrix}
 	$$
 \end{definition}
 \noindent
@@ -41,7 +41,7 @@ To reduce the noise in the gradient estimate, it's common to sample a small mini
 
 \subsection{Adam}
 \label{adam}
-The Adam algorithm is a variation on stochastic gradient descent that attempts to shrink the learning rate $\eta$ automatically in each iteration \citep{kingma2014}. Since the learning rate varies from iteration to iteration, we will denote the learning rate in iteration $i$ as $\eta_i$. Moreover, Adam adapts the learning rate for each parameter $w$ individually by using a learning rate vector $\boldsymbol{\eta}$ instead of a scalar in the update rule, such that $\mathbf{w}_i = \mathbf{w}_{i-1} - \boldsymbol{\eta}_i\nabla e(h(\mathbf{x}_i), \mathbf{y}_i)$
+The Adam algorithm is a variation on stochastic gradient descent that attempts to shrink the learning rate $\eta$ automatically in each iteration \citep{kingma2014}. Since the learning rate varies from iteration to iteration, we will denote the learning rate in iteration $i$ as $\eta_i$. Moreover, Adam adapts the learning rate for each parameter $w \in \vector{w}$ individually by using a learning rate vector $\boldsymbol{\eta}$ instead of a scalar in the update rule, such that $\mathbf{w}_i = \mathbf{w}_{i-1} - \boldsymbol{\eta}_i\nabla e(h(\mathbf{x}_i), \mathbf{y}_i)$
 \\\\
 Adam uses the following heuristic: the learning rate for parameters $w$ for which $\pderiv{}{w} e(h(\mathbf{x}_i), \mathbf{y}_i)$ is frequently large should decrease more quickly than parameters that consistently have small derivatives. To achieve this, Adam scales $\eta$ by $\vector{v}_i$ such that:
 $$ 
@@ -149,11 +149,11 @@ This allows us to compute $\nabla\hat{E}$ and use to search $\mathcal{H}$ iterat
 
 \subsection{Regularization}
 \label{regularisation}
-In section \ref{statistical_learning_theory} we saw that the distance between $E$ and $\hat{E}(h, \mathcal{D})$ is bounded by, among other things, a function of the diversity of $\mathcal{H}$. In this section we discuss techniques for restricting the learning algorithm to search only in a subset of $\mathcal{H}$ with the aim of reducing $E$. These techniques are collectively known as regularization.
+In section \ref{statistical_learning_theory} we saw that the distance between $E(h)$ and $\hat{E}(h, \mathcal{D})$ is bounded by, among other things, a function of the diversity of $\mathcal{H}$. In this section we discuss techniques for restricting the learning algorithm to search only in a subset of $\mathcal{H}$ with the aim of reducing $E$. These techniques are collectively known as regularization.
 \\\\
 For a $\mathcal{H}$ thats parameterized by a weight vector $\mathbf{w}$ such as the hypothesis space given by a particular neural network architecture, we can limit the region of weight space that our learning algorithm is allowed to consider by imposing the constraint that the norm of $\mathbf{w}$ must be smaller than some constant $C$. This has the effect that the weights can be selected only from a limited spherical region around the origin. This reduces the effective number of different hypotheses available during learning, and the Vapnik-Chervonenkis bound gives us confidence that this should improve generalization.
 \\\\
-If the weights $\mathbf{w}^*$ that minimizes the unconstrained training error $\hat{E}(\mathbf{w}, \mathcal{D}_{train})$ lie outside this ball, then the weights $\bar{\mathbf{w}}$ that minimizes $\hat{E}$ while still satisfying the constraint $\bar{\mathbf{w}}^T\bar{\mathbf{w}} \leq C$ must have norm equal to $C$. In other words, these weights lie on the surface of the sphere with radius $C$. The normal vector to this surface at any $\mathbf{w}$ is $\mathbf{w}$ itself. At $\bar{\mathbf{w}}$ the normal vector must point in the exact opposite direction of $\nabla \hat{E}$, since otherwise $\nabla \hat{E}$ would have a component along the border of the constraint sphere, and we could decrease $\hat{E}$ by moving along the border of the sphere in the direction of $\nabla \hat{E}$ and still satisfy the constraint \citep{yaser12}. 
+If the weights $\mathbf{w}^*$ that minimize the unconstrained training error $\hat{E}(\mathbf{w}, \mathcal{D}_{train})$ lie outside this ball, then the weights $\bar{\mathbf{w}}$ that minimize $\hat{E}$ while still satisfying the constraint $\bar{\mathbf{w}}^T\bar{\mathbf{w}} \leq C$ must have norm equal to $C$. In other words, these weights lie on the surface of the sphere with radius $C$. The normal vector to this surface at any $\mathbf{w}$ is $\mathbf{w}$ itself. At $\bar{\mathbf{w}}$ the normal vector must point in the exact opposite direction of $\nabla \hat{E}$, since otherwise $\nabla \hat{E}$ would have a component along the border of the constraint sphere, and we could decrease $\hat{E}$ by moving along the border of the sphere in the direction of $\nabla \hat{E}$ and still satisfy the constraint \citep{yaser12}. 
 
 In other words, the following equality holds for $\bar{\mathbf{w}}$:
 $$
@@ -193,6 +193,6 @@ As $I$ increases, $\hypspace$ becomes more diverse, and Vapnik-Chervonenkis theo
 	\caption{Typical behavior of $E$ and $\hat{E}$ as a function of the number of iterations $i$ of gradient descent. Both errors are reduced until a point $i^*$ beyond which the training error is reduced, but generalization error increases.}
 	\label{early_stopping}
 \end{figure}
-When using early stopping, we treat the optimal number of iterations of gradient descent $i^*$ as a parameter we want to estimate. This is done through validation as described in section \ref{validation}. Specifically, after each gradient descent iteration $\hat{E}(\vector{w}_i, \data_{val})$ is computed as an estimate of $E$. When this quantity is no longer improving, gradient descent is halted and the the parameters $\vector{w}_{i^*}$ are returned.
+When using early stopping, we treat the optimal number of iterations of gradient descent $i^*$ as a parameter we want to estimate. This is done through validation as described in section \ref{validation}. Specifically, after each gradient descent iteration $\hat{E}(\vector{w}_i, \data_{val})$ is computed as an estimate of $E$. When this quantity is no longer improved, gradient descent is halted and the the parameters $\vector{w}_{i^*}$ are returned.
 
 When using stochastic gradient descent, $\hat{E}(\vector{w}_i, \data_{val})$ may vary slightly from iteration to iteration due to the noise introduced by the stochastic gradient. This means that the simple heuristic stopping criterion described above may fail when using stochastic gradient descent. A so called \textbf{patience} parameter is a simple solution to this problem. When using patience $p$, stochastic gradient descent is only halted when no improvement on $\hat{E}(\vector{w}_i, \data_{val})$ has been observed for $p$ iterations.

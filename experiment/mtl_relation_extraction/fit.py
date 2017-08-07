@@ -111,7 +111,10 @@ def find_start_iteration():
 
 def interleaved():
     global metrics
-    fractions = [.6, .8, 1.0]
+    if arguments.share_filters:
+        fractions = [.2, .4, .6, .8, 1.0]
+    else:
+        fractions = [.6, .8, 1.0]
     start_iteration = 1
     for target_fraction in fractions:
         log.info("Starting target fraction %f", target_fraction)

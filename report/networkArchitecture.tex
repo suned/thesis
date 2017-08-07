@@ -10,7 +10,7 @@ The $K \times (d + 2d')$ dimensional augmented sentence matrix is used as input 
 $$
 \sigma\left(w_0 + \sum\limits_{j = i}^{i + n}\vector{S}'_i\vector{W}_i^T\right)
 $$
-Where $\sigma$ is the ReLU activation function, $\vector{W}_i$ and $\vector{S}'_i$ is the $i$'th row of the convolutional filter matrix and augmented sentence matrix respectively, and $w_0$ is a bias term. In our experiment we use 150 filters of each window size, and window sizes $n$ of 2, 3, 4 and 5 for a total of 600 convolutional filters.
+Where $\sigma$ is the rectified linear activation function, $\vector{W}_i$ and $\vector{S}'_i$ is the $i$'th row of the convolutional filter matrix and augmented sentence matrix respectively, and $w_0$ is a bias term. In our experiment we use 150 filters of each window size, and window sizes $n$ of 2, 3, 4 and 5 for a total of 600 convolutional filters.
 
 We apply max-pooling to the output of each convolutional filter yielding a 600 dimensional feature vector, which is used as input for a soft-max output layer. See figure \ref{relation_architecture} for a diagram.
 \\\\
@@ -24,7 +24,7 @@ Secondly, extend the architecture of \citet{nguyen2015} to a \textbf{multi chann
 \\\\
 We can use the idea of multi-channel convolutional neural networks to modify the architecture proposed by \citet{nguyen2015} to accommodate sharing convolutional filter weights between the networks for the target and auxiliary task. Specifically, we can produce two identical sentences matrices from an input sentence. One is used to produce the augmented sentence matrix, one is kept as is. We can feed the augmented sentence matrix into a task-specific convolutional layer, and the un-augmented sentence matrix into a convolutional layer that can be shared with auxiliary tasks.
 \\\\
-Because the ACE 2005 relation classification task and SemEval 2010 Task 8 require exactly the same architecture, we can readily share both the embeddings and the convolutional filters. In this case with test both weight sharing strategies. A diagram of neural network weights are shared between tasks can be seen in figure \ref{relation_sequence_weight_sharing}
+Because the ACE 2005 relation classification task and SemEval 2010 Task 8 require exactly the same architecture, we can readily share both the embeddings and the convolutional filters over the augmented sentence matrix. We therefore test this weight sharing strategy as well, but only when using ACE 2005 as an auxiliary task. A diagram of neural network weights are shared between tasks can be seen in figure \ref{relation_sequence_weight_sharing}
 \newpage
 \begin{figure}[h!]
 	\thispagestyle{empty}
@@ -132,7 +132,7 @@ Because the ACE 2005 relation classification task and SemEval 2010 Task 8 requir
 		\draw[-latex, thick, dashed] (position_embedding) edge (convolutions_task1);
 		
 	\end{tikzpicture}
-	\caption{Diagram of the weight sharing strategy in which the embedding matrices are shared between the auxiliary and target task. The solid lines show how network activations flow from the target task to the target output. Dashed lines show how the activations flow through the auxiliary network.}
+	\caption{Diagram of the weight sharing strategy in which only the embedding matrices are shared between the auxiliary and target task. The solid lines show how network activations flow from the target task to the target output. Dashed lines show how the activations flow through the auxiliary network.}
 	\label{relation_sequence_weight_sharing}
 \end{figure}
 \newpage
@@ -162,6 +162,6 @@ Because the ACE 2005 relation classification task and SemEval 2010 Task 8 requir
 		\draw[-latex, thick, dashed] (position_embedding) edge (convolutions_task1);
 		
 	\end{tikzpicture}
-	\caption{Diagram of how neural network weights are shared when using a multi channel convolutional network to enable sharing the convolutional filters. The solid lines show how network activations flow from the target task to the target output. Dashed lines show how the activations flow through the auxiliary network.}
+	\caption{Diagram of how neural network weights are shared when using a multi channel convolutional network to enable sharing convolutional filters. The solid lines show how network activations flow from the target task to the target output. Dashed lines show how the activations flow through the auxiliary network.}
 \end{figure}
 \FloatBarrier

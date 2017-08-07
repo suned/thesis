@@ -100,7 +100,7 @@ Neural networks have the advantage of being easy to adapt from single-task learn
 	\label{weight_sharing}
 \end{figure}
 \noindent
-Multi-task learning techniques that are based on sharing neural network weights between tasks are collectively known as \textbf{deep multi-task learning} techniques. Deep multi-task learning is closely associated with the idea of representation learning presented in section \ref{representation_learning} and the more general framework of bias learning presented in section \ref{bias_learning}. The network represents a shared representation $f(\vector{x})$ represented by $S$ shared layers, often the first layers, and hypotheses $h_1 = (g_1 \circ f)(\vector{x})$ to $h_M = (g_M \circ f)(\vector{x})$ for each learning task, where $g_m$ is $L - S$ neural network layers specific to each task.
+Multi-task learning techniques that are based on sharing neural network weights between tasks are collectively known as \textbf{deep multi-task learning} techniques. Deep multi-task learning is closely associated with the idea of representation learning presented in section \ref{representation_learning} and the more general framework of bias learning presented in section \ref{bias_learning}. The shared layers, often the early layers of the network, constitute a shared representation $f$. The full networks for each learning task are built from the shared representation $f$ and hypotheses $h_1 = (g_1 \circ f)(\vector{x})$ to $h_M = (g_M \circ f)(\vector{x})$, where $g_m$ is $L - S$ neural network layers specific to each task.
 \\\\
 The exact circumstances under which deep multi-task learning leads to lower overall generalization error compared to deep single-task learning are not yet theoretically well understood. \citet{caruana1997} lists 3 suggestions for how multi-task learning can reduce generalization error:
 \begin{description}
@@ -130,7 +130,7 @@ $$
 
 where $v_{ij}$ is the weight connecting the input feature $x_i$ to unit $j$ in the first layer and $v_{0j}$ is a bias weight. The total number of weights $W$ in these two layers is thus $W = d^{(1)}(d^{(0)} + 1) + d^{(0)}(d + 1)$. The space of all such feature maps $\{\phi_{\vector{w}} \mid \vector{w} \in \mathbb{R}^W\}$ can be thought of as the representation space $\mathcal{F}$ in the representation learning framework of \citet{baxter1995}.
 \\\\
-\cite{baxter2000} defines a hypothesis space $\hypspace_{\vector{w}}$ as a set of binary decision functions on top the feature maps. Specifically:
+\cite{baxter2000} defines a hypothesis space $\hypspace_{\vector{w}}$ as a set of binary decision functions on top of the feature maps. Specifically:
 $$
 \hypspace_{\vector{w}} = \left\{ \sigma\left(  a_{0} + \sum\limits_{i=1}^{d^{(2)}} a_i\phi_{\vector{w},i}\right) \;\middle| \; a_{0},\dots,a_{d^{(2)}} \in \mathbb{R} \right\}
 $$

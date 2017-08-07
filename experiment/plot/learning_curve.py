@@ -14,8 +14,10 @@ labels = {
 
 
 def plot_learning_curves(results, path, name):
-    semeval_path = os.path.join(results, "SemEval", "metrics.csv")
+    semeval_path = os.path.join("results", "SemEval", "metrics.csv")
     semeval = pandas.read_csv(semeval_path)
+    if "auxFraction" in semeval:
+        semeval = semeval[semeval.auxFraction > .9]
     for root, _, filenames in os.walk(results):
         if root.endswith("SemEval"):
             continue
@@ -24,6 +26,8 @@ def plot_learning_curves(results, path, name):
                 aux_path = os.path.join(root, file)
                 aux_name = os.path.split(root)[-1].split("+")[-1]
                 aux_data = pandas.read_csv(aux_path)
+                if "auxFraction" in aux_data:
+                    aux_data = aux_data[aux_data.auxFraction > .9]
                 pyplot.figure(figsize=figure_size())
                 semeval.groupby("targetFraction").mean().f1.plot(
                     label="SemEval 2010 Task 8"
