@@ -9,9 +9,9 @@ We have explored extensions of Vapnik-Chervonenkis analysis to the multi-task le
 \\\\
 We have designed and carried out an experiment that tests the effectiveness of deep multi-task learning on a benchmark relation classification task. Specifically we have searched the research literature and found a convolutional neural network architecture that achieves good results for the relation classification problem. We found however that this architecture made multi-task learning by hard weight sharing impractical. For this reason we adapted this network architecture by proposing three weight sharing strategies:
 \begin{itemize}
-	\item Shared word and position embeddings, in which only the embedding matrices of the target and auxiliary model is shared.
-	\item Shared side channel convolutional filters, in which we extend the original architecture to a multi-channel convolutional network that allows sharing convolutional filters over a sentence matrix without appended relation argument position information.
-	\item Shared convolutional filters, in which we share convolutional filters across the augmented sentence matrix that contains information about the relation argument positions. This approach is only practically feasibly when the auxiliary task is another relation classification task.
+	\item Shared word and position embeddings in which only the embedding matrices of the target and auxiliary model is shared.
+	\item Shared side channel convolutional filters in which we extend the original architecture to a multi-channel convolutional network that allows sharing convolutional filters over a sentence matrix without appended relation argument position information.
+	\item Shared convolutional filters in which we share convolutional filters across the augmented sentence matrix that contains information about the relation argument positions. This approach is only practically feasibly when the auxiliary task is another relation classification task.
 \end{itemize}
 We have empirically compared the sample complexity dynamics of single-task learning and multi-task learning of the target task. Our results are mixed: The shared word and position embedding architecture does not in general lead to statistically significant improvements in target task generalization. The shared side channel architecture leads to occasional improvements of target task generalization. The weight sharing strategy that shares convolutional filters over the augmented sentence matrix reliably produces improvements in generalization error.
 \\\\
